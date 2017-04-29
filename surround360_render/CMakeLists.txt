@@ -550,7 +550,7 @@ IF (USE_ELIXIR)
     CPP_SRCS
     source/scanner_kernels/elixir_main.cpp
     PROTO_SRC source/scanner_kernels/surround360.proto)
-  ADD_EXECUTABLE(
+  add_executable(
     ElixirMain
     source/scanner_kernels/elixir_main.cpp
     )
