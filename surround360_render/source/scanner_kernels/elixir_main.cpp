@@ -69,7 +69,7 @@ namespace surround360 {
        *
        * So BatchedColumns is vector<vector<Element>>
        */
-    void execute(const std::vector<cv::Mat>& frame_col_mats,
+    void execute(std::vector<cv::Mat>& frame_col_mats,
                  const int camIdx,
                  std::vector<cv::Mat>& output_mats) {
       std::cout << "execute, frame_col_mats.size() == " << frame_col_mats.size()
@@ -182,6 +182,14 @@ namespace surround360 {
       }
     }
 
+
+    cv::Mat get_dummy_frame (int width, int height) {
+      int channels = 4;
+      int cv_type = CV_8U;
+      int cv_madetype = CV_MAKETYPE(cv_type, channels);
+
+      return cv::Mat(width, height, cv_madetype);
+    }
   private:
     surround360::proto::ProjectSphericalArgs args_;
     std::unique_ptr<RigDescription> rig_;
@@ -200,7 +208,6 @@ namespace surround360 {
 }
 
 int main() {
-
   surround360::proto::ProjectSphericalArgs args;
   args.set_eqr_width(8400);
   args.set_eqr_height(4096);
@@ -211,9 +218,8 @@ int main() {
   int channels = 4;
   int cv_type = CV_8U;
   int cv_madetype = CV_MAKETYPE(cv_type, channels);
-
-  cv::Mat *dummy_frame = new cv::Mat(args.eqr_width, args.eqr_height, cv_madetype);
-  frame_col_mats.push_back(*dummy_frame);
+  cv::Mat dummy_frame(args.eqr_width(), args.eqr_height(), cv_madetype);
+  frame_col_mats.push_back(dummy_frame);
   std::cout << "Made dummy frame" << std::endl;
 
 
