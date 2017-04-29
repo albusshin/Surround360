@@ -207,7 +207,7 @@ namespace surround360 {
 
 }
 
-int run() {
+int main(int argc, char *argv[]) {
   surround360::proto::ProjectSphericalArgs args;
   args.set_eqr_width(8400);
   args.set_eqr_height(4096);
