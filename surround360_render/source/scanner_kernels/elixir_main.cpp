@@ -1,11 +1,10 @@
-#include <stdint.h>
 #include "render/RigDescription.h"
 #include "render/ImageWarper.h"
 #include "source/scanner_kernels/surround360.pb.h"
 
 #include <opencv2/video.hpp>
+typedef int i32;
 
-typedef uint32 i32;
 /*
   NOTE
   python scripts/scanner_process_video.py
