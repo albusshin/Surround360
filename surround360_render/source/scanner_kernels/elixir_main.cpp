@@ -1,9 +1,12 @@
+#include <ctype.h>
+#include <unistd.h>
 #include "render/RigDescription.h"
 #include "render/ImageWarper.h"
 #include "source/scanner_kernels/surround360.pb.h"
 
 #include <opencv2/video.hpp>
 
+typedef i32 uint32;
 /*
   NOTE
   python scripts/scanner_process_video.py
@@ -44,15 +47,14 @@
 
 */
 
+#define endl std::endl
+
 namespace surround360 {
 
   class ProjectSphericalKernelCPUExtracted {
-    auto log = std::cout;
-    auto endl = std::endl;
   public:
-    ProjectSphericalKernelCPUExtracted(const ProjectSphericalArgs &args) :
-      args_(args) {
-
+    ProjectSphericalKernelCPUExtracted(const surround360::proto::ProjectSphericalArgs &args) {
+      args_ = args;
       // Initialize camera rig
       rig_.reset(new RigDescription(args_.camera_rig_path()));
 
@@ -60,7 +62,7 @@ namespace surround360 {
       vRadians_ = 2 * approximateFov(rig_->rigSideOnly, true);
     }
 
-    void reset() override {
+    void reset() {
       is_reset_ = true;
     }
 
@@ -73,12 +75,12 @@ namespace surround360 {
        */
     void execute(const std::vector<cv::Mat>& frame_col_mats,
                  const int camIdx,
-                 const std::vector<cv::Mat>& output_mats) {
-      log << "execute, frame_col_mats.size() == " << frame_col_mats.size()
+                 std::vector<cv::Mat>& output_mats) {
+      std::cout << "execute, frame_col_mats.size() == " << frame_col_mats.size()
           << ", camIdx == " << camIdx << endl;
 
       if (is_reset_) {
-        log << "is_reset_ == true" << endl;
+        std::cout << "is_reset_ == true" << endl;
         // Use the new camera id to update the spherical projection parameters
         is_reset_ = false;
 
@@ -122,11 +124,11 @@ namespace surround360 {
         }
       */
       i32 input_count = (i32)frame_col_mats.size();
-      log << "input_count == " << input_count << endl;
+      std::cout << "input_count == " << input_count << endl;
       size_t output_image_width = args_.eqr_width() * hRadians_ / (2 * M_PI);
       size_t output_image_height = args_.eqr_height() * vRadians_ / M_PI;
       size_t output_image_size = output_image_width * output_image_height * 4;
-      log << "output_image_width == " << output_image_width
+      std::cout << "output_image_width == " << output_image_width
           << ", output_image_height == " << output_image_height
           << ", output_image_size == " << output_image_size
           << endl;
@@ -141,11 +143,11 @@ namespace surround360 {
       int cv_madetype = CV_MAKETYPE(cv_type, channels);
 
       for (i32 i = 0; i < input_count; ++i) {
-        log << "iteration i = " << i << endl;
+        std::cout << "iteration i = " << i << endl;
         cv::Mat input = frame_col_mats[i];
         cv::Mat tmp;
         cv::cvtColor(input, tmp, CV_BGR2BGRA);
-        log << "after cvtColor()" << endl;
+        std::cout << "after cvtColor()" << endl;
 
         // NOTE: cv::Mat (int rows, int cols, int type)
         cv::Mat projection_image(output_image_height, output_image_width, cv_madetype);
@@ -169,7 +171,7 @@ namespace surround360 {
           rightAngle_,
           topAngle_,
           bottomAngle_);
-        log << "after bicubicRemapToSpherical" << endl;
+        std::cout << "after bicubicRemapToSpherical" << endl;
 
         output_mats.push_back(projection_image);
 
@@ -204,10 +206,10 @@ namespace surround360 {
 int main() {
 
   surround360::proto::ProjectSphericalArgs args;
-  args.eqr_width = 8400;
-  args.eqr_height = 4096;
-  args.camera_rig_path = "~/d/a/palace3/camera_rig.json";
-  ProjectSphericalKernelCPUExtracted project_kernel(args);
+  args.eqr_width(8400);
+  args.eqr_height(4096);
+  args.camera_rig_path("~/d/a/palace3/camera_rig.json");
+  surround360::ProjectSphericalKernelCPUExtracted project_kernel(args);
   std::vector<cv::Mat> frame_col_mats;
 
   int channels = 4;
@@ -225,6 +227,4 @@ int main() {
   project_kernel.execute(frame_col_mats, camera_id, output_mats);
   std::cout << "Done!" << std::endl;
   std::cout << output_mats.size() << std::endl;
-}
-
 }
