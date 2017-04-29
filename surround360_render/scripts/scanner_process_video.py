@@ -132,6 +132,7 @@ def project_tasks_join(db, videos, videos_idx):
   return tasks
 
 
+# kernel project_spherical_kernel_cpu
 def project_images(db, videos, videos_idx, render_params):
   jobs = []
   for i in range(len(video.tables())):
@@ -152,6 +153,7 @@ def project_images(db, videos, videos_idx, render_params):
   return db.run(jobs, 'surround360_spherical', force=True)
 
 
+# kernel temporal_optical_flow_kernel_cpu
 def compute_temporal_flow(db, overlap, render_params):
   jobs = []
   for i in range(len(overlap.tables())):
@@ -176,6 +178,7 @@ def compute_temporal_flow(db, overlap, render_params):
   return db.run(jobs, 'surround360_flow', force=True)
 
 
+# kernel render_stereo_panorama_chunks_kernel_cpu
 def render_stereo_panorama_chunks(db, overlap, flow, render_params):
   jobs = []
   for i in range(len(video.tables())):
@@ -206,6 +209,7 @@ def render_stereo_panorama_chunks(db, overlap, flow, render_params):
   return db.run(jobs, force=True)
 
 
+# kernel concat_panorama_chunks_kernel_cpu
 def concat_stereo_panorama_chunks(db, chunks, render_params, is_left):
   num_cams = 14
   left_inputs = []
@@ -238,6 +242,7 @@ def concat_stereo_panorama_chunks(db, chunks, render_params, is_left):
             name = 'surround360_pano_both')
 
   return db.run(job, force=True)
+
 
 def fused_project_flow_chunk_concat(db, videos, videos_idx, render_params,
                                     start, end):
