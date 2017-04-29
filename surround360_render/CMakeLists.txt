@@ -552,11 +552,12 @@ IF (USE_ELIXIR)
     ElixirMain
     LibVrCamera
     LibJSON
-    boost_filesystem
-    boost_system
-    folly
     gflags
     glog
+    boost_filesystem
+    boost_system
+    double-conversion
+    folly
     ${OpenCV_LIBS}
     ${PLATFORM_SPECIFIC_LIBS}
 )
