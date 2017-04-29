@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
   surround360::proto::ProjectSphericalArgs args;
   args.set_eqr_width(8400);
   args.set_eqr_height(4096);
-  args.set_camera_rig_path("~/d/a/palace3/camera_rig.json");
+  args.set_camera_rig_path("/home/ubuntu/d/a/palace3/camera_rig.json");
   surround360::ProjectSphericalKernelCPUExtracted project_kernel(args);
   std::vector<cv::Mat> frame_col_mats;
 
