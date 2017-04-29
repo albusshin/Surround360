@@ -543,15 +543,20 @@ IF (USE_SCANNER)
 ENDIF()
 
 IF (USE_ELIXIR)
-  SET(SCANNER_PATH "~/m/scanner/")
-  include(${SCANNER_PATH}/cmake/Util/Op.cmake)
-  build_op(
-    LIB_NAME elixir_main
-    CPP_SRCS
+  ADD_EXECUTABLE(
+    ElixirMain
     source/scanner_kernels/elixir_main.cpp
-    PROTO_SRC source/scanner_kernels/surround360.proto)
-  target_link_libraries(
+    )
+  TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
+  TARGET_LINK_LIBRARIES(
+    ElixirMain
     LibVrCamera
+    LibJSON
     folly
-    ${OpenCV_LIBS})
+    gflags
+    glog
+    ${OpenCV_LIBS}
+    ${PLATFORM_SPECIFIC_LIBS}
+)
+
 ENDIF()
