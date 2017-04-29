@@ -1,5 +1,4 @@
-#include <ctype.h>
-#include <unistd.h>
+#include <stdint.h>
 #include "render/RigDescription.h"
 #include "render/ImageWarper.h"
 #include "source/scanner_kernels/surround360.pb.h"
@@ -214,8 +213,8 @@ int main() {
   int cv_type = CV_8U;
   int cv_madetype = CV_MAKETYPE(cv_type, channels);
 
-  cv::Mat dummy_frame(args.eqr_width, args.eqr_height, cv_madetype);
-  frame_col_mats.push_back(dummy_frame);
+  cv::Mat *dummy_frame = new cv::Mat(args.eqr_width, args.eqr_height, cv_madetype);
+  frame_col_mats.push_back(*dummy_frame);
   std::cout << "Made dummy frame" << std::endl;
 
 
