@@ -552,6 +552,8 @@ IF (USE_ELIXIR)
     ElixirMain
     LibVrCamera
     LibJSON
+    boost_filesystem
+    boost_system
     folly
     gflags
     glog
