@@ -550,10 +550,6 @@ IF (USE_ELIXIR)
     CPP_SRCS
     source/scanner_kernels/elixir_main.cpp
     PROTO_SRC source/scanner_kernels/surround360.proto)
-  add_executable(
-    ElixirMain
-    source/scanner_kernels/elixir_main.cpp
-    )
   target_link_libraries(
     ElixirMain
     LibVrCamera
