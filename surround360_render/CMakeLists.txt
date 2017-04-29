@@ -3,6 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
 PROJECT(Surround360Render CXX)
 
 OPTION(USE_SCANNER "Enable using Scanner for distributed rendering" ON)
+OPTION(USE_ELIXIR "Enable using Elixir for fast rendering on Scanner" ON)
 
 FIND_PACKAGE(OpenCV)
 FIND_PACKAGE(Ceres REQUIRED)
@@ -524,7 +525,7 @@ TARGET_LINK_LIBRARIES(
 
 
 IF (USE_SCANNER)
-  SET(SCANNER_PATH "~/repos/scanner/")
+  SET(SCANNER_PATH "~/m/scanner/")
   include(${SCANNER_PATH}/cmake/Util/Op.cmake)
   build_op(
     LIB_NAME surround360kernels
@@ -536,6 +537,25 @@ IF (USE_SCANNER)
 
     PROTO_SRC source/scanner_kernels/surround360.proto)
   target_link_libraries(surround360kernels PUBLIC
+    LibVrCamera
+    folly
+    ${OpenCV_LIBS})
+ENDIF()
+
+IF (USE_ELIXIR)
+  SET(SCANNER_PATH "~/m/scanner/")
+  include(${SCANNER_PATH}/cmake/Util/Op.cmake)
+  build_op(
+    LIB_NAME elixir_main
+    CPP_SRCS
+    source/scanner_kernels/elixir_main.cpp
+    PROTO_SRC source/scanner_kernels/surround360.proto)
+  ADD_EXECUTABLE(
+    ElixirMain
+    source/scanner_kernels/elixir_main.cpp
+    )
+  target_link_libraries(
+    ElixirMain
     LibVrCamera
     folly
     ${OpenCV_LIBS})
