@@ -6,7 +6,7 @@
 
 #include <opencv2/video.hpp>
 
-typedef i32 uint32;
+typedef uint32 i32;
 /*
   NOTE
   python scripts/scanner_process_video.py
@@ -47,8 +47,6 @@ typedef i32 uint32;
 
 */
 
-#define endl std::endl
-
 namespace surround360 {
 
   class ProjectSphericalKernelCPUExtracted {
@@ -77,10 +75,10 @@ namespace surround360 {
                  const int camIdx,
                  std::vector<cv::Mat>& output_mats) {
       std::cout << "execute, frame_col_mats.size() == " << frame_col_mats.size()
-          << ", camIdx == " << camIdx << endl;
+          << ", camIdx == " << camIdx << std::endl;
 
       if (is_reset_) {
-        std::cout << "is_reset_ == true" << endl;
+        std::cout << "is_reset_ == true" << std::endl;
         // Use the new camera id to update the spherical projection parameters
         is_reset_ = false;
 
@@ -124,14 +122,14 @@ namespace surround360 {
         }
       */
       i32 input_count = (i32)frame_col_mats.size();
-      std::cout << "input_count == " << input_count << endl;
+      std::cout << "input_count == " << input_count << std::endl;
       size_t output_image_width = args_.eqr_width() * hRadians_ / (2 * M_PI);
       size_t output_image_height = args_.eqr_height() * vRadians_ / M_PI;
       size_t output_image_size = output_image_width * output_image_height * 4;
       std::cout << "output_image_width == " << output_image_width
           << ", output_image_height == " << output_image_height
           << ", output_image_size == " << output_image_size
-          << endl;
+          << std::endl;
 
 
 
@@ -143,11 +141,11 @@ namespace surround360 {
       int cv_madetype = CV_MAKETYPE(cv_type, channels);
 
       for (i32 i = 0; i < input_count; ++i) {
-        std::cout << "iteration i = " << i << endl;
+        std::cout << "iteration i = " << i << std::endl;
         cv::Mat input = frame_col_mats[i];
         cv::Mat tmp;
         cv::cvtColor(input, tmp, CV_BGR2BGRA);
-        std::cout << "after cvtColor()" << endl;
+        std::cout << "after cvtColor()" << std::endl;
 
         // NOTE: cv::Mat (int rows, int cols, int type)
         cv::Mat projection_image(output_image_height, output_image_width, cv_madetype);
@@ -171,7 +169,7 @@ namespace surround360 {
           rightAngle_,
           topAngle_,
           bottomAngle_);
-        std::cout << "after bicubicRemapToSpherical" << endl;
+        std::cout << "after bicubicRemapToSpherical" << std::endl;
 
         output_mats.push_back(projection_image);
 
@@ -206,9 +204,9 @@ namespace surround360 {
 int main() {
 
   surround360::proto::ProjectSphericalArgs args;
-  args.eqr_width(8400);
-  args.eqr_height(4096);
-  args.camera_rig_path("~/d/a/palace3/camera_rig.json");
+  args.set_eqr_width(8400);
+  args.set_eqr_height(4096);
+  args.set_camera_rig_path("~/d/a/palace3/camera_rig.json");
   surround360::ProjectSphericalKernelCPUExtracted project_kernel(args);
   std::vector<cv::Mat> frame_col_mats;
 
