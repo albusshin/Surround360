@@ -551,7 +551,6 @@ IF (USE_ELIXIR)
     source/scanner_kernels/elixir_main.cpp
     PROTO_SRC source/scanner_kernels/surround360.proto)
   target_link_libraries(
-    elixir_main
     LibVrCamera
     folly
     ${OpenCV_LIBS})
