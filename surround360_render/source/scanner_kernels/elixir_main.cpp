@@ -79,8 +79,9 @@ namespace surround360 {
        *
        * So BatchedColumns is vector<vector<Element>>
        */
-    cv::Mat& execute(cv::Mat& frame_col_mat,
-                     const int camIdx) {
+    void execute(cv::Mat& frame_col_mat,
+                     const int camIdx,
+                     cv::Mat& output_mat) {
       std::cout << "execute "
                 << ", camIdx == " << camIdx << std::endl;
 
@@ -150,7 +151,7 @@ namespace surround360 {
       std::cout << "after cvtColor()" << std::endl;
 
       // NOTE: cv::Mat (int rows, int cols, int type)
-      cv::Mat output_mat(output_image_height, output_image_width, cv_madetype);
+      output_mat(output_image_height, output_image_width, cv_madetype);
 
       /**
          NOTE
@@ -202,7 +203,7 @@ namespace surround360 {
 }
 
 std::string get_video_filename(int camId) {
-  assert(camId >= 0 && camId <= 16)
+  assert(camId >= 0 && camId <= 16);
   std::stringstream ss;
   ss << "/home/ubuntu/d/a/palace3/rgb/cam" << camId << "/vid.mp4";
   return ss.str();
@@ -223,7 +224,6 @@ cv::Mat& getOneFrame(std::string& filename) {
 
   cv::Mat mat();
   capture >> mat;
-  capture.close();
   return mat;
 }
 
@@ -252,14 +252,16 @@ int main(int argc, char *argv[]) {
 
   std::cout << "Before execution of kernel" << std::endl;
   // Calculate output_mat0
-  cv::Mat output_mat0 = project_kernel.execute(frame_col_mat0, 0);
+  cv::Mat output_mat0;
+  project_kernel.execute(frame_col_mat0, 0, output_mat0);
   std::cout << "Done output_mat0, width = "
             << output_mat0.cols
             << " height = "
             << output_mat0.rows
             << std::endl;
   // Calculate output_mat1
-  cv::Mat output_mat1 = project_kernel.execute(frame_col_mat1, 1);
+  cv::Mat output_mat1;
+  project_kernel.execute(frame_col_mat1, 1, output_mat1);
   std::cout << "Done output_mat1, width = "
             << output_mat1.cols
             << " height = "
@@ -279,11 +281,11 @@ int main(int argc, char *argv[]) {
 
   // TODO Counter-clockwise or clockwise?
   std::cout << "Before temporal_kernel.execute" << std::endl;
-  std::tuple<cv::Mat, cv::Mat>& flows = temporal_kernel.execute(frame_col_mat0, frame_col_mat1);
-  std::cout << "After temporal_kernel.execute" << std::endl;
+  cv::Mat left_flow;
+  cv::Mat right_flow;
 
-  cv::Mat &left_flow = flows.get<0>(flows);
-  cv::Mat &right_flow = flows.get<1>(flows);
+  temporal_kernel.execute(frame_col_mat0, frame_col_mat1, left_flow, right_flow);
+  std::cout << "After temporal_kernel.execute" << std::endl;
 
   std::cout << "After temporal_kernel.execute" << std::endl;
   std::cout << "Done left_flow, width = "

@@ -49,8 +49,10 @@ namespace surround360 {
         float(camImageWidth) * (overlapAngleDegrees / camFovHorizontalDegrees);
     }
 
-    std::tuple<cv::Mat, cv::Mat>& execute(cv::Mat& left_frame_col_mat,
-                                          cv::Mat& right_frame_col_mat) {
+    void execute(cv::Mat& left_frame_col_mat,
+                 cv::Mat& right_frame_col_mat,
+                 cv::Mat& left_flow,
+                 cv::Mat& right_flow) {
       assert(overlap_image_width_ != -1);
 
       size_t output_image_width = overlap_image_width_;
@@ -75,7 +77,6 @@ namespace surround360 {
 
       left_flow = novel_view_gen_->getFlowLtoR();
       right_flow = novel_view_gen_->getFlowRtoL();
-      return make_tuple<cv::Mat, cv::Mat>(left_flow, right_flow);
     }
 
   private:
