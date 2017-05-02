@@ -77,16 +77,17 @@ namespace surround360 {
       right_flow = novel_view_gen_->getFlowRtoL();
       return make_tuple<cv::Mat, cv::Mat>(left_flow, right_flow);
     }
-  }
 
-private:
-  surround360::proto::TemporalOpticalFlowArgs args_;
-  std::unique_ptr<RigDescription> rig_;
-  int overlap_image_width_;
+  private:
+    surround360::proto::TemporalOpticalFlowArgs args_;
+    std::unique_ptr<RigDescription> rig_;
+    int overlap_image_width_;
 
-  std::unique_ptr<NovelViewGenerator> novel_view_gen_;
-  cv::Mat prev_frame_flow_l_to_r_;
-  cv::Mat prev_frame_flow_r_to_l_;
-  cv::Mat prev_overlap_image_l_;
-  cv::Mat prev_overlap_image_r_;
-};
+    std::unique_ptr<NovelViewGenerator> novel_view_gen_;
+    cv::Mat prev_frame_flow_l_to_r_;
+    cv::Mat prev_frame_flow_r_to_l_;
+    cv::Mat prev_overlap_image_l_;
+    cv::Mat prev_overlap_image_r_;
+  };
+
+}
