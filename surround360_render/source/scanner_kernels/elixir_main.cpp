@@ -6,6 +6,9 @@
 #include <string>
 typedef int i32;
 
+
+//52.14.253.28
+
 /*
   NOTE
   python scripts/scanner_process_video.py
@@ -209,6 +212,8 @@ namespace surround360 {
 }
 
 int main(int argc, char *argv[]) {
+  std::cout << "Build Information --------------- " << endl;
+  std::cout << cv::getBuildInformation() << std::endl;
   surround360::proto::ProjectSphericalArgs args;
   args.set_eqr_width(8400);
   args.set_eqr_height(4096);
@@ -224,6 +229,7 @@ int main(int argc, char *argv[]) {
               << filename
               << " as cv::VideoCapture"
               << std::endl;
+    return -1;
   }
 
   int channels = 4;
