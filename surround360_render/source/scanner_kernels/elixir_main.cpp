@@ -215,12 +215,28 @@ int main(int argc, char *argv[]) {
   surround360::ProjectSphericalKernelCPUExtracted project_kernel(args);
   std::vector<cv::Mat> frame_col_mats;
 
+  string filename= "/home/ubuntu/d/a/palace3/rgb/cam0/vid.mp4";
+
+  cv::VideoCapture capture(filename);
+  if (!capture.isOpened) {
+    std::cerr << "ERROR opening file "
+              << filename
+              << " as cv::VideoCapture"
+              << std::endl;
+  }
+
   int channels = 4;
   int cv_type = CV_8U;
   int cv_madetype = CV_MAKETYPE(cv_type, channels);
-  cv::Mat dummy_frame(args.eqr_width(), args.eqr_height(), cv_madetype);
-  frame_col_mats.push_back(dummy_frame);
-  std::cout << "Made dummy frame" << std::endl;
+  cv::Mat framemat(args.eqr_width(), args.eqr_height(), cv_madetype);
+  capture >> framemat; // get new frame from video
+  frame_col_mats.push_back(framemat);
+  std::cout << "Made framemat framemat "
+            << " args.eqr_width = " << args.eqr_width()
+            << " args.eqr_height = " << args.eqr_height()
+            << " framemat.rows (height) == " << framemat.rows
+            << " framemat.cols (width) == " << framemat.cols
+            << std::endl;
 
 
   std::vector<cv::Mat> output_mats;
