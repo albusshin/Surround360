@@ -554,7 +554,6 @@ IF (USE_ELIXIR)
   ADD_EXECUTABLE(
     ElixirMain
     source/scanner_kernels/elixir_main.cpp
-    elixirmain
     )
   TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
   TARGET_LINK_LIBRARIES(
