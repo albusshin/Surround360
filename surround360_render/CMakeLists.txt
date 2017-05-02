@@ -548,8 +548,7 @@ IF (USE_ELIXIR)
   build_op(
     LIB_NAME elixirmain
     CPP_SRCS
-    source/scanner_kernels/temporal_extracted.cpp
-
+    source/scanner_kernels/elixir_main.cpp
     PROTO_SRC source/scanner_kernels/surround360.proto)
   ADD_EXECUTABLE(
     ElixirMain
