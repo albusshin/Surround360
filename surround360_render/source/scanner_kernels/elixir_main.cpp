@@ -80,8 +80,8 @@ namespace surround360 {
        * So BatchedColumns is vector<vector<Element>>
        */
     void execute(cv::Mat& frame_col_mat,
-                     const int camIdx,
-                     cv::Mat& output_mat) {
+                 const int camIdx,
+                 cv::Mat& output_mat) {
       std::cout << "execute "
                 << ", camIdx == " << camIdx << std::endl;
 
@@ -151,7 +151,7 @@ namespace surround360 {
       std::cout << "after cvtColor()" << std::endl;
 
       // NOTE: cv::Mat (int rows, int cols, int type)
-      output_mat(output_image_height, output_image_width, cv_madetype);
+      output_mat = cv::Mat(output_image_height, output_image_width, cv_madetype);
 
       /**
          NOTE
@@ -182,7 +182,6 @@ namespace surround360 {
        * }
        *
        */
-      return output_mat;
     }
 
   private:
@@ -202,7 +201,7 @@ namespace surround360 {
 
 }
 
-std::string get_video_filename(int camId) {
+std::string& get_video_filename(int camId) {
   assert(camId >= 0 && camId <= 16);
   std::stringstream ss;
   ss << "/home/ubuntu/d/a/palace3/rgb/cam" << camId << "/vid.mp4";
@@ -212,7 +211,8 @@ std::string get_video_filename(int camId) {
 const std::string CAMERA_RIG_PATH = "/home/ubuntu/d/a/palace3/camera_rig.json";
 const std::string FLOW_ALGO = "pixflow_search_20";
 
-cv::Mat& getOneFrame(std::string& filename) {
+void getOneFrame(std::string& filename,
+                 cv::Mat &output_mat) {
   cv::VideoCapture capture(filename);
   if (!capture.isOpened()) {
     std::cerr << "ERROR opening file "
@@ -222,9 +222,7 @@ cv::Mat& getOneFrame(std::string& filename) {
     assert(false);
   }
 
-  cv::Mat mat();
-  capture >> mat;
-  return mat;
+  capture >> output_mat;
 }
 
 
