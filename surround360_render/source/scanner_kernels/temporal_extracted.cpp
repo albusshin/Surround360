@@ -18,7 +18,6 @@ namespace surround360 {
       const surround360::proto::TemporalOpticalFlowArgs &args) {
 
       args_ = args;
-      work_item_size_ = work_item_size;
 
       rig_.reset(new RigDescription(args_.camera_rig_path()));
 
@@ -38,6 +37,7 @@ namespace surround360 {
 
     // TODO: must this function be invoked before adding a new frame?
     void new_frame_info(int camImageWidth, int camImageHeight) {
+      camImageHeight_ = camImageHeight;
       const int numCams = 14;
       const float cameraRingRadius = rig_->getRingRadius();
       const float camFovHorizontalDegrees =
@@ -56,7 +56,7 @@ namespace surround360 {
       assert(overlap_image_width_ != -1);
 
       size_t output_image_width = overlap_image_width_;
-      size_t output_image_height = frame_info_.height();
+      size_t output_image_height = camImageHeight_;
 
       cv::Mat left_overlap_input =
         left_frame_col_mat(cv::Rect(left_frame_col_mat.cols - overlap_image_width_, 0,
@@ -83,6 +83,7 @@ namespace surround360 {
     surround360::proto::TemporalOpticalFlowArgs args_;
     std::unique_ptr<RigDescription> rig_;
     int overlap_image_width_;
+    size_t camImageHeight_;
 
     std::unique_ptr<NovelViewGenerator> novel_view_gen_;
     cv::Mat prev_frame_flow_l_to_r_;

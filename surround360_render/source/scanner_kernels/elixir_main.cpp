@@ -201,7 +201,7 @@ namespace surround360 {
 
 }
 
-std::string& get_video_filename(int camId) {
+const std::string& get_video_filename(int camId) {
   assert(camId >= 0 && camId <= 16);
   std::stringstream ss;
   ss << "/home/ubuntu/d/a/palace3/rgb/cam" << camId << "/vid.mp4";
@@ -211,7 +211,7 @@ std::string& get_video_filename(int camId) {
 const std::string CAMERA_RIG_PATH = "/home/ubuntu/d/a/palace3/camera_rig.json";
 const std::string FLOW_ALGO = "pixflow_search_20";
 
-void getOneFrame(std::string& filename,
+void getOneFrame(const std::string& filename,
                  cv::Mat &output_mat) {
   cv::VideoCapture capture(filename);
   if (!capture.isOpened()) {
@@ -237,7 +237,8 @@ int main(int argc, char *argv[]) {
 
   // Extract frame from cam0
   // NOTE Using 6 and 7 here, in case cam0 is for something special
-  cv::Mat frame_col_mat0 = getOneFrame(get_video_filename(6));
+  cv::Mat frame_col_mat0;
+  getOneFrame(get_video_filename(6), frame_col_mat0);
   std::cout << "Made framemat framemat "
             << " project_args.eqr_width = " << project_args.eqr_width()
             << " project_args.eqr_height = " << project_args.eqr_height()
@@ -246,7 +247,8 @@ int main(int argc, char *argv[]) {
             << std::endl;
 
   // Extract frame from cam1
-  cv::Mat frame_col_mat1 = getOneFrame(get_video_filename(7));
+  cv::Mat frame_col_mat1;
+  etOneFrame(get_video_filename(7), frame_col_mat1);
 
   std::cout << "Before execution of kernel" << std::endl;
   // Calculate output_mat0
@@ -275,7 +277,7 @@ int main(int argc, char *argv[]) {
   surround360::TemporalOpticalFlowKernelCPUExtracted temporal_kernel(temporal_args);
 
   std::cout << "Before temporal_kernel.new_frame_info" << std::endl;
-  temporal_kernel.new_frame_info(frame_col_mat0.cols, fram_col_mat0.rows);
+  temporal_kernel.new_frame_info(frame_col_mat0.cols, frame_col_mat0.rows);
 
   // TODO Counter-clockwise or clockwise?
   std::cout << "Before temporal_kernel.execute" << std::endl;
