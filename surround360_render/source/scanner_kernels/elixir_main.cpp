@@ -337,7 +337,7 @@ int main(int argc, char *argv[]) {
   cv::Mat frame_col_mat1;
   std::string filename_1;
   get_video_filename(7, filename_1);
-  getOneFrame(fileanme_1, frame_col_mat1);
+  getOneFrame(filename_1, frame_col_mat1);
 
   std::cout << "Before execution of kernel" << std::endl;
   // Calculate output_mat0
