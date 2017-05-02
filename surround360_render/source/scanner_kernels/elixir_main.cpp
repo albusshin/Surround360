@@ -4,10 +4,15 @@
 
 #include <opencv2/video.hpp>
 #include <string>
+#include <tuple>
+
 typedef int i32;
 
 
-//52.14.253.28
+// c2.xlarge
+// 52.14.253.28
+// r4.8xlarge
+// 52.15.64.158
 
 /*
   NOTE
@@ -73,11 +78,10 @@ namespace surround360 {
        *
        * So BatchedColumns is vector<vector<Element>>
        */
-    void execute(std::vector<cv::Mat>& frame_col_mats,
-                 const int camIdx,
-                 std::vector<cv::Mat>& output_mats) {
-      std::cout << "execute, frame_col_mats.size() == " << frame_col_mats.size()
-          << ", camIdx == " << camIdx << std::endl;
+    cv::Mat& execute(cv::Mat& frame_col_mat,
+                     const int camIdx) {
+      std::cout << "execute "
+                << ", camIdx == " << camIdx << std::endl;
 
       if (is_reset_) {
         std::cout << "is_reset_ == true" << std::endl;
@@ -123,15 +127,13 @@ namespace surround360 {
         return CV_MAKETYPE(cv_type, channels);
         }
       */
-      i32 input_count = (i32)frame_col_mats.size();
-      std::cout << "input_count == " << input_count << std::endl;
       size_t output_image_width = args_.eqr_width() * hRadians_ / (2 * M_PI);
       size_t output_image_height = args_.eqr_height() * vRadians_ / M_PI;
       size_t output_image_size = output_image_width * output_image_height * 4;
       std::cout << "output_image_width == " << output_image_width
-          << ", output_image_height == " << output_image_height
-          << ", output_image_size == " << output_image_size
-          << std::endl;
+                << ", output_image_height == " << output_image_height
+                << ", output_image_size == " << output_image_size
+                << std::endl;
 
 
 
@@ -142,58 +144,46 @@ namespace surround360 {
       int cv_type = CV_8U;
       int cv_madetype = CV_MAKETYPE(cv_type, channels);
 
-      for (i32 i = 0; i < input_count; ++i) {
-        std::cout << "iteration i = " << i << std::endl;
-        cv::Mat input = frame_col_mats[i];
-        cv::Mat tmp;
-        cv::cvtColor(input, tmp, CV_BGR2BGRA);
-        std::cout << "after cvtColor()" << std::endl;
+      std::cout << "iteration i = " << i << std::endl;
+      cv::Mat tmp;
+      cv::cvtColor(frame_col_mat, tmp, CV_BGR2BGRA);
+      std::cout << "after cvtColor()" << std::endl;
 
-        // NOTE: cv::Mat (int rows, int cols, int type)
-        cv::Mat projection_image(output_image_height, output_image_width, cv_madetype);
+      // NOTE: cv::Mat (int rows, int cols, int type)
+      cv::Mat output_mat(output_image_height, output_image_width, cv_madetype);
 
-        /**
-           NOTE
-           void bicubicRemapToSpherical(
-           Mat& dst,
-           const Mat& src,
-           const Camera& camera,
-           const float leftAngle,
-           const float rightAngle,
-           const float topAngle,
-           const float bottomAngle);
-        */
-        surround360::warper::bicubicRemapToSpherical(
-          projection_image, //dst
-          tmp, //src
-          rig_->rigSideOnly[camIdx_],
-          leftAngle_,
-          rightAngle_,
-          topAngle_,
-          bottomAngle_);
-        std::cout << "after bicubicRemapToSpherical" << std::endl;
+      /**
+         NOTE
+         void bicubicRemapToSpherical(
+         Mat& dst,
+         const Mat& src,
+         const Camera& camera,
+         const float leftAngle,
+         const float rightAngle,
+         const float topAngle,
+         const float bottomAngle);
+      */
+      surround360::warper::bicubicRemapToSpherical(
+        output_mat, //dst
+        tmp, //src
+        rig_->rigSideOnly[camIdx_],
+        leftAngle_,
+        rightAngle_,
+        topAngle_,
+        bottomAngle_);
+      std::cout << "after bicubicRemapToSpherical" << std::endl;
 
-        output_mats.push_back(projection_image);
-
-        /**
-         * albusshin:
-         *
-         * inline void insert_frame(ElementList& column, Frame* frame) {
-         *   column.push_back(::scanner::Element{frame});
-         * }
-         *
-         */
-      }
+      /**
+       * albusshin:
+       *
+       * inline void insert_frame(ElementList& column, Frame* frame) {
+       *   column.push_back(::scanner::Element{frame});
+       * }
+       *
+       */
+      return output_mat
     }
 
-
-    cv::Mat get_dummy_frame (int width, int height) {
-      int channels = 4;
-      int cv_type = CV_8U;
-      int cv_madetype = CV_MAKETYPE(cv_type, channels);
-
-      return cv::Mat(width, height, cv_madetype);
-    }
   private:
     surround360::proto::ProjectSphericalArgs args_;
     std::unique_ptr<RigDescription> rig_;
@@ -211,45 +201,101 @@ namespace surround360 {
 
 }
 
-int main(int argc, char *argv[]) {
-  std::cout << "Build Information --------------- " << std::endl;
-  std::cout << cv::getBuildInformation() << std::endl;
-  surround360::proto::ProjectSphericalArgs args;
-  args.set_eqr_width(8400);
-  args.set_eqr_height(4096);
-  args.set_camera_rig_path("/home/ubuntu/d/a/palace3/camera_rig.json");
-  surround360::ProjectSphericalKernelCPUExtracted project_kernel(args);
-  std::vector<cv::Mat> frame_col_mats;
+std::string get_video_filename(int camId) {
+  assert(camId >= 0 && camId <= 16)
+  std::stringstream ss;
+  ss << "/home/ubuntu/d/a/palace3/rgb/cam" << camId << "/vid.mp4";
+  return ss.str();
+}
 
-  std::string filename= "/home/ubuntu/d/a/palace3/rgb/cam0/vid.mp4";
+const std::string CAMERA_RIG_PATH = "/home/ubuntu/d/a/palace3/camera_rig.json";
+const std::string FLOW_ALGO = "pixflow_search_20";
 
+cv::Mat& getOneFrame(string filename) {
   cv::VideoCapture capture(filename);
   if (!capture.isOpened()) {
     std::cerr << "ERROR opening file "
               << filename
               << " as cv::VideoCapture"
               << std::endl;
-    return -1;
+    assert(false);
   }
 
-  int channels = 4;
-  int cv_type = CV_8U;
-  int cv_madetype = CV_MAKETYPE(cv_type, channels);
-  cv::Mat framemat(args.eqr_width(), args.eqr_height(), cv_madetype);
-  capture >> framemat; // get new frame from video
-  frame_col_mats.push_back(framemat);
+  cv::Mat mat();
+  capture >> mat;
+  capture.close();
+  return mat;
+}
+
+
+int main(int argc, char *argv[]) {
+
+  // First step arg
+  surround360::proto::ProjectSphericalArgs project_args;
+  project_args.set_eqr_width(8400);
+  project_args.set_eqr_height(4096);
+  project_args.set_camera_rig_path(CAMERA_RIG_PATH);
+  surround360::ProjectSphericalKernelCPUExtracted project_kernel(project_args);
+
+  // Extract frame from cam0
+  // NOTE Using 6 and 7 here, in case cam0 is for something special
+  cv::Mat frame_col_mat0 = getOneFrame(get_video_filename(6));
   std::cout << "Made framemat framemat "
-            << " args.eqr_width = " << args.eqr_width()
-            << " args.eqr_height = " << args.eqr_height()
-            << " framemat.rows (height) == " << framemat.rows
-            << " framemat.cols (width) == " << framemat.cols
+            << " project_args.eqr_width = " << project_args.eqr_width()
+            << " project_args.eqr_height = " << project_args.eqr_height()
+            << " frame_col_mat0.rows (height) == " << frame_col_mat0.rows
+            << " frame_col_mat0.cols (width) == " << frame_col_mat0.cols
             << std::endl;
 
+  // Extract frame from cam1
+  cv::Mat frame_col_mat1 = getOneFrame(get_video_filename(7));
 
-  std::vector<cv::Mat> output_mats;
-  int camera_id = 0;
   std::cout << "Before execution of kernel" << std::endl;
-  project_kernel.execute(frame_col_mats, camera_id, output_mats);
-  std::cout << "Done!" << std::endl;
-  std::cout << output_mats.size() << std::endl;
+  // Calculate output_mat0
+  cv::Mat output_mat0 = project_kernel.execute(frame_col_mat0, 0);
+  std::cout << "Done output_mat0, width = "
+            << output_mat0.cols
+            << " height = "
+            << output_mat0.rows
+            << std::endl;
+  // Calculate output_mat1
+  cv::Mat output_mat1 = project_kernel.execute(frame_col_mat1, 1);
+  std::cout << "Done output_mat1, width = "
+            << output_mat1.cols
+            << " height = "
+            << output_mat1.rows
+            << std::endl;
+
+  // Second step arg
+  surround360::proto::TemporalOpticalFlowArgs temporal_args;
+
+  temporal_args.set_camera_rig_path(CAMERA_RIG_PATH);
+  temporal_args.set_flow_algo(FLOW_ALGO);
+
+  surround360::TemporalOpticalFlowKernelCPUExtracted temporal_kernel(temporal_args);
+
+  std::cout << "Before temporal_kernel.new_frame_info" << std::endl;
+  temporal_kernel.new_frame_info(frame_col_mat0.cols, fram_col_mat0.rows);
+
+  // TODO Counter-clockwise or clockwise?
+  std::cout << "Before temporal_kernel.execute" << std::endl;
+  std::tuple<cv::Mat, cv::Mat>& flows = temporal_kernel.execute(frame_col_mat0, frame_col_mat1);
+  std::cout << "After temporal_kernel.execute" << std::endl;
+
+  cv::Mat &left_flow = flows.get<0>(flows);
+  cv::Mat &right_flow = flows.get<1>(flows);
+
+  std::cout << "After temporal_kernel.execute" << std::endl;
+  std::cout << "Done left_flow, width = "
+            << left_flow.cols
+            << " height = "
+            << left_flow.rows
+            << std::endl;
+
+  std::cout << "Done right_flow, width = "
+            << right_flow.cols
+            << " height = "
+            << right_flow.rows
+            << std::endl;
+
 }
