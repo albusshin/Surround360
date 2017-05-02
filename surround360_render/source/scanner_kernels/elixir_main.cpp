@@ -4,6 +4,7 @@
 
 #include <opencv2/video.hpp>
 #include <string>
+#include <sstream>
 #include <tuple>
 
 typedef int i32;
@@ -144,7 +145,6 @@ namespace surround360 {
       int cv_type = CV_8U;
       int cv_madetype = CV_MAKETYPE(cv_type, channels);
 
-      std::cout << "iteration i = " << i << std::endl;
       cv::Mat tmp;
       cv::cvtColor(frame_col_mat, tmp, CV_BGR2BGRA);
       std::cout << "after cvtColor()" << std::endl;
@@ -181,7 +181,7 @@ namespace surround360 {
        * }
        *
        */
-      return output_mat
+      return output_mat;
     }
 
   private:
@@ -211,7 +211,7 @@ std::string get_video_filename(int camId) {
 const std::string CAMERA_RIG_PATH = "/home/ubuntu/d/a/palace3/camera_rig.json";
 const std::string FLOW_ALGO = "pixflow_search_20";
 
-cv::Mat& getOneFrame(string filename) {
+cv::Mat& getOneFrame(std::string& filename) {
   cv::VideoCapture capture(filename);
   if (!capture.isOpened()) {
     std::cerr << "ERROR opening file "
