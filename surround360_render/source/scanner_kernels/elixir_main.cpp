@@ -212,7 +212,7 @@ namespace surround360 {
 }
 
 int main(int argc, char *argv[]) {
-  std::cout << "Build Information --------------- " << endl;
+  std::cout << "Build Information --------------- " << std::endl;
   std::cout << cv::getBuildInformation() << std::endl;
   surround360::proto::ProjectSphericalArgs args;
   args.set_eqr_width(8400);
