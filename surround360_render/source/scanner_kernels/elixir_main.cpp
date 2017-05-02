@@ -248,7 +248,7 @@ int main(int argc, char *argv[]) {
 
   // Extract frame from cam1
   cv::Mat frame_col_mat1;
-  etOneFrame(get_video_filename(7), frame_col_mat1);
+  getOneFrame(get_video_filename(7), frame_col_mat1);
 
   std::cout << "Before execution of kernel" << std::endl;
   // Calculate output_mat0

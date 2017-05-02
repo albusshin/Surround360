@@ -549,13 +549,12 @@ IF (USE_ELIXIR)
     LIB_NAME elixirmain
     CPP_SRCS
     source/scanner_kernels/temporal_extracted.cpp
-    source/scanner_kernels/elixir_main.cpp
 
     PROTO_SRC source/scanner_kernels/surround360.proto)
   ADD_EXECUTABLE(
     ElixirMain
-    source/scanner_kernels/temporal_extracted.cpp
     source/scanner_kernels/elixir_main.cpp
+    elixirmain
     )
   TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
   TARGET_LINK_LIBRARIES(
