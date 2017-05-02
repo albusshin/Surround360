@@ -286,11 +286,11 @@ namespace surround360 {
 
 }
 
-const std::string& get_video_filename(int camId) {
+void get_video_filename(int camId, std::string& outstr) {
   assert(camId >= 0 && camId <= 16);
   std::stringstream ss;
   ss << "/home/ubuntu/d/a/palace3/rgb/cam" << camId << "/vid.mp4";
-  return ss.str();
+  ss >> outstr;
 }
 
 const std::string CAMERA_RIG_PATH = "/home/ubuntu/d/a/palace3/camera_rig.json";
@@ -323,7 +323,9 @@ int main(int argc, char *argv[]) {
   // Extract frame from cam0
   // NOTE Using 6 and 7 here, in case cam0 is for something special
   cv::Mat frame_col_mat0;
-  getOneFrame(get_video_filename(6), frame_col_mat0);
+  std::string filename_0;
+  get_video_filename(6, filename_0);
+  getOneFrame(filename_0, frame_col_mat0);
   std::cout << "Made framemat framemat "
             << " project_args.eqr_width = " << project_args.eqr_width()
             << " project_args.eqr_height = " << project_args.eqr_height()
@@ -333,7 +335,9 @@ int main(int argc, char *argv[]) {
 
   // Extract frame from cam1
   cv::Mat frame_col_mat1;
-  getOneFrame(get_video_filename(7), frame_col_mat1);
+  std::string filename_1;
+  get_video_filename(7, filename_1);
+  getOneFrame(fileanme_1, frame_col_mat1);
 
   std::cout << "Before execution of kernel" << std::endl;
   // Calculate output_mat0
