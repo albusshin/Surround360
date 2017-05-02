@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
   std::string filename= "/home/ubuntu/d/a/palace3/rgb/cam0/vid.mp4";
 
   cv::VideoCapture capture(filename);
-  if (!capture.isOpened) {
+  if (!capture.isOpened()) {
     std::cerr << "ERROR opening file "
               << filename
               << " as cv::VideoCapture"
