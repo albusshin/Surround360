@@ -3,6 +3,7 @@
 #include "source/scanner_kernels/surround360.pb.h"
 
 #include <opencv2/video.hpp>
+#include <string>
 typedef int i32;
 
 /*
@@ -215,7 +216,7 @@ int main(int argc, char *argv[]) {
   surround360::ProjectSphericalKernelCPUExtracted project_kernel(args);
   std::vector<cv::Mat> frame_col_mats;
 
-  string filename= "/home/ubuntu/d/a/palace3/rgb/cam0/vid.mp4";
+  std::string filename= "/home/ubuntu/d/a/palace3/rgb/cam0/vid.mp4";
 
   cv::VideoCapture capture(filename);
   if (!capture.isOpened) {
