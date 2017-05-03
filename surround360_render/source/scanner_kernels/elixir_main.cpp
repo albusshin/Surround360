@@ -748,6 +748,6 @@ int main(int argc, char *argv[]) {
             << (end - start)
             << std::endl;
 
-  cv::imwrite( "~/o/panoL.jpg", panoL );
-  cv::imwrite( "~/o/panoR.jpg", panoR );
+  cv::imwrite( "/home/ubuntu/o/panoL.jpg", panoL);
+  cv::imwrite( "/home/ubuntu/o/panoR.jpg", panoR);
 }
