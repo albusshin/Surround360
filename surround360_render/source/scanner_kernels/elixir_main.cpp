@@ -538,11 +538,11 @@ int main(int argc, char *argv[]) {
               << "Done project["
               << i
               << "] = "
-              << project[i].cols
+              << projects[i].cols
               << " * "
-              << project[i].rows
+              << projects[i].rows
               << " * "
-              << project[i].channels()
+              << projects[i].channels()
               << std::endl;
   }
 
