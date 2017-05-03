@@ -562,7 +562,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < numCamera; ++i) {
     surround360::TemporalOpticalFlowKernelCPUExtracted *temporal_kernel =
       new surround360::TemporalOpticalFlowKernelCPUExtracted(temporal_args);
-    temporal_kernels[i]->push_back(temporal_kernel);
+    temporal_kernels.push_back(temporal_kernel);
     // TODO Counter-clockwise or clockwise?
     cv::Mat& left_project = projects[i];
     cv::Mat& right_project = projects[(i + 1) % numCamera];
@@ -615,7 +615,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < numCamera; ++i) {
     surround360::RenderStereoPanoramaChunkKernelCPUExtracted *render_kernel = new
       surround360::RenderStereoPanoramaChunkKernelCPUExtracted(render_args);
-    render_kernels->push_back(render_kernel);
+    render_kernels.push_back(render_kernel);
     std::cout << "[Main]\t"
               << "Before render_kernel.new_frame_info"
               <<"["
