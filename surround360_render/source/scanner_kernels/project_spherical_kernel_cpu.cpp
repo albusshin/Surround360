@@ -69,7 +69,7 @@ class ProjectSphericalKernelCPU : public VideoKernel {
                 << " * "
                 << left_input.rows
                 << " * "
-                << left_input.channels
+                << left_input.channels()
                 << std::endl;
 
       cv::Mat tmp;

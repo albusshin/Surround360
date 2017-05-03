@@ -254,7 +254,7 @@ namespace surround360 {
                 << " * "
                 << left_input.rows
                 << " * "
-                << left_input.channels
+                << left_input.channels()
                 << std::endl;
 
       cv::Mat left_overlap_input =
@@ -269,7 +269,7 @@ namespace surround360 {
                 << " * "
                 << left_overlap_input.rows
                 << " * "
-                << left_overlap_input.channels
+                << left_overlap_input.channels()
                 << std::endl;
 
       novel_view_gen_->prepare(left_overlap_input, right_overlap_input,
