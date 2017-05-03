@@ -544,7 +544,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Before execution of kernel" << std::endl;
     // Calculate right project
-    project_kernels[i]->execute(frame_col_mats[i], i, projects[i]);
+    project_kernels[i]->execute(frame_col_mats[i], cameraId, projects[i]);
     std::cout << "[Main]\t"
               << "Done project["
               << i
@@ -581,7 +581,7 @@ int main(int argc, char *argv[]) {
     temporal_kernels.push_back(temporal_kernel);
     // TODO Counter-clockwise or clockwise?
     cv::Mat& left_project = projects[i];
-    cv::Mat& right_project = projects[(i + 1) % numCamera];
+    cv::Mat& right_project = projects[(i - 1) % numCamera];
 
     std::cout << "[Main]\t"
               << "Before temporal_kernel.new_frame_info"
@@ -658,7 +658,7 @@ int main(int argc, char *argv[]) {
               << std::endl;
 
     // TODO Counter-clockwise or clockwise?
-    render_kernels[i]->execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkLs[i], chunkRs[i]);
+    render_kernels[i]->execute(projects[i], projects[(i - 1) % numCamera], left_flows[i], right_flows[i], chunkLs[i], chunkRs[i]);
 
     std::cout << "[Main]\t"
               << "After render_kernel.execute"
