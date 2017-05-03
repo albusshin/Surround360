@@ -98,7 +98,7 @@ class ConcatPanoramaChunksKernelCPU : public VideoKernel {
   }
 
   private:
-    static int i = 0;
+    static int i; 
     surround360::proto::ConcatPanoramaChunksArgs args_;
     std::unique_ptr<RigDescription> rig_;
     DeviceHandle device_;
