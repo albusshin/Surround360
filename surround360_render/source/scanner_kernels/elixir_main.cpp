@@ -381,8 +381,6 @@ namespace surround360 {
       size_t output_image_height = camImageHeight_;
       size_t output_image_size =
         output_image_width * output_image_height * 4;
-      FrameInfo info(output_image_height, output_image_width, 4, FrameType::U8);
-      std::vector<Frame*> frames = new_frames(device_, info, input_count * 2);
 
       cv::Mat left_overlap_input =
         left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
