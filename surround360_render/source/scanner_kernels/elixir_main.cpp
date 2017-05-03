@@ -523,11 +523,13 @@ int main(int argc, char *argv[]) {
 
   std::vector<cv::Mat> projects(numCamera, cv::Mat());
 
+  int offset = 1;
   for (int i = 0; i < numCamera; ++i) {
+    int cameraId = i + offset;
     surround360::ProjectSphericalKernelCPUExtracted *project_kernel =
       new surround360::ProjectSphericalKernelCPUExtracted(project_args);
     project_kernels.push_back(project_kernel);
-    get_video_filename(i, filenames[i]);
+    get_video_filename(cameraId, filenames[i]);
     getOneFrame(filenames[i], frame_col_mats[i]);
     std::cout << "[Main]\t"
               << "Made frame_col_mat["
@@ -542,7 +544,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Before execution of kernel" << std::endl;
     // Calculate right project
-    project_kernels[i]->execute(frame_col_mats[i], i, projects[i]);
+    project_kernels[i]->execute(frame_col_mats[i], cameraId, projects[i]);
     std::cout << "[Main]\t"
               << "Done project["
               << i
