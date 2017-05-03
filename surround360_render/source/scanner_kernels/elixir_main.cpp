@@ -8,6 +8,7 @@
 #include <opencv2/video.hpp>
 #include <string>
 #include <sstream>
+#include <ctime>
 
 typedef int i32;
 
@@ -504,6 +505,12 @@ int main(int argc, char *argv[]) {
 
   const int numCamera = 14;
 
+  time_t start = time(0);
+  std::cout << "[Main]\t"
+            << "start time: "
+            << start
+            << std::endl;
+
   // First step arg
   surround360::proto::ProjectSphericalArgs project_args;
   project_args.set_eqr_width(8400);
@@ -547,6 +554,11 @@ int main(int argc, char *argv[]) {
               << projects[i].channels()
               << std::endl;
   }
+  time_t after_projects = time(0);
+  std::cout << "[Main]\t"
+            << " after_projects: "
+            << after_projects 
+            << std::endl;
 
   // Second step arg
   surround360::proto::TemporalOpticalFlowArgs temporal_args;
@@ -596,6 +608,12 @@ int main(int argc, char *argv[]) {
               << left_flows[i].channels()
               << std::endl;
   }
+
+  time_t after_temporal = time(0);
+  std::cout << "[Main]\t"
+            << " after_temporal: "
+            << after_temporal 
+            << std::endl;
 
   // Third step arg
   surround360::proto::RenderStereoPanoramaChunkArgs render_args;
@@ -658,6 +676,12 @@ int main(int argc, char *argv[]) {
 
   }
 
+  time_t after_render = time(0);
+  std::cout << "[Main]\t"
+            << " after_render: "
+            << after_render 
+            << std::endl;
+
   surround360::proto::ConcatPanoramaChunksArgs concat_args_left;
   concat_args_left.set_camera_rig_path(CAMERA_RIG_PATH);
   concat_args_left.set_eqr_width(8400);
@@ -706,5 +730,11 @@ int main(int argc, char *argv[]) {
             << panoR.rows
             << " * "
             << panoR.channels()
+            << std::endl;
+
+  time_t end = time(0);
+  std::cout << "[Main]\t"
+            << "end time: "
+            << end 
             << std::endl;
 }
