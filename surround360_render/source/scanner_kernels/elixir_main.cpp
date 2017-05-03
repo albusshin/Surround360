@@ -666,7 +666,7 @@ int main(int argc, char *argv[]) {
               << "]"
               << std::endl;
 
-    render_kernels[i]->execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkLs[i], chunkRs[i]);
+    render_kernels[i]->execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkRs[i], chunkLs[i]);
 
     std::cout << "[Main]\t"
               << "After render_kernel.execute"
