@@ -544,7 +544,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Before execution of kernel" << std::endl;
     // Calculate right project
-    project_kernels[i]->execute(frame_col_mats[i], cameraId, projects[i]);
+    project_kernels[i]->execute(frame_col_mats[i], i, projects[i]);
     std::cout << "[Main]\t"
               << "Done project["
               << i
