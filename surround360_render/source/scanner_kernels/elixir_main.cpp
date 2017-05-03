@@ -537,7 +537,7 @@ int main(int argc, char *argv[]) {
               << ", filenames["
               << i
               << "] = "
-              << filenames[i];
+              << filenames[i]
               << std::endl;
 
     getOneFrame(filenames[i], frame_col_mats[i]);
