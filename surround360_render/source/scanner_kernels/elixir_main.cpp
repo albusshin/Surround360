@@ -528,8 +528,8 @@ int main(int argc, char *argv[]) {
               << " * "
               << frame_col_mats[i].cols
               << " * "
-              << frame_col_mats[i].channels();
-    << std::endl;
+              << frame_col_mats[i].channels()
+              << std::endl;
 
     std::cout << "Before execution of kernel" << std::endl;
     // Calculate right project
@@ -538,11 +538,11 @@ int main(int argc, char *argv[]) {
               << "Done project["
               << i
               << "] = "
-              << left_project.cols
+              << project[i].cols
               << " * "
-              << left_project.rows
+              << project[i].rows
               << " * "
-              << left_project.channels()
+              << project[i].channels()
               << std::endl;
   }
 
@@ -569,7 +569,7 @@ int main(int argc, char *argv[]) {
               << i
               << "]"
               << std::endl;
-    temporal_kernel.new_frame_info(left_project.cols, left_project.rows);
+    temporal_kernels[i].new_frame_info(left_project.cols, left_project.rows);
 
     std::cout << "[Main]\t"
               << "Before temporal_kernel.execute"
@@ -578,18 +578,18 @@ int main(int argc, char *argv[]) {
               << "]"
               << std::endl;
 
-    temporal_kernel.execute(left_project, right_project, left_flows[i], right_flows[i]);
+    temporal_kernels[i].execute(left_project, right_project, left_flows[i], right_flows[i]);
 
     std::cout << "[Main]\t"
-              << "Done left_flow"
+              << "Done left_flows"
               <<"["
               << i
               << "] = "
-              << left_flow.cols
+              << left_flows[i].cols
               << " * "
-              << left_flow.rows
+              << left_flows[i].rows
               << " * "
-              << left_flow.channels()
+              << left_flows[i].channels()
               << std::endl;
   }
 
@@ -627,7 +627,7 @@ int main(int argc, char *argv[]) {
               << std::endl;
 
     // TODO Counter-clockwise or clockwise?
-    render_kernel.execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkLs[i], chunkRs[i]);
+    render_kernels[i].execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkLs[i], chunkRs[i]);
 
     std::cout << "[Main]\t"
               << "After render_kernel.execute"
