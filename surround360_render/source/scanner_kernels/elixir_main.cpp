@@ -3,6 +3,12 @@
 #include "optical_flow/NovelView.h"
 #include "util/MathUtil.h"
 #include "source/scanner_kernels/surround360.pb.h"
+#include "optical_flow/NovelView.h"
+a
+#include "scanner/api/kernel.h"
+#include "scanner/api/op.h"
+#include "scanner/util/memory.h"
+#include "scanner/util/opencv.h"
 
 #include <opencv2/video.hpp>
 #include <string>
@@ -300,7 +306,7 @@ namespace surround360 {
     surround360::proto::TemporalOpticalFlowArgs args_;
     std::unique_ptr<RigDescription> rig_;
     int overlap_image_width_;
-    size_t camImageHeight_;
+    int camImageHeight_;
 
     std::unique_ptr<NovelViewGenerator> novel_view_gen_;
     cv::Mat prev_frame_flow_l_to_r_;
@@ -309,6 +315,107 @@ namespace surround360 {
     cv::Mat prev_overlap_image_r_;
   };
 
+  class RenderStereoPanoramaChunkKernelCPUExtracted {
+  public:
+    RenderStereoPanoramaChunkKernelCPUExtracted(surround360::proto::RenderStereoPanoramaChunkArgs args) {
+      args_ = args;
+
+      rig_.reset(new RigDescription(args_.camera_rig_path()));
+
+      overlap_image_width_ = -1;
+      novel_view_gen_.reset(
+        new NovelViewGeneratorAsymmetricFlow(args_.flow_algo()));
+    }
+
+    void new_frame_info(int camImageWidth, int camImageHeight) {
+      camImageHeight_ = camImageHeight;
+
+      const int numCams = 14;
+      const float cameraRingRadius = rig_->getRingRadius();
+      const float camFovHorizontalDegrees =
+        2 * approximateFov(rig_->rigSideOnly, false) * (180 / M_PI);
+      fov_horizontal_radians_ = toRadians(camFovHorizontalDegrees);
+      const float overlapAngleDegrees =
+        (camFovHorizontalDegrees * float(numCams) - 360.0) / float(numCams);
+      overlap_image_width_ = float(camImageWidth) *
+        (overlapAngleDegrees / camFovHorizontalDegrees);
+      num_novel_views_ =
+        camImageWidth - overlap_image_width_; // per image pair
+
+      const float v =
+        atanf(args_.zero_parallax_dist() / (args_.interpupilary_dist() / 2.0f));
+      const float psi =
+        asinf(sinf(v) * (args_.interpupilary_dist() / 2.0f) / cameraRingRadius);
+      const float vergeAtInfinitySlabDisplacement =
+        psi * (float(camImageWidth) / fov_horizontal_radians_);
+      const float theta = -M_PI / 2.0f + v + psi;
+      const float zeroParallaxNovelViewShiftPixels =
+        float(args_.eqr_width()) * (theta / (2.0f * M_PI));
+
+      int currChunkX = 0;
+      lazy_view_buffer_.reset(new LazyNovelViewBuffer(args_.eqr_width() / numCams,
+                                                      camImageHeight));
+      for (int nvIdx = 0; nvIdx < num_novel_views_; ++nvIdx) {
+        const float shift = float(nvIdx) / float(num_novel_views_);
+        const float slabShift =
+          float(camImageWidth) * 0.5f - float(num_novel_views_ - nvIdx);
+
+        for (int v = 0; v < camImageHeight; ++v) {
+          lazy_view_buffer_->warpL[currChunkX][v] =
+            Point3f(slabShift + vergeAtInfinitySlabDisplacement, v, shift);
+          lazy_view_buffer_->warpR[currChunkX][v] =
+            Point3f(slabShift - vergeAtInfinitySlabDisplacement, v, shift);
+        }
+        ++currChunkX;
+      }
+    }
+
+    void execute(cv::Mat& left_input,
+                 cv::Mat& right_input,
+                 cv::Mat& left_flow,
+                 cv::Mat& right_flow,
+                 cv::Mat& chunkL,
+                 cv::Mat& chunkR) {
+      assert(overlap_image_width_ != -1);
+
+      size_t output_image_width = num_novel_views_;
+      size_t output_image_height = camImageHeight_;
+      size_t output_image_size =
+        output_image_width * output_image_height * 4;
+      FrameInfo info(output_image_height, output_image_width, 4, FrameType::U8);
+      std::vector<Frame*> frames = new_frames(device_, info, input_count * 2);
+
+      cv::Mat left_overlap_input =
+        left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
+                            overlap_image_width_, left_input.rows));
+      cv::Mat right_overlap_input =
+        right_input(cv::Rect(0, 0,
+                             overlap_image_width_, right_input.rows));
+
+
+      // Initialize NovelViewGenerator with images and flow since we are
+      // bypassing the prepare method
+      novel_view_gen_->setImageL(left_overlap_input);
+      novel_view_gen_->setImageR(right_overlap_input);
+      novel_view_gen_->setFlowLtoR(left_flow);
+      novel_view_gen_->setFlowRtoL(right_flow);
+      std::pair<Mat, Mat> lazyNovelChunksLR =
+        novel_view_gen_->combineLazyNovelViews(*lazy_view_buffer_.get());
+      chunkL = lazyNovelChunksLR.first;
+      chunkR = lazyNovelChunksLR.second;
+    }
+
+  private:
+    int camImageHeight_;
+    surround360::proto::RenderStereoPanoramaChunkArgs args_;
+    std::unique_ptr<RigDescription> rig_;
+    float fov_horizontal_radians_;
+    int overlap_image_width_;
+    int num_novel_views_;
+
+    std::unique_ptr<NovelViewGenerator> novel_view_gen_;
+    std::unique_ptr<LazyNovelViewBuffer> lazy_view_buffer_;
+  };
 
 }
 
@@ -366,21 +473,25 @@ int main(int argc, char *argv[]) {
   getOneFrame(filename_1, frame_col_mat1);
 
   std::cout << "Before execution of kernel" << std::endl;
-  // Calculate output_mat0
-  cv::Mat output_mat0;
-  project_kernel.execute(frame_col_mat0, 0, output_mat0);
-  std::cout << "Done output_mat0, width = "
-            << output_mat0.cols
-            << " height = "
-            << output_mat0.rows
+  // Calculate left_project
+  cv::Mat left_project;
+  project_kernel.execute(frame_col_mat0, 0, left_project);
+  std::cout << "Done left_project = "
+            << left_project.cols
+            << " * "
+            << left_project.rows
+            << " * "
+            << left_project.channels()
             << std::endl;
-  // Calculate output_mat1
-  cv::Mat output_mat1;
-  project_kernel.execute(frame_col_mat1, 1, output_mat1);
-  std::cout << "Done output_mat1, width = "
-            << output_mat1.cols
-            << " height = "
-            << output_mat1.rows
+  // Calculate right_project
+  cv::Mat right_project;
+  project_kernel.execute(frame_col_mat1, 1, right_project);
+  std::cout << "Done right_project = "
+            << right_project.cols
+            << " * "
+            << right_project.rows
+            << " * "
+            << right_project.channels()
             << std::endl;
 
   // Second step arg
@@ -392,27 +503,47 @@ int main(int argc, char *argv[]) {
   surround360::TemporalOpticalFlowKernelCPUExtracted temporal_kernel(temporal_args);
 
   std::cout << "Before temporal_kernel.new_frame_info" << std::endl;
-  temporal_kernel.new_frame_info(output_mat0.cols, output_mat0.rows);
+  temporal_kernel.new_frame_info(left_project.cols, left_project.rows);
 
   // TODO Counter-clockwise or clockwise?
   std::cout << "Before temporal_kernel.execute" << std::endl;
   cv::Mat left_flow;
   cv::Mat right_flow;
 
-  temporal_kernel.execute(output_mat0, output_mat1, left_flow, right_flow);
+  temporal_kernel.execute(left_project, right_project, left_flow, right_flow);
   std::cout << "After temporal_kernel.execute" << std::endl;
 
   std::cout << "After temporal_kernel.execute" << std::endl;
-  std::cout << "Done left_flow, width = "
+  std::cout << "Done left_flow = "
             << left_flow.cols
-            << " height = "
+            << " * "
             << left_flow.rows
+            << " * "
+            << left_flow.channels()
             << std::endl;
 
-  std::cout << "Done right_flow, width = "
-            << right_flow.cols
-            << " height = "
-            << right_flow.rows
+
+  // Third step arg
+  surround360::proto::RenderStereoPanoramaChunkArgs render_args;
+  render_args.set_camera_rig_path(CAMERA_RIG_PATH);
+  render_args.set_flow_algo(FLOW_ALGO);
+  render_args.set_eqr_width(8400);
+  render_args.set_eqr_height(4096);
+  render_args.set_zero_parallax_dist(10000);
+  render_args.set_interpupilary_dist(6.4);
+
+  surround360::RenderStereoPanoramaChunkKernelCPUExtracted render_kernel(render_args);
+  render_kernel.new_frame_info(left_flow.cols, left_flow.rows);
+  cv::Mat chunkL, chunkR;
+  std::cout << "Before render_kernel.execute" << std::endl;
+  render_kernel.execute(left_project, right_project, left_flow, right_flow, chunkL, chunkR);
+  std::cout << "After render_kernel.execute" << std::endl;
+  std::cout << "Done chunkL = "
+            << chunkL.cols
+            << " * "
+            << chunkL.rows
+            << " * "
+            << chunkL.channels()
             << std::endl;
 
 }
