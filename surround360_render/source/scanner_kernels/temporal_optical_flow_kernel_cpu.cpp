@@ -68,6 +68,15 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
 
     for (i32 i = 0; i < input_count; ++i) {
       cv::Mat left_input = frame_to_mat(left_frame_col[i].as_const_frame());
+
+      std::cout << "T: left_input = "
+                << left_input.cols
+                << " * "
+                << left_input.rows
+                << " * "
+                << left_input.channels
+                << std::endl;
+
       cv::Mat right_input = frame_to_mat(right_frame_col[i].as_const_frame());
 
       cv::Mat left_overlap_input =
@@ -77,16 +86,12 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
           right_input(cv::Rect(0, 0,
                                overlap_image_width_, right_input.rows));
 
-      std::cout << "left_overlap_input.width == "
+      std::cout << "T: left_overlap_input = "
                 << left_overlap_input.cols
-                << ", height == "
+                << " * "
                 << left_overlap_input.rows
-                << std::endl;
-
-      std::cout << "right_overlap_input.width == "
-                << right_overlap_input.cols
-                << ", height == "
-                << right_overlap_input.rows
+                << " * "
+                << left_overlap_input.channels
                 << std::endl;
 
       novel_view_gen_->prepare(left_overlap_input, right_overlap_input,

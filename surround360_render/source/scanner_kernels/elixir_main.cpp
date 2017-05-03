@@ -240,8 +240,8 @@ namespace surround360 {
         float(camImageWidth) * (overlapAngleDegrees / camFovHorizontalDegrees);
     }
 
-    void execute(cv::Mat& left_frame_col_mat,
-                 cv::Mat& right_frame_col_mat,
+    void execute(cv::Mat& left_input,
+                 cv::Mat& right_input,
                  cv::Mat& left_flow,
                  cv::Mat& right_flow) {
       assert(overlap_image_width_ != -1);
@@ -249,25 +249,28 @@ namespace surround360 {
       size_t output_image_width = overlap_image_width_;
       size_t output_image_height = camImageHeight_;
 
+      std::cout << "T: left_input = "
+                << left_input.cols
+                << " * "
+                << left_input.rows
+                << " * "
+                << left_input.channels
+                << std::endl;
+
       cv::Mat left_overlap_input =
-        left_frame_col_mat(cv::Rect(left_frame_col_mat.cols - overlap_image_width_, 0,
-                                    overlap_image_width_, left_frame_col_mat.rows));
+        left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
+                            overlap_image_width_, left_input.rows));
       cv::Mat right_overlap_input =
-        right_frame_col_mat(cv::Rect(0, 0,
-                                     overlap_image_width_, right_frame_col_mat.rows));
+        right_input(cv::Rect(0, 0,
+                             overlap_image_width_, right_input.rows));
 
-      std::cout << "left_overlap_input.width == "
+      std::cout << "T: left_overlap_input = "
                 << left_overlap_input.cols
-                << ", height == "
+                << " * "
                 << left_overlap_input.rows
+                << " * "
+                << left_overlap_input.channels
                 << std::endl;
-
-      std::cout << "right_overlap_input.width == "
-                << right_overlap_input.cols
-                << ", height == "
-                << right_overlap_input.rows
-                << std::endl;
-
 
       novel_view_gen_->prepare(left_overlap_input, right_overlap_input,
                                prev_frame_flow_l_to_r_, prev_frame_flow_r_to_l_,

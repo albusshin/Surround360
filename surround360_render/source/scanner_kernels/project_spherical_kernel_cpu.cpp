@@ -63,6 +63,15 @@ class ProjectSphericalKernelCPU : public VideoKernel {
 
     for (i32 i = 0; i < input_count; ++i) {
       cv::Mat input = frame_to_mat(frame_col[i].as_const_frame());
+
+      std::cout << "P: input = "
+                << left_input.cols
+                << " * "
+                << left_input.rows
+                << " * "
+                << left_input.channels
+                << std::endl;
+
       cv::Mat tmp;
       cv::cvtColor(input, tmp, CV_BGR2BGRA);
 
