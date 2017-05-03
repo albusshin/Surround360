@@ -65,11 +65,11 @@ class ProjectSphericalKernelCPU : public VideoKernel {
       cv::Mat input = frame_to_mat(frame_col[i].as_const_frame());
 
       std::cout << "P: input = "
-                << left_input.cols
+                << input.cols
                 << " * "
-                << left_input.rows
+                << input.rows
                 << " * "
-                << left_input.channels()
+                << input.channels()
                 << std::endl;
 
       cv::Mat tmp;
