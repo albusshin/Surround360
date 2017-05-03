@@ -150,6 +150,16 @@ namespace surround360 {
       int cv_type = CV_8U;
       int cv_madetype = CV_MAKETYPE(cv_type, channels);
 
+
+      std::cout << "P: input = "
+                << frame_col_mat.cols
+                << " * "
+                << frame_col_mat.rows
+                << " * "
+                << frame_col_mat.channels()
+                << std::endl;
+
+
       cv::Mat tmp;
       cv::cvtColor(frame_col_mat, tmp, CV_BGR2BGRA);
       std::cout << "after cvtColor()" << std::endl;
@@ -382,14 +392,14 @@ int main(int argc, char *argv[]) {
   surround360::TemporalOpticalFlowKernelCPUExtracted temporal_kernel(temporal_args);
 
   std::cout << "Before temporal_kernel.new_frame_info" << std::endl;
-  temporal_kernel.new_frame_info(frame_col_mat0.cols, frame_col_mat0.rows);
+  temporal_kernel.new_frame_info(output_mat0.cols, output_mat0.rows);
 
   // TODO Counter-clockwise or clockwise?
   std::cout << "Before temporal_kernel.execute" << std::endl;
   cv::Mat left_flow;
   cv::Mat right_flow;
 
-  temporal_kernel.execute(frame_col_mat0, frame_col_mat1, left_flow, right_flow);
+  temporal_kernel.execute(output_mat0, output_mat1, left_flow, right_flow);
   std::cout << "After temporal_kernel.execute" << std::endl;
 
   std::cout << "After temporal_kernel.execute" << std::endl;
