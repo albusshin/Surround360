@@ -554,10 +554,12 @@ int main(int argc, char *argv[]) {
               << projects[i].channels()
               << std::endl;
   }
-  time_t after_projects = time(0);
+  time_t after_step1 = time(0);
   std::cout << "[Main]\t"
-            << " after_projects: "
-            << after_projects 
+            << "after_step1 time: "
+            << after_step1
+            << ", step1 = "
+            << (after_step1 - start)
             << std::endl;
 
   // Second step arg
@@ -609,10 +611,12 @@ int main(int argc, char *argv[]) {
               << std::endl;
   }
 
-  time_t after_temporal = time(0);
+  time_t after_step2 = time(0);
   std::cout << "[Main]\t"
-            << " after_temporal: "
-            << after_temporal 
+            << "after_step2 time: "
+            << after_step2
+            << ", step2 = "
+            << (after_step2 - after_step1)
             << std::endl;
 
   // Third step arg
@@ -676,10 +680,12 @@ int main(int argc, char *argv[]) {
 
   }
 
-  time_t after_render = time(0);
+  time_t after_step3 = time(0);
   std::cout << "[Main]\t"
-            << " after_render: "
-            << after_render 
+            << "after_step3 time: "
+            << after_step3
+            << ", step3 = "
+            << (after_step3 - after_step2)
             << std::endl;
 
   surround360::proto::ConcatPanoramaChunksArgs concat_args_left;
@@ -736,5 +742,12 @@ int main(int argc, char *argv[]) {
   std::cout << "[Main]\t"
             << "end time: "
             << end 
+            << ", step4 = "
+            << (end - after_step3)
+            << ", end - start = "
+            << (end - start)
             << std::endl;
+
+  cv::imwrite( "~/o/panoL.jpg", panoL );
+  cv::imwrite( "~/o/panoR.jpg", panoR );
 }
