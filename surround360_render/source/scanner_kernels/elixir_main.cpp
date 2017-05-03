@@ -4,10 +4,6 @@
 #include "util/MathUtil.h"
 #include "source/scanner_kernels/surround360.pb.h"
 #include "optical_flow/NovelView.h"
-#include "scanner/api/kernel.h"
-#include "scanner/api/op.h"
-#include "scanner/util/memory.h"
-#include "scanner/util/opencv.h"
 
 #include <opencv2/video.hpp>
 #include <string>
@@ -414,6 +410,70 @@ namespace surround360 {
     std::unique_ptr<LazyNovelViewBuffer> lazy_view_buffer_;
   };
 
+  class ConcatPanoramaChunksKernelCPUExtracted {
+  public:
+    ConcatPanoramaChunksKernelCPUExtracted(surround360::proto::ConcatPanoramaChunksArgs args) {
+
+      args_ = args;
+
+      rig_.reset(new RigDescription(args_.camera_rig_path()));
+    }
+
+    void new_frame_info(int camImageWidth, int camImageHeight) {
+      camImageWidth_ = camImageWidth;
+      camImageHeight_ = camImageHeight;
+      const int numCams = 14;
+      const float cameraRingRadius = rig_->getRingRadius();
+      const float camFovHorizontalDegrees =
+        2 * approximateFov(rig_->rigSideOnly, false) * (180 / M_PI);
+      const float fovHorizontalRadians = toRadians(camFovHorizontalDegrees);
+      const float overlapAngleDegrees =
+        (camFovHorizontalDegrees * float(numCams) - 360.0) / float(numCams);
+      const int overlapImageWidth =
+        float(camImageWidth) * (overlapAngleDegrees / camFovHorizontalDegrees);
+
+      const float v =
+        atanf(args_.zero_parallax_dist() / (args_.interpupilary_dist() / 2.0f));
+      const float psi =
+        asinf(sinf(v) * (args_.interpupilary_dist() / 2.0f) / cameraRingRadius);
+      const float vergeAtInfinitySlabDisplacement =
+        psi * (float(camImageWidth) / fovHorizontalRadians);
+      const float theta = -M_PI / 2.0f + v + psi;
+      zeroParallaxNovelViewShiftPixels_ =
+        float(args_.eqr_width()) * (theta / (2.0f * M_PI));
+      if (!args_.left()) {
+        zeroParallaxNovelViewShiftPixels_ *= -1;
+      }
+    }
+
+    void execute(std::vector<cv::Mat>& input_chunks,
+                 cv::Mat& pano) {
+
+      i32 num_chunks = input_chunks.size();
+      size_t output_image_width = camImageWidth_ * num_chunks;
+      size_t output_image_height = camImageHeight_;
+      output_image_width += (output_image_width % 2);
+      output_image_height += (output_image_height % 2);
+      size_t output_image_size =
+        output_image_width * output_image_height * 3;
+
+      std::vector<cv::Mat> pano_chunks(num_chunks, Mat());
+      for (i32 c = 0; c < num_chunks; ++c) {
+        cv::cvtColor(input_chunks[c],
+                     pano_chunks[c], CV_BGRA2BGR);
+      }
+      pano = stackHorizontal(pano_chunks);
+      pano = offsetHorizontalWrap(pano, zeroParallaxNovelViewShiftPixels_);
+    }
+
+  private:
+    surround360::proto::ConcatPanoramaChunksArgs args_;
+    std::unique_ptr<RigDescription> rig_;
+    float zeroParallaxNovelViewShiftPixels_;
+    int camImageWidth_;
+    int camImageHeight_;
+  };
+
 }
 
 void get_video_filename(int camId, std::string& outstr) {
@@ -440,56 +500,51 @@ void getOneFrame(const std::string& filename,
   capture >> output_mat;
 }
 
-
 int main(int argc, char *argv[]) {
+
+  const int numCamera = 14;
 
   // First step arg
   surround360::proto::ProjectSphericalArgs project_args;
   project_args.set_eqr_width(8400);
   project_args.set_eqr_height(4096);
   project_args.set_camera_rig_path(CAMERA_RIG_PATH);
-  surround360::ProjectSphericalKernelCPUExtracted project_kernel(project_args);
+  std::vector<surround360::ProjectSphericalKernelCPUExtracted>
+    project_kernels(numCamera, surround360::ProjectSphericalKernelCPUExtracted(project_args));
 
-  // Extract frame from cam0
-  // NOTE Using 6 and 7 here, in case cam0 is for something special
-  cv::Mat frame_col_mat0;
-  std::string filename_0;
-  get_video_filename(6, filename_0);
-  getOneFrame(filename_0, frame_col_mat0);
-  std::cout << "Made framemat framemat "
-            << " project_args.eqr_width = " << project_args.eqr_width()
-            << " project_args.eqr_height = " << project_args.eqr_height()
-            << " frame_col_mat0.rows (height) == " << frame_col_mat0.rows
-            << " frame_col_mat0.cols (width) == " << frame_col_mat0.cols
-            << std::endl;
+  std::vector<cv::Mat> frame_col_mats(numCamera, cv::Mat());
+  std::vector<std::string> filenames(numCamera);
 
-  // Extract frame from cam1
-  cv::Mat frame_col_mat1;
-  std::string filename_1;
-  get_video_filename(7, filename_1);
-  getOneFrame(filename_1, frame_col_mat1);
+  std::vector<cv::Mat> projects(numCamera, cv::Mat());
 
-  std::cout << "Before execution of kernel" << std::endl;
-  // Calculate left_project
-  cv::Mat left_project;
-  project_kernel.execute(frame_col_mat0, 0, left_project);
-  std::cout << "Done left_project = "
-            << left_project.cols
-            << " * "
-            << left_project.rows
-            << " * "
-            << left_project.channels()
-            << std::endl;
-  // Calculate right_project
-  cv::Mat right_project;
-  project_kernel.execute(frame_col_mat1, 1, right_project);
-  std::cout << "Done right_project = "
-            << right_project.cols
-            << " * "
-            << right_project.rows
-            << " * "
-            << right_project.channels()
-            << std::endl;
+  for (int i = 0; i < numCamera; ++i) {
+    get_video_filename(i, filenames[i]);
+    getOneFrame(filenames[i], frame_col_mats[i]);
+    std::cout << "[Main]\t"
+              << "Made frame_col_mat["
+              << i
+              << "] = "
+              << frame_col_mats[i].rows
+              << " * "
+              << frame_col_mats[i].cols
+              << " * "
+              << frame_col_mats[i].channels();
+    << std::endl;
+
+    std::cout << "Before execution of kernel" << std::endl;
+    // Calculate right project
+    project_kernels[i].execute(frame_col_mats[i], i, projects[i]);
+    std::cout << "[Main]\t"
+              << "Done project["
+              << i
+              << "] = "
+              << left_project.cols
+              << " * "
+              << left_project.rows
+              << " * "
+              << left_project.channels()
+              << std::endl;
+  }
 
   // Second step arg
   surround360::proto::TemporalOpticalFlowArgs temporal_args;
@@ -497,28 +552,46 @@ int main(int argc, char *argv[]) {
   temporal_args.set_camera_rig_path(CAMERA_RIG_PATH);
   temporal_args.set_flow_algo(FLOW_ALGO);
 
-  surround360::TemporalOpticalFlowKernelCPUExtracted temporal_kernel(temporal_args);
+  std::vector<surround360::TemporalOpticalFlowKernelCPUExtracted>
+    temporal_kernels(numCamera, surround360::TemporalOpticalFlowKernelCPUExtracted(temporal_args));
 
-  std::cout << "Before temporal_kernel.new_frame_info" << std::endl;
-  temporal_kernel.new_frame_info(left_project.cols, left_project.rows);
+  std::vector<cv::Mat> left_flows(numCamera, cv::Mat());
+  std::vector<cv::Mat> right_flows(numCamera, cv::Mat());
 
-  // TODO Counter-clockwise or clockwise?
-  std::cout << "Before temporal_kernel.execute" << std::endl;
-  cv::Mat left_flow;
-  cv::Mat right_flow;
+  for (int i = 0; i < numCamera; ++i) {
+    // TODO Counter-clockwise or clockwise?
+    cv::Mat& left_project = projects[i];
+    cv::Mat& right_project = projects[(i + 1) % numCamera];
 
-  temporal_kernel.execute(left_project, right_project, left_flow, right_flow);
-  std::cout << "After temporal_kernel.execute" << std::endl;
+    std::cout << "[Main]\t"
+              << "Before temporal_kernel.new_frame_info"
+              <<"["
+              << i
+              << "]"
+              << std::endl;
+    temporal_kernel.new_frame_info(left_project.cols, left_project.rows);
 
-  std::cout << "After temporal_kernel.execute" << std::endl;
-  std::cout << "Done left_flow = "
-            << left_flow.cols
-            << " * "
-            << left_flow.rows
-            << " * "
-            << left_flow.channels()
-            << std::endl;
+    std::cout << "[Main]\t"
+              << "Before temporal_kernel.execute"
+              <<"["
+              << i
+              << "]"
+              << std::endl;
 
+    temporal_kernel.execute(left_project, right_project, left_flows[i], right_flows[i]);
+
+    std::cout << "[Main]\t"
+              << "Done left_flow"
+              <<"["
+              << i
+              << "] = "
+              << left_flow.cols
+              << " * "
+              << left_flow.rows
+              << " * "
+              << left_flow.channels()
+              << std::endl;
+  }
 
   // Third step arg
   surround360::proto::RenderStereoPanoramaChunkArgs render_args;
@@ -529,18 +602,102 @@ int main(int argc, char *argv[]) {
   render_args.set_zero_parallax_dist(10000);
   render_args.set_interpupilary_dist(6.4);
 
-  surround360::RenderStereoPanoramaChunkKernelCPUExtracted render_kernel(render_args);
-  render_kernel.new_frame_info(left_flow.cols, left_flow.rows);
-  cv::Mat chunkL, chunkR;
-  std::cout << "Before render_kernel.execute" << std::endl;
-  render_kernel.execute(left_project, right_project, left_flow, right_flow, chunkL, chunkR);
-  std::cout << "After render_kernel.execute" << std::endl;
-  std::cout << "Done chunkL = "
-            << chunkL.cols
-            << " * "
-            << chunkL.rows
-            << " * "
-            << chunkL.channels()
+  std::vector<surround360::RenderStereoPanoramaChunkKernelCPUExtracted>
+    render_kernels(numCamera, surround360::RenderStereoPanoramaChunkKernelCPUExtracted(render_args));
+
+  std::vector<cv::Mat> chunkLs(numCamera, cv::Mat());
+  std::vector<cv::Mat> chunkRs(numCamera, cv::Mat());
+
+  for (int i = 0; i < numCamera; ++i) {
+    std::cout << "[Main]\t"
+              << "Before render_kernel.new_frame_info"
+              <<"["
+              << i
+              << "]"
+              << std::endl;
+
+    render_kernels[i].new_frame_info(left_flows[i].cols, left_flows[i].rows);
+
+
+    std::cout << "[Main]\t"
+              << "Before render_kernel.execute"
+              <<"["
+              << i
+              << "]"
+              << std::endl;
+
+    // TODO Counter-clockwise or clockwise?
+    render_kernel.execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkLs[i], chunkRs[i]);
+
+    std::cout << "[Main]\t"
+              << "After render_kernel.execute"
+              <<"["
+              << i
+              << "]"
+              << std::endl;
+
+
+    std::cout << "[Main]\t"
+              << "Done chunkLs"
+              <<"["
+              << i
+              << "] = "
+              << chunkLs[i].cols
+              << " * "
+              << chunkLs[i].rows
+              << " * "
+              << chunkLs[i].channels()
+              << std::endl;
+
+  }
+
+  surround360::proto::ConcatPanoramaChunksArgs concat_args_left;
+  concat_args_left.set_camera_rig_path(CAMERA_RIG_PATH);
+  concat_args_left.set_eqr_width(8400);
+  concat_args_left.set_eqr_height(4096);
+  concat_args_left.set_zero_parallax_dist(10000);
+  concat_args_left.set_interpupilary_dist(6.4);
+  concat_args_left.set_left(true);
+
+  surround360::proto::ConcatPanoramaChunksArgs concat_args_right;
+  concat_args_right.set_camera_rig_path(CAMERA_RIG_PATH);
+  concat_args_right.set_eqr_width(8400);
+  concat_args_right.set_eqr_height(4096);
+  concat_args_right.set_zero_parallax_dist(10000);
+  concat_args_right.set_interpupilary_dist(6.4);
+  concat_args_right.set_left(false);
+
+  surround360::ConcatPanoramaChunksKernelCPUExtracted concat_kernel_left(concat_args_left);
+  surround360::ConcatPanoramaChunksKernelCPUExtracted concat_kernel_right(concat_args_right);
+
+  concat_kernel_left.new_frame_info(chunkLs[0].cols, chunkLs[0].rows);
+  concat_kernel_right.new_frame_info(chunkRs[0].cols, chunkRs[0].rows);
+
+  std::cout << "[Main]\t"
+            << "Before concat_kernel_left.execute"
             << std::endl;
 
+  cv::Mat panoL, panoR;
+  concat_kernel_left.execute(chunkLs, panoL);
+  std::cout << "[Main]\t"
+            << "Done panoL = "
+            << panoL.cols
+            << " * "
+            << panoL.rows
+            << " * "
+            << panoL.channels()
+            << std::endl;
+
+  std::cout << "[Main]\t"
+            << "Before concat_kernel_right.execute"
+            << std::endl;
+  concat_kernel_right.execute(chunkRs, panoR);
+  std::cout << "[Main]\t"
+            << "Done panoR = "
+            << panoR.cols
+            << " * "
+            << panoR.rows
+            << " * "
+            << panoR.channels()
+            << std::endl;
 }
