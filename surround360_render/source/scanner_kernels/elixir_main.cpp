@@ -509,7 +509,7 @@ int main(int argc, char *argv[]) {
   project_args.set_eqr_width(8400);
   project_args.set_eqr_height(4096);
   project_args.set_camera_rig_path(CAMERA_RIG_PATH);
-  std::vector<surround360::ProjectSphericalKernelCPUExtracted> project_kernels;
+  std::vector<surround360::ProjectSphericalKernelCPUExtracted *> project_kernels;
 
   std::vector<cv::Mat> frame_col_mats(numCamera, cv::Mat());
   std::vector<std::string> filenames(numCamera);
@@ -517,7 +517,8 @@ int main(int argc, char *argv[]) {
   std::vector<cv::Mat> projects(numCamera, cv::Mat());
 
   for (int i = 0; i < numCamera; ++i) {
-    surround360::ProjectSphericalKernelCPUExtracted project_kernel(project_args);
+    surround360::ProjectSphericalKernelCPUExtracted *project_kernel =
+      new surround360::ProjectSphericalKernelCPUExtracted(project_args);
     project_kernels.push_back(project_kernel);
     get_video_filename(i, filenames[i]);
     getOneFrame(filenames[i], frame_col_mats[i]);
@@ -534,7 +535,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Before execution of kernel" << std::endl;
     // Calculate right project
-    project_kernels[i].execute(frame_col_mats[i], i, projects[i]);
+    project_kernels[i]->execute(frame_col_mats[i], i, projects[i]);
     std::cout << "[Main]\t"
               << "Done project["
               << i
@@ -553,14 +554,15 @@ int main(int argc, char *argv[]) {
   temporal_args.set_camera_rig_path(CAMERA_RIG_PATH);
   temporal_args.set_flow_algo(FLOW_ALGO);
 
-  std::vector<surround360::TemporalOpticalFlowKernelCPUExtracted> temporal_kernels;
+  std::vector<surround360::TemporalOpticalFlowKernelCPUExtracted *> temporal_kernels;
 
   std::vector<cv::Mat> left_flows(numCamera, cv::Mat());
   std::vector<cv::Mat> right_flows(numCamera, cv::Mat());
 
   for (int i = 0; i < numCamera; ++i) {
-    surround360::TemporalOpticalFlowKernelCPUExtracted temporal_kernel(temporal_args);
-    temporal_kernels.push_back(temporal_kernel);
+    surround360::TemporalOpticalFlowKernelCPUExtracted *temporal_kernel =
+      new surround360::TemporalOpticalFlowKernelCPUExtracted(temporal_args);
+    temporal_kernels[i]->push_back(temporal_kernel);
     // TODO Counter-clockwise or clockwise?
     cv::Mat& left_project = projects[i];
     cv::Mat& right_project = projects[(i + 1) % numCamera];
@@ -571,7 +573,7 @@ int main(int argc, char *argv[]) {
               << i
               << "]"
               << std::endl;
-    temporal_kernels[i].new_frame_info(left_project.cols, left_project.rows);
+    temporal_kernels[i]->new_frame_info(left_project.cols, left_project.rows);
 
     std::cout << "[Main]\t"
               << "Before temporal_kernel.execute"
@@ -580,7 +582,7 @@ int main(int argc, char *argv[]) {
               << "]"
               << std::endl;
 
-    temporal_kernels[i].execute(left_project, right_project, left_flows[i], right_flows[i]);
+    temporal_kernels[i]->execute(left_project, right_project, left_flows[i], right_flows[i]);
 
     std::cout << "[Main]\t"
               << "Done left_flows"
@@ -604,14 +606,16 @@ int main(int argc, char *argv[]) {
   render_args.set_zero_parallax_dist(10000);
   render_args.set_interpupilary_dist(6.4);
 
-  std::vector<surround360::RenderStereoPanoramaChunkKernelCPUExtracted> render_kernels;
+  std::vector<surround360::RenderStereoPanoramaChunkKernelCPUExtracted *>
+    render_kernels;
 
   std::vector<cv::Mat> chunkLs(numCamera, cv::Mat());
   std::vector<cv::Mat> chunkRs(numCamera, cv::Mat());
 
   for (int i = 0; i < numCamera; ++i) {
-    surround360::RenderStereoPanoramaChunkKernelCPUExtracted render_kernel(render_args);
-    render_kernels.push_back(render_kernel);
+    surround360::RenderStereoPanoramaChunkKernelCPUExtracted *render_kernel = new
+      surround360::RenderStereoPanoramaChunkKernelCPUExtracted(render_args);
+    render_kernels->push_back(render_kernel);
     std::cout << "[Main]\t"
               << "Before render_kernel.new_frame_info"
               <<"["
@@ -619,7 +623,7 @@ int main(int argc, char *argv[]) {
               << "]"
               << std::endl;
 
-    render_kernels[i].new_frame_info(left_flows[i].cols, left_flows[i].rows);
+    render_kernels[i]->new_frame_info(left_flows[i].cols, left_flows[i].rows);
 
 
     std::cout << "[Main]\t"
@@ -630,7 +634,7 @@ int main(int argc, char *argv[]) {
               << std::endl;
 
     // TODO Counter-clockwise or clockwise?
-    render_kernels[i].execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkLs[i], chunkRs[i]);
+    render_kernels[i]->execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkLs[i], chunkRs[i]);
 
     std::cout << "[Main]\t"
               << "After render_kernel.execute"
