@@ -4,7 +4,6 @@
 #include "util/MathUtil.h"
 #include "source/scanner_kernels/surround360.pb.h"
 #include "optical_flow/NovelView.h"
-a
 #include "scanner/api/kernel.h"
 #include "scanner/api/op.h"
 #include "scanner/util/memory.h"
