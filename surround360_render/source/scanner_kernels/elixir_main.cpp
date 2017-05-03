@@ -523,7 +523,7 @@ int main(int argc, char *argv[]) {
 
   std::vector<cv::Mat> projects(numCamera, cv::Mat());
 
-  int offset = 2;
+  int offset = 1;
   for (int i = 0; i < numCamera; ++i) {
     int cameraId = i + offset;
     surround360::ProjectSphericalKernelCPUExtracted *project_kernel =
@@ -695,7 +695,7 @@ int main(int argc, char *argv[]) {
   concat_args_left.set_zero_parallax_dist(10000);
   concat_args_left.set_interpupilary_dist(6.4);
   concat_args_left.set_left(true);
-
+  
   surround360::proto::ConcatPanoramaChunksArgs concat_args_right;
   concat_args_right.set_camera_rig_path(CAMERA_RIG_PATH);
   concat_args_right.set_eqr_width(8400);

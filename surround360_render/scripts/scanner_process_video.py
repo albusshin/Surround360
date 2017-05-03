@@ -553,7 +553,7 @@ if __name__ == "__main__":
           print(render_params)
           sys.stdout.flush()
 
-      visualize = False
+      visualize = True
       fused_4 = False # Fused project, flow, stereo chunk, and pano
       fused_3 = True # Fused project, flow, and stereo chunk
       fused_2 = False # Fused flow and stereo chunk
@@ -607,10 +607,9 @@ if __name__ == "__main__":
 
       png_start = timer()
       pano_col = db.table('surround360_pano_both')
-      # left_table = pano_col[0]
-      # right_table = pano_col[1]
+      
       if visualize:
-        left_table.columns('panorama').save_mp4('pano_test.mp4')
+        pano_col.columns('panorama').save_mp4('pano_test.mp4')
       print('To png', timer() - png_start)
 
   end_time = timer()
