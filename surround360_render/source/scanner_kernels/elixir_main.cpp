@@ -610,7 +610,7 @@ int main(int argc, char *argv[]) {
   std::vector<cv::Mat> chunkRs(numCamera, cv::Mat());
 
   for (int i = 0; i < numCamera; ++i) {
-    surround360::RenderStereoPanoramaChunkKernelCPUExtracted render_kernel;
+    surround360::RenderStereoPanoramaChunkKernelCPUExtracted render_kernel(render_args);
     render_kernels.push_back(render_kernel);
     std::cout << "[Main]\t"
               << "Before render_kernel.new_frame_info"
