@@ -572,9 +572,12 @@ int main(int argc, char *argv[]) {
               << projects[i].channels()
               << std::endl;
 
+    cv::Mat towrite;
+    cv::cvtColor(projects[i], towrite, CV_BGRA2BGR);
+
     std::stringstream ss;
     ss << "/home/ubuntu/o/projects_elixir_" << i << ".jpg";
-    cv::imwrite(ss.str(), projects[i]);
+    cv::imwrite(ss.str(), towrite);
   }
   time_t after_step1 = time(0);
   std::cout << "[Main]\t"
@@ -631,12 +634,18 @@ int main(int argc, char *argv[]) {
               << left_flows[i].channels()
               << std::endl;
 
+    cv::Mat towrite_left;
+    cv::cvtColor(left_flows[i], towrite_left, CV_BGRA2BGR);
+
+    cv::Mat towrite_right;
+    cv::cvtColor(right_flows[i], towrite_right, CV_BGRA2BGR);
+
     std::stringstream ss;
     ss << "/home/ubuntu/o/left_flow_elixir_" << i << ".jpg";
-    cv::imwrite(ss.str(), left_flows[i]);
+    cv::imwrite(ss.str(), towrite_left);
     ss.clear();
     ss << "/home/ubuntu/o/right_flow_elixir_" << i << ".jpg";
-    cv::imwrite(ss.str(), right_flows[i]);
+    cv::imwrite(ss.str(), towrite_right);
   }
 
   time_t after_step2 = time(0);
@@ -711,12 +720,18 @@ int main(int argc, char *argv[]) {
               << chunkLs[i].channels()
               << std::endl;
 
+    cv::Mat towrite_left;
+    cv::cvtColor(chunkLs[i], towrite_left, CV_BGRA2BGR);
+
+    cv::Mat towrite_right;
+    cv::cvtColor(chunkRs[i], towrite_right, CV_BGRA2BGR);
+
     std::stringstream ss;
     ss << "/home/ubuntu/o/chunkL_elixir_" << i << ".jpg";
-    cv::imwrite(ss.str(), chunkLs[i]);
+    cv::imwrite(ss.str(), towrite_left);
     ss.clear();
     ss << "/home/ubuntu/o/chunkR_elixir" << i << ".jpg";
-    cv::imwrite(ss.str(), chunkRs[i]);
+    cv::imwrite(ss.str(), towrite_right);
 
   }
 

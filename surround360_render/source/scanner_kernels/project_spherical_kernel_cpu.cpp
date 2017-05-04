@@ -85,9 +85,12 @@ class ProjectSphericalKernelCPU : public VideoKernel {
           projection_image, tmp, rig_->rigSideOnly[camIdx_], leftAngle_,
           rightAngle_, topAngle_, bottomAngle_);
 
+      cv::Mat towrite;
+      cv::cvtColor(projection_image, towrite, CV_BGRA2BGR);
+
       std::stringstream ss;
       ss << "/home/ubuntu/o/projects_" << camIdx_ << ".jpg";
-      cv::imwrite(ss.str(), projection_image);
+      cv::imwrite(ss.str(), towrite);
 
       insert_frame(output_columns[0], output_frames[i]);
     }

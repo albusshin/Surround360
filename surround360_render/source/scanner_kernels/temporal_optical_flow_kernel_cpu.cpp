@@ -113,14 +113,20 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
       const auto& left_flow = novel_view_gen_->getFlowLtoR();
       const auto& right_flow = novel_view_gen_->getFlowRtoL();
 
+      cv::Mat towrite_left;
+      cv::cvtColor(left_flow, towrite_left, CV_BGRA2BGR);
+
+      cv::Mat towrite_right;
+      cv::cvtColor(right_flow, towrite_right, CV_BGRA2BGR);
+
       std::stringstream ss;
       ss << "/home/ubuntu/o/left_flow_" << imwrite_count << ".jpg";
-      cv::imwrite(ss.str(), left_flow);
+      cv::imwrite(ss.str(), towrite_left);
 
       ss.clear();
       ss << "/home/ubuntu/o/right_flow_" << imwrite_count << ".jpg";
       imwrite_count += 1;
-      cv::imwrite(ss.str(), right_flow);
+      cv::imwrite(ss.str(), towrite_right);
 
 
       for (i32 r = 0; r < left_flow.rows; ++r) {
