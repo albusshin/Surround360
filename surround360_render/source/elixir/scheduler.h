@@ -15,7 +15,7 @@ namespace elixir {
   using namespace std;
 
   class Scheduler {
-    pthread_mutex_t lock;
+    pthread_mutex_t schedulerLock;
 
   public:
     void init(Graph *graph);
@@ -32,7 +32,7 @@ namespace elixir {
 
     Data *readData(int nodeKey);
 
-    static const Scheduler& getScheduler();
+    static Scheduler& getScheduler();
 
   private:
 
@@ -51,13 +51,17 @@ namespace elixir {
 
     unordered_map<int, Data *> dataMap;
 
+    void lock();
+
+    void unlock();
+
     void markJobFinished(int nodeKey);
 
     void deleteData(int nodeKey);
 
     void setGraph(Graph *graph);
 
-    static const Scheduler INSTANCE;
+    static Scheduler INSTANCE;
   };
 
 }

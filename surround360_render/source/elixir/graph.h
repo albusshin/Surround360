@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "pthread.h"
 #include "kernel.h"
 
 namespace elixir {
@@ -14,21 +15,35 @@ namespace elixir {
 
   class Graph {
 
-    int totalNodes;
-
   public:
 
-    Graph (int totalNodes);
+    static int totalNodes;
+
+    Graph (int totalNodes, int numBatches)
+      : numBatches(numBatches) {
+      Graph::totalNodes = totalNodes;
+    }
 
     vector<Node *> getRunnableJobs();
 
-  private:
     // All the nodes in one layer, with probably different batchIds
     vector<Node *> nodes;
+
+    int numBatches;
+
+  private:
+    pthread_mutex_t graphlock;
+
+    Node *getRunnableJob();
+
+    void lock();
+
+    void unlock();
 
   };
 
   class Node {
+  public:
     int nodeId;
     int batchId;
 
@@ -42,11 +57,22 @@ namespace elixir {
 
     unordered_set<int> children;
 
-  public:
+    Node(int nodeId,
+         int batchId,
+         Graph *graph,
+         vector<int> &parents,
+         unordered_set<int> &children)
+      : nodeId(nodeId),
+        batchId(batchId),
+        graph(graph),
+        parents(parents),
+        children(children) {}
 
     static int getNodeKeyByIds(int nodeId, int batchId);
 
     static int getNodeIdByNodeKey(int nodeKey);
+
+    static int getBatchIdByNodeKey(int nodeKey);
   };
 
 }

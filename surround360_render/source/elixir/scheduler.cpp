@@ -30,7 +30,24 @@ namespace elixir {
   }
 
   bool Scheduler::allFinished() {
-    //TODO implement
+    lock();
+    if (!runnableJobs.empty()) {
+      unlock();
+      return false;
+    } else if (!runningJobs.empty()) {
+      unlock();
+      return false;
+    }
+    else {
+      for (Node *node: graph->nodes) {
+        if (node->batchId < graph->numBatches) {
+          unlock();
+          return false;
+        }
+      }
+    }
+    unlock();
+    return true;
   }
 
   void Scheduler::onJobFinishing(int nodeKey) {
@@ -56,7 +73,7 @@ namespace elixir {
 
   }
 
-  const Scheduler& Scheduler::getScheduler() {
+  Scheduler& Scheduler::getScheduler() {
     //TODO implement
     return Scheduler::INSTANCE;
   }
@@ -77,23 +94,12 @@ namespace elixir {
     this->graph = graph;
   }
 
-};
+  void Scheduler::lock() {
+    pthread_mutex_lock(&schedulerLock);
+  }
 
-}
+  void Scheduler::unlock() {
+    pthread_mutex_unlock(&schedulerLock);
+  }
 
-elixir::Graph *loadGraph() {
-  // return a pointer on HEAP!!!!!!!!!!!!!
-
-}
-
-int main() {
-  elixir::Scheduler scheduler;
-
-  // build graph
-  elixir::Graph *graph = loadGraph();
-  scheduler.init(graph);
-
-  // spawn worker threads
-
-  //
 }
