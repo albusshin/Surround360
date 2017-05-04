@@ -571,6 +571,10 @@ int main(int argc, char *argv[]) {
               << " * "
               << projects[i].channels()
               << std::endl;
+
+    stringstream ss;
+    ss << "/home/ubuntu/o/projects_elixir_" << i << ".jpg";
+    cv::imwrite(ss.str(), projects[i]);
   }
   time_t after_step1 = time(0);
   std::cout << "[Main]\t"
@@ -626,6 +630,13 @@ int main(int argc, char *argv[]) {
               << " * "
               << left_flows[i].channels()
               << std::endl;
+
+    stringstream ss;
+    ss << "/home/ubuntu/o/left_flow_elixir_" << i << ".jpg";
+    cv::imwrite(ss.str(), left_flows[i]);
+    ss.clear();
+    ss << "/home/ubuntu/o/right_flow_elixir_" << i << ".jpg";
+    cv::imwrite(ss.str(), right_flows[i]);
   }
 
   time_t after_step2 = time(0);
@@ -699,6 +710,13 @@ int main(int argc, char *argv[]) {
               << " * "
               << chunkLs[i].channels()
               << std::endl;
+
+    stringstream ss;
+    ss << "/home/ubuntu/o/chunkL_elixir_" << i << ".jpg";
+    cv::imwrite(ss.str(), chunkLs[i]);
+    ss.clear();
+    ss << "/home/ubuntu/o/chunkR_elixir" << i << ".jpg";
+    cv::imwrite(ss.str(), chunkRs[i]);
 
   }
 

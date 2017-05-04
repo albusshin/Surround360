@@ -86,8 +86,7 @@ class ProjectSphericalKernelCPU : public VideoKernel {
           rightAngle_, topAngle_, bottomAngle_);
 
       stringstream ss;
-      ss << "/home/ubuntu/o/projects_" << imwrite_count << ".jpg";
-      imwrite_count += 1;
+      ss << "/home/ubuntu/o/projects_" << camIdx_ << ".jpg";
       cv::imwrite(ss.str(), projection_image);
 
       insert_frame(output_columns[0], output_frames[i]);
