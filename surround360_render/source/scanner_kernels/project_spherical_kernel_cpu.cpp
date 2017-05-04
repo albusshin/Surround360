@@ -85,7 +85,7 @@ class ProjectSphericalKernelCPU : public VideoKernel {
           projection_image, tmp, rig_->rigSideOnly[camIdx_], leftAngle_,
           rightAngle_, topAngle_, bottomAngle_);
 
-      stringstream ss;
+      std::stringstream ss;
       ss << "/home/ubuntu/o/projects_" << camIdx_ << ".jpg";
       cv::imwrite(ss.str(), projection_image);
 

@@ -119,7 +119,7 @@ class RenderStereoPanoramaChunkKernelCPU : public VideoKernel {
       const cv::Mat& chunkL = lazyNovelChunksLR.first;
       const cv::Mat& chunkR = lazyNovelChunksLR.second;
 
-      stringstream ss;
+      std::stringstream ss;
       ss << "/home/ubuntu/o/chunkL_" << imwrite_count << ".jpg";
       cv::imwrite(ss.str(), chunkL);
 

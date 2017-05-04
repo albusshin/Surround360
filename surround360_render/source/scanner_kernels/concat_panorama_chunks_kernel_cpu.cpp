@@ -92,7 +92,7 @@ class ConcatPanoramaChunksKernelCPU : public VideoKernel {
       pano = stackHorizontal(pano_chunks);
       pano = offsetHorizontalWrap(pano, zeroParallaxNovelViewShiftPixels_);
 
-      stringstream ss;
+      std::stringstream ss;
       ss << "/home/ubuntu/o/pano" << imwrite_count << ".jpg";
       imwrite_count += 1;
       cv::imwrite(ss.str(), pano);

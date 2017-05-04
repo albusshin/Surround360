@@ -572,7 +572,7 @@ int main(int argc, char *argv[]) {
               << projects[i].channels()
               << std::endl;
 
-    stringstream ss;
+    std::stringstream ss;
     ss << "/home/ubuntu/o/projects_elixir_" << i << ".jpg";
     cv::imwrite(ss.str(), projects[i]);
   }
@@ -631,7 +631,7 @@ int main(int argc, char *argv[]) {
               << left_flows[i].channels()
               << std::endl;
 
-    stringstream ss;
+    std::stringstream ss;
     ss << "/home/ubuntu/o/left_flow_elixir_" << i << ".jpg";
     cv::imwrite(ss.str(), left_flows[i]);
     ss.clear();
@@ -711,7 +711,7 @@ int main(int argc, char *argv[]) {
               << chunkLs[i].channels()
               << std::endl;
 
-    stringstream ss;
+    std::stringstream ss;
     ss << "/home/ubuntu/o/chunkL_elixir_" << i << ".jpg";
     cv::imwrite(ss.str(), chunkLs[i]);
     ss.clear();

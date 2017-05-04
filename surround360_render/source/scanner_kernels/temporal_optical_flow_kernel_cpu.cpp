@@ -113,7 +113,7 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
       const auto& left_flow = novel_view_gen_->getFlowLtoR();
       const auto& right_flow = novel_view_gen_->getFlowRtoL();
 
-      stringstream ss;
+      std::stringstream ss;
       ss << "/home/ubuntu/o/left_flow_" << imwrite_count << ".jpg";
       cv::imwrite(ss.str(), left_flow);
 
