@@ -24,15 +24,15 @@ namespace elixir {
 
     bool allFinished();
 
-    void onJobFinishing(int nodeKey);
+    void onJobFinishing(int nodeKey, Data *outputData, int workerId);
 
     bool isJobFinished(int nodeKey);
 
-    void addData(Data *data);
-
-    Data *readData(int nodeKey);
+    Data *getDataByNodeKey(int nodeKey);
 
     static Scheduler& getScheduler();
+
+    Graph *graph;
 
   private:
 
@@ -44,22 +44,21 @@ namespace elixir {
     // Map: workerId -> running job
     unordered_map<int, Node *> runningJobs;
 
-    Graph *graph;
-
     // Finished jobs. Key: NodeKey
     unordered_set<int> finished;
 
+    // Map: nodeKey -> data output of that job
     unordered_map<int, Data *> dataMap;
 
     void lock();
 
     void unlock();
 
+    void dataMapCleanup();
+
     void markJobFinished(int nodeKey);
-
-    void deleteData(int nodeKey);
-
-    void setGraph(Graph *graph);
+    
+    void assertThatInvariantsHold();
 
     static Scheduler INSTANCE;
   };

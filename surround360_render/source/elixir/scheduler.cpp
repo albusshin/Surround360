@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
+#include <assert.h>
 
 #include "scheduler.h"
 #include "graph.h"
@@ -14,7 +15,7 @@ namespace elixir {
 
   void Scheduler::init(Graph *graph) {
     //TODO implement
-    this->setGraph(graph);
+    this->graph = graph;
 
     // parse graph to find every runnable job
     vector<Node *> runnableJobs = this->graph->getRunnableJobs();
@@ -26,11 +27,11 @@ namespace elixir {
   Node *Scheduler::scheduleJob(int workerId) {
     //TODO implement
     // select job from job queue
-
   }
 
   bool Scheduler::allFinished() {
     lock();
+    assertThatInvariantsHold();
     if (!runnableJobs.empty()) {
       unlock();
       return false;
@@ -39,59 +40,91 @@ namespace elixir {
       return false;
     }
     else {
-      for (Node *node: graph->nodes) {
+      for (auto pair: graph->nodes) {
+        Node *node = pair.second;
         if (node->batchId < graph->numBatches) {
           unlock();
           return false;
         }
       }
     }
+    assertThatInvariantsHold();
+    assert(finished.size() == graph->totalNodes * graph->numBatches);
     unlock();
     return true;
   }
 
-  void Scheduler::onJobFinishing(int nodeKey) {
-    //TODO implement
-    // update state (graph, data, ...)
-    // set job finished
-    // cleanup ()
+  void Scheduler::onJobFinishing(int nodeKey, Data *outputData, int workerId) {
+    lock();
+    assertThatInvariantsHold();
+    // update state
+    // update data
+    dataMap[nodeKey] = outputData;
 
+    // cleanup
+    Node *graphNode = graph->nodes[nodeKey];
+    Node *finishingNode = runningJobs[workerId];
+
+    assert(graphNode != finishingNode);
+
+    // remove from runningJobs
+    runningJobs.erase(nodeKey);
+
+    // set job finished
+    markJobFinished(nodeKey);
+
+    dataMapCleanup();
+
+    assertThatInvariantsHold();
+    unlock();
+  }
+
+  void Scheduler::dataMapCleanup() {
+    //TODO implement
+    for (auto pair: dataMap) {
+      int nodeKey = pair.first;
+
+      //Free up memory
+      // TODO double check the correctness of memory releasing here
+      delete finishingNode;
+
+      // The node might already been free'd at this point.
+      // Find through the graph and in runningJobs, to see if the dependency
+      if (graph->nodes.find(nodeKey) != graph->nodes.end()
+          || runningJobs) {
+
+      }
+    }
   }
 
   bool Scheduler::isJobFinished(int nodeKey) {
-    //TODO implement
-    return finished.find(nodeKey) != finished.end();
+    lock();
+    assertThatInvariantsHold();
+    bool result = finished.find(nodeKey) != finished.end();
+    assertThatInvariantsHold();
+    unlock();
+    return result;
   }
 
-  void Scheduler::addData(Data *data) {
-    //TODO implement
-
-  }
-
-  Data *Scheduler::readData(int nodeKey) {
-    //TODO implement
-
+  Data *Scheduler::getDataByNodeKey(int nodeKey) {
+    lock();
+    assertThatInvariantsHold();
+    assert(dataMap.find(nodeKey) != dataMap.end());
+    Data *result = dataMap[nodeKey];
+    assertThatInvariantsHold();
+    unlock();
+    return result;
   }
 
   Scheduler& Scheduler::getScheduler() {
-    //TODO implement
     return Scheduler::INSTANCE;
   }
 
   // Privates
   void Scheduler::markJobFinished(int nodeKey) {
-    //TODO implement
+    lock();
     finished.insert(nodeKey);
-  }
-
-  void Scheduler::deleteData(int nodeKey) {
-    //TODO implement
-
-  }
-
-  void Scheduler::setGraph(Graph *graph) {
-    //TODO implement
-    this->graph = graph;
+    unlock();
   }
 
   void Scheduler::lock() {
@@ -100,6 +133,35 @@ namespace elixir {
 
   void Scheduler::unlock() {
     pthread_mutex_unlock(&schedulerLock);
+  }
+
+  void Scheduler::assertThatInvariantsHold() {
+#ifdef DEBUG
+    // Assert running jobs are not runnable and are not finished
+    for (auto pair : runningJobs) {
+      int nodeKey = pair.first;
+      Node *node = pair.second;
+      assert(Node::getNodeKeyByIds(node->nodeId, node->batchId) == nodeKey);
+      assert(runnableJobs.find(node) == runnableJobs.end());
+      assert(finished.find(nodeKey) == finished.end());
+
+      // Assert graph does not contain running jobs
+      assert(graph->nodes.find(nodeKey) == graph->nodes.end())
+        }
+
+    // Assert runnable jobs are not in graph
+    for (Node *node : runnableJobs) {
+      int nodeKey = Node::getNodeKeyByIds(node->nodeId, node->batchId);
+      assert(graph->nodes.find(nodeKey) == graph->nodes.end());
+    }
+
+    // Assert keys in dataMap are all finished
+    for (auto pair: dataMap) {
+      int nodeKey = pair.first;
+      assert(finished.find(nodeKey) != finished.end());
+    }
+
+#endif
   }
 
 }

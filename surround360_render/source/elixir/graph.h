@@ -17,19 +17,24 @@ namespace elixir {
 
   public:
 
-    static int totalNodes;
+    static size_t totalNodes;
+    static size_t numBatches;
 
-    Graph (int totalNodes, int numBatches)
-      : numBatches(numBatches) {
+    Graph (size_t totalNodes, size_t numBatches) {
       Graph::totalNodes = totalNodes;
+      Graph::numBatches = numBatches;
     }
 
     vector<Node *> getRunnableJobs();
 
-    // All the nodes in one layer, with probably different batchIds
-    vector<Node *> nodes;
+//TODO
+    void ChangeName(int nodeKey);
 
-    int numBatches;
+    void assertThatInvariantsHold();
+
+    // All the nodes in one layer, with probably different batchIds
+    // Mapping NodeKey -> nodes
+    unordered_map<int, Node *> nodes;
 
   private:
     pthread_mutex_t graphlock;
@@ -55,13 +60,13 @@ namespace elixir {
     // parents, order is the same with Data input order
     vector<int> parents;
 
-    unordered_set<int> children;
+    vector<int> children;
 
     Node(int nodeId,
          int batchId,
          Graph *graph,
          vector<int> &parents,
-         unordered_set<int> &children)
+         vector<int> &children)
       : nodeId(nodeId),
         batchId(batchId),
         graph(graph),

@@ -1,6 +1,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <assert.h>
 
 #include "graph.h"
 #include "scheduler.h"
@@ -20,8 +21,13 @@ namespace elixir {
 
   Node *Graph::getRunnableJob() {
     this->lock();
+    assertThatInvariantsHold();
 
-    for (Node *node: nodes) {
+    for (auto pair: nodes) {
+      int nodeKey = pair.first;
+      Node *node = pair.second;
+      assert(node != nullptr);
+
       bool nodeIsRunnable = true;
       // Check if all the parents are finisehd
       for (int parentNodeKey : node->parents) {
@@ -33,13 +39,63 @@ namespace elixir {
       // Return runnable job
       if (nodeIsRunnable) {
 
+        Node *result = new Node(node->nodeId, node->batchId, node->graph, node->parents, node->children);
+        ChangeName(nodeKey);
+        assert(result != nullptr);
+
+        assertThatInvariantsHold();
         this->unlock();
-        return node;
+        return result;
       }
     }
 
+    assertThatInvariantsHold();
     this->unlock();
     return nullptr;
+  }
+
+  //TODO
+  void Graph::ChangeName(int nodeKey) {
+    //TODO check implementataion correctness
+    lock();
+    assertThatInvariantsHold();
+
+    Node *node = nodes[nodeKey];
+    for (size_t i = 0; i < node->parents.size(); ++i) {
+      // Update every dependency to the next layer.
+      node->parents[i] += totalNodes;
+    }
+    for (size_t i = 0; i < node->children.size(); ++i) {
+      // Update every dependency to the next layer.
+      node->children[i] += totalNodes;
+    }
+
+    // remove from nodes map and reinsert with new nodeKey.
+    int newKey = nodeKey + totalNodes;
+    // update node batchId
+    node->batchId++;
+    nodes.erase(nodeKey);
+    nodes[newKey] = node;
+
+    assertThatInvariantsHold();
+    unlock();
+  }
+
+  void Graph::assertThatInvariantsHold() {
+#ifdef DEBUG
+    assert(nodes.size() == totalNodes);
+    for (auto pair : nodes) {
+      int nodeKey = pair.first;
+      Node *node = pair.second;
+      assert(Node::getNodeKeyByIds(node->nodeId, node->batchId) == nodeKey);
+      assert(Node::getNodeIdByNodeKey(nodeKey) == node->nodeId);
+      assert(Node::getBatchIdByNodeKey(nodeKey) == node->batchId);
+      assert(node->batchId >= -1 && node->batchId <= numBatches);
+      assert(node->kernel != nullptr);
+      assert(node->graph == Scheduler::getScheduler().graph);
+      assert(!(node->parents.empty() && node->children.empty()));
+    }
+#endif /* DEBUG */
   }
 
   void Graph::lock() {
