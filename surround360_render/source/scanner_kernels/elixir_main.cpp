@@ -423,6 +423,12 @@ namespace surround360 {
     void new_frame_info(int camImageWidth, int camImageHeight) {
       camImageWidth_ = camImageWidth;
       camImageHeight_ = camImageHeight;
+      std::cout << "[Concat]\t"
+                << "new_frame_info: "
+                << "camImageWidth = "
+                << camImageWidth
+                << "camImageHeight = "
+                << camImageHeight;
       const int numCams = 14;
       const float cameraRingRadius = rig_->getRingRadius();
       const float camFovHorizontalDegrees =
@@ -554,7 +560,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Before execution of kernel" << std::endl;
     // Calculate right project
-    project_kernels[i]->execute(frame_col_mats[i], cameraId, projects[i]);
+    project_kernels[i]->execute(frame_col_mats[i], i, projects[i]);
     std::cout << "[Main]\t"
               << "Done project["
               << i
@@ -630,6 +636,7 @@ int main(int argc, char *argv[]) {
             << (after_step2 - after_step1)
             << std::endl;
 
+
   // Third step arg
   surround360::proto::RenderStereoPanoramaChunkArgs render_args;
   render_args.set_camera_rig_path(CAMERA_RIG_PATH);
@@ -666,7 +673,12 @@ int main(int argc, char *argv[]) {
               << "]"
               << std::endl;
 
-    render_kernels[i]->execute(projects[i], projects[(i + 1) % numCamera], left_flows[i], right_flows[i], chunkRs[i], chunkLs[i]);
+    render_kernels[i]->execute(projects[i],
+                               projects[(i + 1) % numCamera],
+                               left_flows[i],
+                               right_flows[i],
+                               chunkLs[i],
+                               chunkRs[i]);
 
     std::cout << "[Main]\t"
               << "After render_kernel.execute"

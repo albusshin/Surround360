@@ -41,6 +41,12 @@ class ConcatPanoramaChunksKernelCPU : public VideoKernel {
         (camFovHorizontalDegrees * float(numCams) - 360.0) / float(numCams);
     const int camImageWidth = frame_info_.width();
     const int camImageHeight = frame_info_.height();
+    std::cout << "[Concat]\t"
+              << "new_frame_info: "
+              << "camImageWidth = "
+              << camImageWidth
+              << "camImageHeight = "
+              << camImageHeight;
     const int overlapImageWidth =
         float(camImageWidth) * (overlapAngleDegrees / camFovHorizontalDegrees);
 
