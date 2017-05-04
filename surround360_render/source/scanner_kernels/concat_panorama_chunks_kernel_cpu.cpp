@@ -97,14 +97,16 @@ class ConcatPanoramaChunksKernelCPU : public VideoKernel {
 
       insert_frame(output_columns[0], output_frames[i]);
 
+      /*
       stringstream ss;
       ss << "/home/ubuntu/o/pano" << (pano_count++) << ".jpg";
       cv::imwrite(ss.str(), pano);
+      */
     }
   }
 
   private:
-  static int pano_count; 
+  //static int pano_count; 
     surround360::proto::ConcatPanoramaChunksArgs args_;
     std::unique_ptr<RigDescription> rig_;
     DeviceHandle device_;
