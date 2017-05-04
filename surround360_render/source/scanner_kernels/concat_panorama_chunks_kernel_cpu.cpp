@@ -90,8 +90,8 @@ class ConcatPanoramaChunksKernelCPU : public VideoKernel {
       pano = offsetHorizontalWrap(pano, zeroParallaxNovelViewShiftPixels_);
 
       stringstream ss;
-      ss << "/home/ubuntu/o/pano" << pano_count << ".jpg";
-      pano_count += 1;
+      ss << "/home/ubuntu/o/pano" << imwrite_count << ".jpg";
+      imwrite_count += 1;
       cv::imwrite(ss.str(), pano);
 
       u8 *output = output_frames[i]->data;
@@ -105,7 +105,6 @@ class ConcatPanoramaChunksKernelCPU : public VideoKernel {
   }
 
   private:
-    static int pano_count;
     surround360::proto::ConcatPanoramaChunksArgs args_;
     std::unique_ptr<RigDescription> rig_;
     DeviceHandle device_;
@@ -113,6 +112,8 @@ class ConcatPanoramaChunksKernelCPU : public VideoKernel {
     int num_chunks_;
     float zeroParallaxNovelViewShiftPixels_;
 };
+
+static int imwrite_count = 0;
 
 REGISTER_OP(ConcatPanoramaChunks)
     .variadic_inputs()
