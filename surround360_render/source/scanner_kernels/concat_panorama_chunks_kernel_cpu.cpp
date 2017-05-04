@@ -15,8 +15,11 @@ using namespace scanner;
 
 namespace surround360 {
 
+
 using namespace optical_flow;
 using namespace math_util;
+
+static int imwrite_count = 0;
 
 class ConcatPanoramaChunksKernelCPU : public VideoKernel {
  public:
@@ -112,8 +115,6 @@ class ConcatPanoramaChunksKernelCPU : public VideoKernel {
     int num_chunks_;
     float zeroParallaxNovelViewShiftPixels_;
 };
-
-static int imwrite_count = 0;
 
 REGISTER_OP(ConcatPanoramaChunks)
     .variadic_inputs()
