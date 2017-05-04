@@ -8,12 +8,17 @@
 #include "scanner/util/memory.h"
 #include "scanner/util/opencv.h"
 
+#include <sstream>
+#include <string>
+
 using namespace scanner;
 
 namespace surround360 {
 
 using namespace optical_flow;
 using namespace math_util;
+
+static int imwrite_count = 0;
 
 class TemporalOpticalFlowKernelCPU : public VideoKernel {
  public:
@@ -107,6 +112,17 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
       u8* right_output = frames[2 * i + 1]->data;
       const auto& left_flow = novel_view_gen_->getFlowLtoR();
       const auto& right_flow = novel_view_gen_->getFlowRtoL();
+
+      stringstream ss;
+      ss << "/home/ubuntu/o/left_flow_" << imwrite_count << ".jpg";
+      cv::imwrite(ss.str(), left_flow);
+
+      ss.clear();
+      ss << "/home/ubuntu/o/right_flow_" << imwrite_count << ".jpg";
+      imwrite_count += 1;
+      cv::imwrite(ss.str(), right_flow);
+
+
       for (i32 r = 0; r < left_flow.rows; ++r) {
         memcpy(left_output + r * output_image_width * sizeof(float) * 2,
                left_flow.data + left_flow.step * r,

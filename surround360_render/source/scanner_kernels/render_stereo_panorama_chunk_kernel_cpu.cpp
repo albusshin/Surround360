@@ -8,10 +8,14 @@
 #include "scanner/util/memory.h"
 #include "scanner/util/opencv.h"
 
+#include <sstream>
+#include <string>
+
 using namespace scanner;
 
 namespace surround360 {
 
+static int imwrite_count;
 using namespace optical_flow;
 using namespace math_util;
 
@@ -115,8 +119,19 @@ class RenderStereoPanoramaChunkKernelCPU : public VideoKernel {
       const cv::Mat& chunkL = lazyNovelChunksLR.first;
       const cv::Mat& chunkR = lazyNovelChunksLR.second;
 
+      stringstream ss;
+      ss << "/home/ubuntu/o/chunkL_" << imwrite_count << ".jpg";
+      cv::imwrite(ss.str(), chunkL);
+
+      ss.clear();
+      ss << "/home/ubuntu/o/chunkR_" << imwrite_count << ".jpg";
+      imwrite_count += 1;
+      cv::imwrite(ss.str(), chunkR);
+
+
       u8* left_output = frames[2 * i]->data;
       u8* right_output = frames[2 * i + 1]->data;
+      
       for (i32 r = 0; r < chunkL.rows; ++r) {
         memcpy(left_output + r * output_image_width * sizeof(char) * 4,
                chunkL.data + chunkL.step * r,

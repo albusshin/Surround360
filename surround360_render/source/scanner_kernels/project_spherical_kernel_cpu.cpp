@@ -8,10 +8,14 @@
 #include "scanner/util/opencv.h"
 
 #include <opencv2/video.hpp>
+#include <sstream>
+#include <string>
 
 using namespace scanner;
 
 namespace surround360 {
+
+static int imwrite_count = 0;
 
 class ProjectSphericalKernelCPU : public VideoKernel {
  public:
@@ -80,6 +84,11 @@ class ProjectSphericalKernelCPU : public VideoKernel {
       surround360::warper::bicubicRemapToSpherical(
           projection_image, tmp, rig_->rigSideOnly[camIdx_], leftAngle_,
           rightAngle_, topAngle_, bottomAngle_);
+
+      stringstream ss;
+      ss << "/home/ubuntu/o/projects_" << imwrite_count << ".jpg";
+      imwrite_count += 1;
+      cv::imwrite(ss.str(), projection_image);
 
       insert_frame(output_columns[0], output_frames[i]);
     }
