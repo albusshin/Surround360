@@ -73,6 +73,10 @@ namespace elixir {
     // set job finished
     markJobFinished(nodeKey);
 
+    //Free up memory
+    // TODO double check the correctness of memory releasing here
+    delete finishingNode;
+
     dataMapCleanup();
 
     assertThatInvariantsHold();
@@ -83,10 +87,6 @@ namespace elixir {
     //TODO implement
     for (auto pair: dataMap) {
       int nodeKey = pair.first;
-
-      //Free up memory
-      // TODO double check the correctness of memory releasing here
-      delete finishingNode;
 
       // The node might already been free'd at this point.
       // Find through the graph and in runningJobs, to see if the dependency
