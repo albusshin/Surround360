@@ -29,7 +29,7 @@ namespace elixir {
       assert(node != nullptr);
 
       bool nodeIsRunnable = true;
-      // Check if all the parents are finisehd
+      // Check if all the parents are finished
       for (int parentNodeKey : node->parents) {
         if (!Scheduler::getScheduler().isJobFinished(parentNodeKey)) {
           nodeIsRunnable = false;
@@ -39,8 +39,9 @@ namespace elixir {
       // Return runnable job
       if (nodeIsRunnable) {
 
-        Node *result = new Node(node->nodeId, node->batchId, node->graph, node->parents, node->children);
-        ChangeName(nodeKey);
+        Node *result = new Node(node->nodeId, node->batchId, node->graph,
+                                node->parents, node->children);
+        UpdateGraphNode(nodeKey);
         assert(result != nullptr);
 
         assertThatInvariantsHold();
@@ -55,8 +56,8 @@ namespace elixir {
   }
 
   //TODO
-  void Graph::ChangeName(int nodeKey) {
-    //TODO check implementataion correctness
+  void Graph::UpdateGraphNode(int nodeKey) {
+    //TODO check implementation correctness
     lock();
     assertThatInvariantsHold();
 
