@@ -1,13 +1,20 @@
 #include "scheduler.h"
 #include "graph.h"
+#include "surround360_kernels.h"
+
+#include <string>
 
 using namespace elixir;
 using namespace std;
 
-Graph *loadGraph() {
-  // TODO implement
-  // return a pointer on HEAP!!!!!!!!!!!!!
+size_t eqr_width = 8400;
+size_t eqr_height = 8400;
+string camera_rig_path = "/home/ubuntu/d/a/palace3/camera_rig.json";
+string flow_algo = "pixflow_search_20";
+float zero_parallax_dist = 10000;
+float interpupilary_dist = 6.4;
 
+Graph *loadGraph() {
   size_t frameNum = 10;
   size_t nodeNum = 44;
 
@@ -38,7 +45,8 @@ Graph *loadGraph() {
     // Create a node
     Node *node = new Node(i, 0, graph, parent, children);
 
-    // TODO: CREATE KERNEL AND ADD TO NODE
+    // TODO: cameraId == i for now.
+    node->kernel = new KernelP(eqr_width, eqr_height, camera_rig_path, i);
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
@@ -66,7 +74,7 @@ Graph *loadGraph() {
     // Create a node
     Node *node = new Node(i, 0, graph, parent, children);
 
-    // TODO: CREATE KERNEL AND ADD TO NODE
+    node->kernel = new KernelF(camera_rig_path, flow_algo);
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
@@ -95,7 +103,12 @@ Graph *loadGraph() {
     // Create a node
     Node *node = new Node(i, 0, graph, parent, children);
 
-    // TODO: CREATE KERNEL AND ADD TO NODE
+    node->kernel = new KernelR(eqr_width,
+                               eqr_height,
+                               camera_rig_path,
+                               flow_algo,
+                               zero_parallax_dist,
+                               interpupilary_dist);
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
@@ -115,7 +128,13 @@ Graph *loadGraph() {
     // Create a node
     Node *node = new Node(i, 0, graph, parent, children);
 
-    // TODO: CREATE KERNEL AND ADD TO NODE
+    node->kernel = new KernelC(eqr_width,
+                               eqr_height,
+                               camera_rig_path,
+                               flow_algo,
+                               zero_parallax_dist,
+                               interpupilary_dist,
+                               i == 42); //If i == 42 then it's left, otherwise it's right.
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
