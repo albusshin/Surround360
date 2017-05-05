@@ -31,11 +31,14 @@ namespace elixir {
 
     Data *getDataByNodeKey(int nodeKey);
 
+    int getMinBatchIdInRunnableJobs();
+
     static Scheduler& getScheduler();
 
     Graph *graph;
 
-    enum SchedulerPolicy { Fifo, Optimized };
+    // Map: nodeKey -> data output of that job
+    unordered_map<int, Data *> dataMap;
 
   private:
 
@@ -50,8 +53,7 @@ namespace elixir {
     // Finished jobs. Key: NodeKey
     unordered_set<int> finished;
 
-    // Map: nodeKey -> data output of that job
-    unordered_map<int, Data *> dataMap;
+    enum SchedulerPolicy { Fifo, Optimized };
 
     static SchedulerPolicy policy;
 

@@ -10,7 +10,7 @@ namespace elixir {
 
   class Kernel {
   public:
-    virtual void *execute(vector<Data *>& dataList);
+    virtual Data *execute(vector<Data *>& dataList);
   };
 
 
