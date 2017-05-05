@@ -75,7 +75,6 @@ namespace elixir {
     markJobFinished(nodeKey);
 
     //Free up memory
-    // TODO double check the correctness of memory releasing here
     delete finishingNode;
 
     dataMapCleanup();
@@ -85,15 +84,17 @@ namespace elixir {
   }
 
   void Scheduler::dataMapCleanup() {
-    //TODO implement
-    for (auto pair: dataMap) {
-      int nodeKey = pair.first;
-
-      // The node might already been free'd at this point.
-      // Find through the graph and in runningJobs, to see if the dependency
-      if (graph->nodes.find(nodeKey) != graph->nodes.end()
-          || runningJobs) {
-
+    for (auto ite = dataMap.begin(); ite != dataMap.end();) {
+      int nodeKey = ite->first;
+      Data *data = ite->second;
+      // Deleting while iterating map as per
+      // http://stackoverflow.com/a/8234813/1831275
+      if (isJobFinished(nodeKey)) {
+        dataMap.erase(ite++);
+        //Free up memory
+        delete data;
+      } else {
+        ++ite;
       }
     }
   }

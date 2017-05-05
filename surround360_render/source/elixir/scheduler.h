@@ -34,6 +34,9 @@ namespace elixir {
 
     Graph *graph;
 
+    // Map: nodeKey -> data output of that job
+    unordered_map<int, Data *> dataMap;
+
   private:
 
     Scheduler() {}
@@ -46,9 +49,6 @@ namespace elixir {
 
     // Finished jobs. Key: NodeKey
     unordered_set<int> finished;
-
-    // Map: nodeKey -> data output of that job
-    unordered_map<int, Data *> dataMap;
 
     void lock();
 
