@@ -10,7 +10,7 @@ namespace elixir {
 
   class Kernel {
   public:
-    virtual vector<void *> execute(vector<Data *>& dataList);
+    virtual unordered_map<string, void *> execute(vector<Data *>& dataList);
   };
 
 

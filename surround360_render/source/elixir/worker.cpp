@@ -1,8 +1,9 @@
-#include <string>
-#include <unistd.h>
-
 #include "worker.h"
 #include "scheduler.h"
+
+#include <string>
+#include <unistd.h>
+#include <unordered_map>
 
 namespace elixir {
 
@@ -27,7 +28,12 @@ namespace elixir {
         dataList.push_back(Scheduler::getScheduler().dataMap[parentNodeKey]);
       }
 
-      Data *outputData = node->kernel->execute(dataList);
+      unordered_map<string, void *> outputRawData = node->kernel->execute(dataList);
+
+      Data *outputData = new Data(outputRawData,
+                                  Node::getNodeKeyByIds(node->nodeId,
+                                                        node->batchId),
+                                  node->children);
 
       Scheduler::getScheduler().onJobFinishing(
         Node::getNodeKeyByIds(node->nodeId, node->batchId),
