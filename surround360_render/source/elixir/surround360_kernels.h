@@ -17,10 +17,10 @@
 
 typedef int i32;
 
-class kernelP : public elixir::Kernel {
+class KernelP : public elixir::Kernel {
 
 public:
-  kernelP(size_t eqr_width,
+  KernelP(size_t eqr_width,
           size_t eqr_height,
           string &camera_rig_path,
           int camIdx)
