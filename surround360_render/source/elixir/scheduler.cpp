@@ -14,13 +14,14 @@ namespace elixir {
   using namespace std;
 
   void Scheduler::init(Graph *graph) {
-    //TODO implement
     this->graph = graph;
 
     // parse graph to find every runnable job
     vector<Node *> runnableJobs = this->graph->getRunnableJobs();
-    for (Node *node : runnableJobs) {
-      this->runnableJobs.insert(node);
+
+    for (vector<Node *>::iterator it = runnableJobs.begin();
+         it != runnableJobs.end(); ++it) {
+      this->runnableJobs.insert(*it);
     }
   }
 
