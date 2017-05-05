@@ -30,6 +30,8 @@ namespace elixir {
 
     Data *getDataByNodeKey(int nodeKey);
 
+    int getMinBatchIdInRunnableJobs();
+
     static Scheduler& getScheduler();
 
     Graph *graph;

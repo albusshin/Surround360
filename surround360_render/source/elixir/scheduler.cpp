@@ -102,10 +102,16 @@ namespace elixir {
   bool Scheduler::isJobFinished(int nodeKey) {
     lock();
     assertThatInvariantsHold();
-    bool result = finished.find(nodeKey) != finished.end();
-    assertThatInvariantsHold();
-    unlock();
-    return result;
+    if (nodeKey < 0) {
+      // treat all nodes with nodeKey less than 0 as finished
+      unlock();
+      return true;
+    } else {
+      bool result = finished.find(nodeKey) != finished.end();
+      assertThatInvariantsHold();
+      unlock();
+      return result;
+    }
   }
 
   Data *Scheduler::getDataByNodeKey(int nodeKey) {
@@ -116,6 +122,14 @@ namespace elixir {
     assertThatInvariantsHold();
     unlock();
     return result;
+  }
+
+  int Scheduler::getMinBatchIdInRunnableJobs() {
+    int minBatchIdInRunnableQueue = INT_MAX;
+    for (Node *node: runnableJobs) {
+      minBatchIdInRunnableQueue = min(node->batchId, minBatchIdInRunnableQueue);
+    }
+    return minBatchIdInRunnableQueue;
   }
 
   Scheduler& Scheduler::getScheduler() {

@@ -36,6 +36,8 @@ namespace elixir {
     unordered_map<int, Node *> nodes;
 
   private:
+    const int layers_threshold = 3;
+
     pthread_mutex_t graphlock;
 
     Node *getRunnableJob();

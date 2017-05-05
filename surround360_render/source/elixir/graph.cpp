@@ -28,6 +28,15 @@ namespace elixir {
       Node *node = pair.second;
       assert(node != nullptr);
 
+      // Criterion: check if the batchId of the job is too deep.
+      // If so, we don't add this job to the queue even if it's runnable.
+      int minBatchIdInRunnableQueue =
+        Scheduler::getScheduler().getMinBatchIdInRunnableJobs();
+
+      if (minBatchIdInRunnableQueue + layers_threshold < node->batchId) {
+        continue;
+      }
+      
       bool nodeIsRunnable = true;
       // Check if all the parents are finished
       for (int parentNodeKey : node->parents) {
@@ -36,9 +45,8 @@ namespace elixir {
           break;
         }
       }
-      // Return runnable job
       if (nodeIsRunnable) {
-
+        // Return runnable job
         Node *result = new Node(node->nodeId, node->batchId, node->graph,
                                 node->parents, node->children);
         UpdateGraphNode(nodeKey);
