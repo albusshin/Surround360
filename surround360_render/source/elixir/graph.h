@@ -19,10 +19,11 @@ namespace elixir {
 
     static size_t totalNodes;
     static size_t numBatches;
+    const size_t batchSize = 1;
 
-    Graph (size_t totalNodes, size_t numBatches) {
+    Graph (size_t totalNodes, size_t numFrames) {
       Graph::totalNodes = totalNodes;
-      Graph::numBatches = numBatches;
+      Graph::numBatches = (numFrames + batchSize - 1) / batchSize;
     }
 
     vector<Node *> getRunnableJobs();

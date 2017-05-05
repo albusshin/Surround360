@@ -117,15 +117,15 @@ namespace elixir {
 
   //publics for Node
   int Node::getNodeKeyByIds(int nodeId, int batchId) {
-    return batchId * Graph::totalNodes + nodeId;
+    return int(batchId * Graph::totalNodes + nodeId);
   }
 
   int Node::getNodeIdByNodeKey(int nodeKey) {
-    return nodeKey % Graph::totalNodes;
+    return int(nodeKey % Graph::totalNodes);
   }
 
   int Node::getBatchIdByNodeKey(int nodeKey) {
-    return nodeKey / Graph::totalNodes;
+    return int(nodeKey / Graph::totalNodes);
   }
 
 };
