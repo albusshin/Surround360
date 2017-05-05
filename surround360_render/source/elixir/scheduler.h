@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
+#include <list>
 
 #include "graph.h"
 
@@ -34,12 +35,14 @@ namespace elixir {
 
     Graph *graph;
 
+    enum SchedulerPolicy { Fifo, Optimized };
+
   private:
 
     Scheduler() {}
 
     // the priority queue
-    unordered_set<Node *> runnableJobs;
+    list<Node *> runnableJobs;
 
     // Map: workerId -> running job
     unordered_map<int, Node *> runningJobs;
@@ -50,6 +53,8 @@ namespace elixir {
     // Map: nodeKey -> data output of that job
     unordered_map<int, Data *> dataMap;
 
+    static SchedulerPolicy policy;
+
     void lock();
 
     void unlock();
@@ -57,6 +62,12 @@ namespace elixir {
     void dataMapCleanup();
 
     void markJobFinished(int nodeKey);
+
+    Node *fifoPickAJob(int workerId);
+
+    Node *optimizedPickAJob(int workerId);
+
+    Node *pickAJob(int workerId);
     
     void assertThatInvariantsHold();
 

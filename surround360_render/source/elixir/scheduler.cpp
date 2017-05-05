@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include <assert.h>
+#include <stdexcept>
 
 #include "scheduler.h"
 #include "graph.h"
@@ -15,19 +16,57 @@ namespace elixir {
 
   void Scheduler::init(Graph *graph) {
     this->graph = graph;
+    this->policy = SchedulerPolicy::Fifo;
+  }
 
+  Node *Scheduler::fifoPickAJob(int workerId) {
+    Node *node = this->runnableJobs.front();
+    this->runnableJobs.pop_front();
+    return node;
+  }
+
+  Node *Scheduler::optimizedPickAJob(int workerId) {
+    // TODO: implementation
+    return NULL;
+  }
+
+  Node *Scheduler::pickAJob(int workerId) {
+    Node* node = NULL;
+
+    switch(this->policy) {
+      case SchedulerPolicy::Fifo:
+        node = fifoPickAJob(workerId);
+        break;
+      case SchedulerPolicy::Optimized:
+        node = optimizedPickAJob(workerId);
+        break;
+      default:
+        throw invalid_argument("Invalid Policy!!\n");
+    }
+
+    return node;
+  }
+
+  Node *Scheduler::scheduleJob(int workerId) {
+    lock();
     // parse graph to find every runnable job
     vector<Node *> runnableJobs = this->graph->getRunnableJobs();
 
     for (vector<Node *>::iterator it = runnableJobs.begin();
          it != runnableJobs.end(); ++it) {
-      this->runnableJobs.insert(*it);
+      this->runnableJobs.push_back(*it);
     }
-  }
 
-  Node *Scheduler::scheduleJob(int workerId) {
-    //TODO implement
     // select job from job queue
+    // Delete the node from the runnableQueue
+    Node *node = pickAJob(workerId);
+    assert(node != NULL);
+
+    // Add the node to the runningMap
+    this->runningJobs[workerId] = node;
+
+    unlock();
+    return node;
   }
 
   bool Scheduler::allFinished() {
