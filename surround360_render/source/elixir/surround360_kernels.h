@@ -1,3 +1,6 @@
+#ifndef SURROUND360_KERNELS_ELIXIR
+#define SURROUND360_KERNELS_ELIXIR
+
 #include "render/RigDescription.h"
 #include "render/ImageWarper.h"
 #include "optical_flow/NovelView.h"
@@ -176,3 +179,5 @@ private:
   float interpupilary_dist;
   bool left;
 };
+
+#endif /* SURROUND360_KERNELS_ELIXIR */
