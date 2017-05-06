@@ -1,5 +1,6 @@
 #include <pthread.h>
 #include <string>
+#include <iostream>
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
@@ -43,14 +44,14 @@ namespace elixir {
     Node* node = NULL;
 
     switch(this->policy) {
-      case SchedulerPolicy::Fifo:
-        node = fifoPickAJob(workerId);
-        break;
-      case SchedulerPolicy::Optimized:
-        node = optimizedPickAJob(workerId);
-        break;
-      default:
-        throw invalid_argument("Invalid Policy!!\n");
+    case SchedulerPolicy::Fifo:
+      node = fifoPickAJob(workerId);
+      break;
+    case SchedulerPolicy::Optimized:
+      node = optimizedPickAJob(workerId);
+      break;
+    default:
+      throw invalid_argument("Invalid Policy!!\n");
     }
 
     return node;
@@ -219,12 +220,17 @@ namespace elixir {
       int nodeKey = pair.first;
       Node *node = pair.second;
       assert(Node::getNodeKeyByIds(node->nodeId, node->batchId) == nodeKey);
-      assert(runnableJobs.find(node) == runnableJobs.end());
+      for (Node *runnableJob : runnableJobs) {
+        assert(node != runnableJob);
+        assert(
+          Node::getNodeKeyByIds(node->nodeId, node->batchId)
+          != Node::getNodeKeyByIds(runnableJob->nodeId, runnableJob->batchId));
+      }
       assert(finished.find(nodeKey) == finished.end());
 
       // Assert graph does not contain running jobs
-      assert(graph->nodes.find(nodeKey) == graph->nodes.end())
-        }
+      assert(graph->nodes.find(nodeKey) == graph->nodes.end());
+    }
 
     // Assert runnable jobs are not in graph
     for (Node *node : runnableJobs) {
