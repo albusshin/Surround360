@@ -106,6 +106,8 @@ Graph *loadGraph() {
     dummyRawData["prev_overlap_image_r_"] = (void *) new cv::Mat();
     dummyRawData["prev_frame_flow_l_to_r_"] = (void *) new cv::Mat();
     dummyRawData["prev_frame_flow_r_to_l_"] = (void *) new cv::Mat();
+    dummyRawData["left_flow"] = (void *) new cv::Mat();
+    dummyRawData["right_flow"] = (void *) new cv::Mat();
     Data *dummyData = new Data(dummyRawData,
                                i - 58,
                                dummyNextLayer);
