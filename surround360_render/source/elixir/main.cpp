@@ -2,6 +2,7 @@
 #include "graph.h"
 #include "surround360_kernels.h"
 
+#include <pthread.h>
 #include <string>
 
 using namespace elixir;
@@ -174,13 +175,42 @@ Graph *loadGraph() {
   return graph;
 }
 
+#define NUM_CORES 32
+
+void *worker_thread(void *arg) {
+  int tid = (int) arg;
+  std::cout << "[T " << tid << "]\t"
+            << " Up and running."
+            << std::endl;
+
+  Worker worker = new Worker(tid);
+  worker.workerThread();
+  
+  std::cout << "[T " << tid << "]\t"
+            << "Finished. "
+            << std::endl;
+}
+
 int main() {
-  //TODO implement
   // build graph
   Graph *graph = loadGraph();
   Scheduler::getScheduler().init(graph);
 
-  // spawn worker threads
+  pthread_t threads[NUM_CORES];
 
-  //
+  // spawn worker threads
+  for (int i = 0; i < 32; ++i) {
+    pthread_create(&threads[i], NULL, worker_thread, (void *) i);
+  }
+
+  // join worker threads
+  for (int i = 0; i < 32; ++i) {
+    pthread_join(&threads[i], NULL);
+  }
+
+  std::cout << "[Main]\t"
+            << "Joined all threads. Exiting."
+            << std::endl;
+
+  return 0;
 }

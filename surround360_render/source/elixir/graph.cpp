@@ -65,7 +65,6 @@ namespace elixir {
     return nullptr;
   }
 
-  //TODO
   void Graph::updateGraphNode(int nodeKey) {
     //TODO check implementation correctness
     lock();
