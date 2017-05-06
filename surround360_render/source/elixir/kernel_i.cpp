@@ -18,13 +18,6 @@ std::unordered_map<std::string, void *> KernelI::execute(
 
   cv::Mat *frame_col_mat = new cv::Mat();
   cap >> *frame_col_mat;
-  if (!success){
-    std::cout << "I: Cannot read frame_col_mat "
-              << frameNumber_
-              << "from video file "
-              << videoFilename_
-              << std::endl;
-  }
 
   std::unordered_map<std::string, void *> outputData;
   outputData["frame_col_mat"] = ((void *) frame_col_mat);
