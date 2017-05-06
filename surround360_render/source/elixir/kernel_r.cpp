@@ -49,12 +49,12 @@ std::unordered_map<std::string, void *> KernelR::execute (
   std::vector<elixir::Data *>& dataList) {
 
   assert(dataList.size() == 3);
-  assert(dataList[0].data.size() == 1);
-  assert(dataList[1].data.size() == 1);
-  assert(dataList[2].data.size() == 6);
+  assert(dataList[0]->data.size() == 1);
+  assert(dataList[1]->data.size() == 1);
+  assert(dataList[2]->data.size() == 6);
 
-  cv::Mat& left_input = *(cv::Mat *) dataList[0].data["p_mat"];
-  cv::Mat& right_input = *(cv::Mat *) dataList[1].data["p_mat"];
+  cv::Mat& left_input = *(cv::Mat *) dataList[0]->data["p_mat"];
+  cv::Mat& right_input = *(cv::Mat *) dataList[1]->data["p_mat"];
   int camImageWidthL = left_input.cols;
   int camImageHeightL = left_input.rows;
   int camImageWidthR = right_input.cols;
@@ -63,8 +63,8 @@ std::unordered_map<std::string, void *> KernelR::execute (
   assert(camImageWidthL == camImageWidthR);
   assert(camImageHeightL == camImageHeightR);
 
-  cv::Mat& left_flow = *(cv::Mat *) dataList[2].data["left_flow"];
-  cv::Mat& right_flow = *(cv::Mat *) dataList[2].data["right_flow"];
+  cv::Mat& left_flow = *(cv::Mat *) dataList[2]->data["left_flow"];
+  cv::Mat& right_flow = *(cv::Mat *) dataList[2]->data["right_flow"];
 
   new_frame_info(camImageWidthL, camImageHeightL);
 
