@@ -100,11 +100,25 @@ Graph *loadGraph() {
     } else {
       parent.push_back(i - 13);
     }
-    parent.push_back(i - 44);
+    parent.push_back(i - 58);
+
+    vector<int> dummyNextLayer;
+    dummyNextLayer.push_back(i);
+    unordered_map<string, void *> dummyRawData;
+    dummyRawData["prev_overlap_image_l_"] = (void *) new cv::Mat();
+    dummyRawData["prev_overlap_image_r_"] = (void *) new cv::Mat();
+    dummyRawData["prev_frame_flow_l_to_r_"] = (void *) new cv::Mat();
+    dummyRawData["prev_frame_flow_r_to_l_"] = (void *) new cv::Mat();
+    dummyRawData["left_flow"] = (void *) new cv::Mat();
+    dummyRawData["right_flow"] = (void *) new cv::Mat();
+    Data *dummyData = new Data(dummyRawData,
+                               i - 58,
+                               dummyNextLayer);
+    Scheduler::getScheduler().addDummyData(i - 58, dummyData);
 
     // Children sequence: r => later f
     children.push_back(i + 14);
-    children.push_back(i + 44);
+    children.push_back(i + 58);
 
     // Create a node
     elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
@@ -190,7 +204,7 @@ void *worker_thread(void *arg) {
 
   elixir::Worker *worker = new Worker(tid);
   worker->workerThread();
-  
+
   std::cout << "[T " << tid << "]\t"
             << "Finished. "
             << std::endl;

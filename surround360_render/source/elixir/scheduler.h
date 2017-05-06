@@ -27,6 +27,8 @@ namespace elixir {
 
     void onJobFinishing(int nodeKey, Data *outputData, int workerId);
 
+    void addDummyData(int dummyNodeKey, Data *dummyData);
+
     bool isJobFinished(int nodeKey);
 
     Data *getDataByNodeKey(int nodeKey);
