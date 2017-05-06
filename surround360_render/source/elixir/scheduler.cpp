@@ -76,8 +76,10 @@ namespace elixir {
     // Delete the node from the runnableQueue
     Node *node = pickAJob(workerId);
 
-    // Add the node to the runningMap
-    this->runningJobs[workerId] = node;
+    if (node != nullptr) {
+      // Add the node to the runningMap
+      this->runningJobs[workerId] = node;
+    }
 
     unlock();
     return node;
@@ -226,6 +228,7 @@ namespace elixir {
     // Assert running jobs are not runnable and are not finished
     for (auto pair : runningJobs) {
       Node *node = pair.second;
+      assert(node != nullptr);
       int nodeKey = Node::getNodeKeyByIds(node->nodeId, node->batchId);
       for (Node *runnableJob : runnableJobs) {
         assert(node != runnableJob);
