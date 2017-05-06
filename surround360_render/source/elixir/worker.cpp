@@ -19,6 +19,7 @@ namespace elixir {
           break;
         } else {
           sleep(1);
+          continue;
         }
       }
 
