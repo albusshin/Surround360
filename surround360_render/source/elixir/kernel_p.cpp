@@ -40,7 +40,7 @@ std::unordered_map<std::string, void *> KernelP::execute(
   cv::cvtColor(frame_col_mat, tmp, CV_BGR2BGRA);
   std::cout << "after cvtColor()" << std::endl;
 
-  output_mat = new cv::Mat(output_image_height, output_image_width, cv_madetype);
+  cv::Mat *output_mat = new cv::Mat(output_image_height, output_image_width, cv_madetype);
 
   surround360::warper::bicubicRemapToSpherical(
     *output_mat, //dst

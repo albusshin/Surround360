@@ -81,7 +81,7 @@ std::unordered_map<std::string, void *> KernelC::execute(
   cv::Mat *pano = new cv::Mat();
 
   *pano = stackHorizontal(pano_chunks);
-  *pano = offsetHorizontalWrap(pano, zeroParallaxNovelViewShiftPixels_);
+  *pano = offsetHorizontalWrap(*pano, zeroParallaxNovelViewShiftPixels_);
 
   std::unordered_map<std::string, void *> outputData;
   outputData["pano"] = ((void *) pano);

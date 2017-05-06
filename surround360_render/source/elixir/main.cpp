@@ -40,7 +40,7 @@ Graph *loadGraph() {
     children.push_back(i + 14);
 
     // Create a node
-    Node *node = new Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
 
     node->kernel = new KernelI(get_video_filename(i), 0);
 
@@ -74,7 +74,7 @@ Graph *loadGraph() {
     }
 
     // Create a node
-    Node *node = new Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
 
     int camIdx = ((i - 14) + offset) % 14;
 
@@ -104,7 +104,7 @@ Graph *loadGraph() {
     children.push_back(i + 44);
 
     // Create a node
-    Node *node = new Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
 
     node->kernel = new KernelF(camera_rig_path, flow_algo);
 
@@ -133,7 +133,7 @@ Graph *loadGraph() {
     children.push_back(i + 15);
 
     // Create a node
-    Node *node = new Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
 
     node->kernel = new KernelR(eqr_width,
                                eqr_height,
@@ -158,7 +158,7 @@ Graph *loadGraph() {
     }
 
     // Create a node
-    Node *node = new Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
 
     node->kernel = new KernelC(eqr_width,
                                eqr_height,
@@ -178,7 +178,7 @@ Graph *loadGraph() {
 #define NUM_CORES 32
 
 void *worker_thread(void *arg) {
-  int tid = (int) arg;
+  int tid = *(int *) arg;
   std::cout << "[T " << tid << "]\t"
             << " Up and running."
             << std::endl;
@@ -198,9 +198,11 @@ int main() {
 
   pthread_t threads[NUM_CORES];
 
+  int ids[NUM_CORES];
   // spawn worker threads
   for (int i = 0; i < 32; ++i) {
-    pthread_create(&threads[i], NULL, worker_thread, (void *) i);
+    ids[i] = i;
+    pthread_create(&threads[i], NULL, worker_thread, &ids[i]);
   }
 
   // join worker threads

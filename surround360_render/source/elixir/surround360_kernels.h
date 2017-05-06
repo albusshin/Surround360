@@ -21,6 +21,7 @@ typedef int i32;
 using namespace std;
 using namespace surround360;
 using namespace surround360::optical_flow;
+using namespace surround360::math_util;
 
 class KernelI : public elixir::Kernel {
 public:
