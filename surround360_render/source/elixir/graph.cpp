@@ -103,7 +103,6 @@ namespace elixir {
 
   void Graph::updateGraphNode(int nodeKey) {
     //TODO check implementation correctness
-    lock();
     assertThatInvariantsHold();
 
     Node *node = nodes[nodeKey];
@@ -125,7 +124,6 @@ namespace elixir {
     nodes[newKey] = node;
 
     assertThatInvariantsHold();
-    unlock();
   }
 
   void Graph::assertThatInvariantsHold() {
