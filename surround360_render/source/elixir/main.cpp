@@ -101,7 +101,7 @@ Graph *loadGraph() {
 
     vector<int> dummyNextLayer;
     dummyNextLayer.push_back(i);
-    vector<string, void*> dummyRawData;
+    vector<string, void *> dummyRawData;
     dummyRawData["prev_overlap_image_l_"] = (void *) new cv::Mat();
     dummyRawData["prev_overlap_image_r_"] = (void *) new cv::Mat();
     dummyRawData["prev_frame_flow_l_to_r_"] = (void *) new cv::Mat();
