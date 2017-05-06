@@ -56,7 +56,7 @@ Graph *loadGraph() {
 
   // Add P nodes
   size_t start = iNodeNum;
-  size_t end = end + pNodeNum;
+  size_t end = start + pNodeNum;
   int offset = 1;
   depth += 1;
   for (int i = start; i < end; ++i) {
@@ -179,7 +179,7 @@ Graph *loadGraph() {
   depth += 1;
   start = end;
   end = start + cNodeNum;
-  for (int i = start; i < end - 1; ++i) {
+  for (int i = start; i < end; ++i) {
     // Create parent list, child list
     vector<int> parent;
     vector<int> children; // Empty
