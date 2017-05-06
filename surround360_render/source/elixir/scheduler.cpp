@@ -127,6 +127,7 @@ namespace elixir {
     // cleanup
     assert(graph->nodes.find(nodeKey) == graph->nodes.end());
     Node *finishingNode = runningJobs[workerId];
+    assert(finishingNode != nullptr);
 
     // remove from runningJobs
     runningJobs.erase(nodeKey);
@@ -176,6 +177,7 @@ namespace elixir {
     assertThatInvariantsHold();
     assert(dataMap.find(nodeKey) != dataMap.end());
     Data *result = dataMap[nodeKey];
+    assert(result != nullptr);
     assertThatInvariantsHold();
     unlock();
     return result;
