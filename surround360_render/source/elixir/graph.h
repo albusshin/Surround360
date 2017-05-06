@@ -37,6 +37,9 @@ namespace elixir {
     unordered_map<int, Node *> nodes;
 
   private:
+    // TODO:
+    // Should be a variable that can be adjust based on core number and first
+    // layer node number. Should > (core number / first layer node number)
     const int layers_threshold = 3;
 
     pthread_mutex_t graphlock;
@@ -53,6 +56,7 @@ namespace elixir {
   public:
     int nodeId;
     int batchId;
+    int depth;
 
     // The graph this node belongs to
     Graph *graph;
@@ -66,6 +70,7 @@ namespace elixir {
 
     Node(int nodeId,
          int batchId,
+         int depth,
          Graph *graph,
          vector<int> &parents,
          vector<int> &children)
@@ -73,7 +78,8 @@ namespace elixir {
         batchId(batchId),
         graph(graph),
         parents(parents),
-        children(children) {}
+        children(children),
+        depth(depth){}
 
     static int getNodeKeyByIds(int nodeId, int batchId);
 

@@ -50,8 +50,8 @@ namespace elixir {
       }
       if (nodeIsRunnable) {
         // Return runnable job
-        Node *result = new Node(node->nodeId, node->batchId, node->graph,
-                                node->parents, node->children);
+        Node *result = new Node(node->nodeId, node->batchId, node->depth,
+                                node->graph, node->parents, node->children);
         result->kernel = node->kernel->clone();
 
         updateGraphNode(nodeKey);

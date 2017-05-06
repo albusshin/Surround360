@@ -31,6 +31,7 @@ Graph *loadGraph() {
   Graph *graph = new Graph(nodeNum, frameNum);
 
   // Add I nodes
+  int depth = 0;
   for (int i = 0; i < 14; ++i) {
     // Create parent list, child list
     vector<int> parent; // Empty
@@ -40,7 +41,7 @@ Graph *loadGraph() {
     children.push_back(i + 14);
 
     // Create a node
-    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
 
     node->kernel = new KernelI(get_video_filename(i), 0);
 
@@ -48,8 +49,9 @@ Graph *loadGraph() {
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
   }
 
-  int offset = 1;
   // Add P nodes
+  int offset = 1;
+  depth += 1;
   for (int i = 14; i < 28; ++i) {
     // Create parent list, child list
     vector<int> parent;
@@ -74,7 +76,7 @@ Graph *loadGraph() {
     }
 
     // Create a node
-    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
 
     int camIdx = ((i - 14) + offset) % 14;
 
@@ -85,6 +87,7 @@ Graph *loadGraph() {
   }
 
   // Add F nodes
+  depth += 1;
   for (int i = 28; i < 42; ++i) {
     // Create parent list, child list
     vector<int> parent;
@@ -104,7 +107,7 @@ Graph *loadGraph() {
     children.push_back(i + 44);
 
     // Create a node
-    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
 
     node->kernel = new KernelF(camera_rig_path, flow_algo);
 
@@ -113,6 +116,7 @@ Graph *loadGraph() {
   }
 
   // Add R nodes
+  depth += 1;
   for (int i = 42; i < 56; ++i) {
     // Create parent list, child list
     vector<int> parent;
@@ -133,7 +137,7 @@ Graph *loadGraph() {
     children.push_back(i + 15);
 
     // Create a node
-    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
 
     node->kernel = new KernelR(eqr_width,
                                eqr_height,
@@ -147,6 +151,7 @@ Graph *loadGraph() {
   }
 
   // Add C nodes
+  depth += 1;
   for (int i = 56; i < 58; ++i) {
     // Create parent list, child list
     vector<int> parent;
@@ -158,7 +163,7 @@ Graph *loadGraph() {
     }
 
     // Create a node
-    elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
+    elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
 
     node->kernel = new KernelC(eqr_width,
                                eqr_height,
@@ -166,7 +171,7 @@ Graph *loadGraph() {
                                flow_algo,
                                zero_parallax_dist,
                                interpupilary_dist,
-                               i == 56); //If i == 42 then it's left, otherwise it's right.
+                               i == 56); // If i == 56 then it's left, otherwise it's right.
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
