@@ -551,7 +551,6 @@ IF (USE_ELIXIR)
   build_op(
     LIB_NAME elixirmain
     CPP_SRCS
-    source/elixir/main.cpp
     source/elixir/graph.cpp
     source/elixir/kernel_c.cpp
     source/elixir/kernel_f.cpp
@@ -574,20 +573,6 @@ IF (USE_ELIXIR)
     ${PLATFORM_SPECIFIC_LIBS})
   ADD_EXECUTABLE(
     ElixirMain
-    source/elixir/data.h
-    source/elixir/graph.h
-    source/elixir/kernel.h
-    source/elixir/graph.cpp
-    source/elixir/surround360_kernels.h
-    source/elixir/kernel_c.cpp
-    source/elixir/kernel_f.cpp
-    source/elixir/kernel_i.cpp
-    source/elixir/kernel_p.cpp
-    source/elixir/kernel_r.cpp
-    source/elixir/scheduler.h
-    source/elixir/scheduler.cpp
-    source/elixir/worker.h
-    source/elixir/worker.cpp
     source/elixir/main.cpp)
   TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
   TARGET_LINK_LIBRARIES(
