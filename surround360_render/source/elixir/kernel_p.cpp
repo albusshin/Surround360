@@ -10,7 +10,7 @@ typedef int i32;
   p_mat
 */
 
-std::unordered_map<std::string, void *> KernelP::execute override (
+std::unordered_map<std::string, void *> KernelP::execute (
   std::vector<elixir::Data>& dataList) {
 
   // dataList contains

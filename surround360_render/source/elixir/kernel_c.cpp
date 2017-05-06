@@ -45,7 +45,7 @@ void KernelC::new_frame_info(
   Output:
   pano
 */
-std::unordered_map<std::string, void *> KernelC::execute override (
+std::unordered_map<std::string, void *> KernelC::execute (
   std::vector<elixir::Data>& dataList) {
 
   string chunkKey;
