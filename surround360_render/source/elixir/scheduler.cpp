@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <stdexcept>
 #include <limits.h>
+#include <map>
 
 #include "scheduler.h"
 #include "graph.h"
@@ -32,9 +33,161 @@ namespace elixir {
     return node;
   }
 
+  void Scheduler::getJobsWithMinBatchID(std::map<int, Node *> &jobs) {
+    // Get the smallest batch number
+    int minBatch = -1;
+    for (std::map<int, Node *>::iterator it = jobs.begin();
+         it != jobs.end(); ++it) {
+      if ((minBatch == -1) || (it->second->batchId < minBatch)) {
+        minBatch = it->second->batchId;
+      }
+    }
+
+    // Get the jobs collection
+    for (std::map<int, Node *>::iterator it = jobs.begin();
+         it != jobs.end();) {
+      if (it->second->batchId != minBatch) {
+        it = jobs.erase(it);
+      } else {
+        it++;
+      }
+    }
+  }
+
+  void Scheduler::getJobsWithMinDepth(std::map<int, Node *> &jobs) {
+    // Get the smallest depth number
+    int minDepth = -1;
+    for (std::map<int, Node *>::iterator it = jobs.begin();
+         it != jobs.end(); ++it) {
+      if ((minDepth == -1) || (it->second->depth < minDepth)) {
+        minDepth = it->second->depth;
+      }
+    }
+
+    // Get the Jobs collection
+    for (std::map<int, Node *>::iterator it = jobs.begin();
+         it != jobs.end();) {
+      if (it->second->depth != minDepth) {
+        it = jobs.erase(it);
+      } else {
+        it++;
+      }
+    }
+  }
+
+
+
+  void Scheduler::getJobsWithLocality(std::map<int, Node *> &jobs,
+                                      int workerId) {
+    Node *preRunningJob = runningJobs[workerId];
+    int previousNodeKey = preRunningJob->getNodeKeyByIds(
+        preRunningJob->nodeId, preRunningJob->batchId);
+
+    for (std::map<int, Node *>::iterator it = jobs.begin();
+         it != jobs.end();) {
+      bool flag = false;
+      for (int i = 0; i < it->second->parents.size(); ++i) {
+        if (it->second->parents[i] == previousNodeKey) {
+          flag = true;
+        }
+      }
+
+      if (it->second->parents.size() == 0) {
+        flag = true;
+      }
+
+      if (!flag) {
+        it = jobs.erase(it);
+      } else {
+        it++;
+      }
+    }
+  }
+
+  void Scheduler::getJobsWithMaxChildren(std::map<int, Node *> &jobs) {
+    // Get the largest children number
+    size_t maxChildren = 0;
+    for (std::map<int, Node *>::iterator it = jobs.begin();
+         it != jobs.end(); ++it) {
+      if (it->second->children.size() < maxChildren) {
+        maxChildren = it->second->children.size();
+      }
+    }
+
+    // Get the filtered collection
+    for (std::map<int, Node *>::iterator it = jobs.begin();
+         it != jobs.end();) {
+      if (it->second->children.size() != maxChildren) {
+        it = jobs.erase(it);
+      } else {
+        it++;
+      }
+    }
+  }
+
+  int Scheduler::getFirstComeJob(std::map<int, Node *> &jobs) {
+    int minIdx = -1;
+    for (std::map<int, Node *>::iterator it = jobs.begin();
+         it != jobs.end(); ++it) {
+      if ((minIdx == -1) || (it->first < minIdx)) {
+        minIdx = it->first;
+      }
+    }
+    return minIdx;
+  }
+
   Node *Scheduler::optimizedPickAJob(int workerId) {
     // TODO: implementation
-    return NULL;
+    Node *node = NULL;
+    int jobIdx = -1;
+    if (this->runnableJobs.size() != 0) {
+      // Copy the original queue
+      std::map<int, Node *> jobs;
+      std::list<Node *>::iterator itList = runnableJobs.begin();
+      for (int i = 0; i < runnableJobs.size(); ++i) {
+        jobs[i] = *itList;
+        itList++;
+      }
+
+      getJobsWithMinBatchID(jobs);
+
+      if (jobs.size() == 1) {
+        std::map<int, Node *>::iterator it = jobs.begin();
+        jobIdx = it->first;
+      } else {
+
+        getJobsWithMinDepth(jobs);
+
+        if (jobs.size() == 1) {
+          std::map<int, Node *>::iterator it = jobs.begin();
+          jobIdx = it->first;
+        } else {
+          getJobsWithLocality(jobs, workerId);
+
+          if (jobs.size() == 1) {
+            std::map<int, Node *>::iterator it = jobs.begin();
+            jobIdx = it->first;
+          } else {
+            getJobsWithMaxChildren(jobs);
+
+            if (jobs.size() == 1) {
+              std::map<int, Node *>::iterator it = jobs.begin();
+              jobIdx = it->first;
+            } else {
+              jobIdx = getFirstComeJob(jobs);
+            }
+          }
+        }
+      }
+
+      itList = runnableJobs.begin();
+      for (int i = 0; i < jobIdx; ++i) {
+        itList++;
+      }
+      node = *itList;
+    }
+
+    return node;
   }
 
   Node *Scheduler::pickAJob(int workerId) {

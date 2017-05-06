@@ -65,6 +65,16 @@ namespace elixir {
 
     void markJobFinished(int nodeKey);
 
+    void getJobsWithMinBatchID(std::map<int, Node *> &jobs);
+
+    void getJobsWithMinDepth(std::map<int, Node *> &jobs);
+
+    void getJobsWithLocality(std::map<int, Node *> &jobs, int workerId);
+
+    void getJobsWithMaxChildren(std::map<int, Node *> &jobs);
+
+    int getFirstComeJob(std::map<int, Node *> &jobs);
+
     Node *fifoPickAJob(int workerId);
 
     Node *optimizedPickAJob(int workerId);
