@@ -33,6 +33,13 @@ namespace elixir {
     for (auto pair: nodes) {
       int nodeKey = pair.first;
       Node *node = pair.second;
+
+      pthread_t tid = pthread_self();
+      cout << "[Graph]\t"
+           << tid
+           << "getRunnableJob(): nodeKey: "
+           << nodeKey
+           << endl;
       assert(node != nullptr);
 
       // Criterion: check if the batchId of the job is too deep.
@@ -43,6 +50,11 @@ namespace elixir {
       if (tooDeep) {
         continue;
       }
+      cout << "[Graph]\t"
+           << tid
+           << "getRunnableJob(): not too deep: "
+           << nodeKey
+           << endl;
       
       bool nodeIsRunnable = true;
       // Check if all the parents are finished
@@ -53,6 +65,11 @@ namespace elixir {
         }
       }
       if (nodeIsRunnable) {
+        cout << "[Graph]\t"
+             << tid
+             << "getRunnableJob(): node is runnable:"
+             << nodeKey
+             << endl;
         // Return runnable job
         Node *result = new Node(node->nodeId, node->batchId, node->graph,
                                 node->parents, node->children);
