@@ -191,10 +191,15 @@ void *worker_thread(void *arg) {
             << std::endl;
 }
 
+Graph *theGraph;
+Scheduler *theScheduler;
+
 int main() {
   // build graph
   Graph *graph = loadGraph();
+  theGraph = graph;
   Scheduler::getScheduler().init(graph);
+  theScheduler = &(Scheduler::getScheduler());
 
   pthread_t threads[NUM_CORES];
 
