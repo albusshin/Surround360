@@ -114,6 +114,7 @@ namespace elixir {
     assertThatInvariantsHold();
 
     Node *node = nodes[nodeKey];
+    assert(node != nullptr);
     for (size_t i = 0; i < node->parents.size(); ++i) {
       // Update every dependency to the next layer.
       node->parents[i] += totalNodes;

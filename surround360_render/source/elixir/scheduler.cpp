@@ -125,10 +125,8 @@ namespace elixir {
     dataMap[nodeKey] = outputData;
 
     // cleanup
-    Node *graphNode = graph->nodes[nodeKey];
+    assert(graph->nodes.find(nodeKey) == graph->nodes.end());
     Node *finishingNode = runningJobs[workerId];
-
-    assert(graphNode != finishingNode);
 
     // remove from runningJobs
     runningJobs.erase(nodeKey);
