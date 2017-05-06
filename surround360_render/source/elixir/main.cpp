@@ -185,7 +185,7 @@ Graph *loadGraph() {
     vector<int> children; // Empty
 
     // Parent sequence: all r from 42 to 56
-    for (int j = end - rNodeNum; j < end; ++j) {
+    for (int j = start - rNodeNum; j < start; ++j) {
       parent.push_back(j);
     }
 
