@@ -225,9 +225,8 @@ namespace elixir {
 #ifdef DEBUG
     // Assert running jobs are not runnable and are not finished
     for (auto pair : runningJobs) {
-      int nodeKey = pair.first;
       Node *node = pair.second;
-      assert(Node::getNodeKeyByIds(node->nodeId, node->batchId) == nodeKey);
+      int nodeKey = Node::getNodeKeyByIds(node->nodeId, node->batchId);
       for (Node *runnableJob : runnableJobs) {
         assert(node != runnableJob);
         assert(
