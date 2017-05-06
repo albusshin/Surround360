@@ -35,7 +35,7 @@ void KernelF::new_frame_info(int camImageWidth, int camImageHeight) {
   prev_overlap_image_r_
 */
 std::unordered_map<std::string, void *> KernelF::execute override (
-  std::vector<elixir::Data> dataList) {
+  std::vector<elixir::Data>& dataList) {
 
   /* Magic numbers fest */
   assert(dataList.size() == 3);

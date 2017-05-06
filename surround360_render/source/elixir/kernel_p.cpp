@@ -11,7 +11,7 @@ typedef int i32;
 */
 
 std::unordered_map<std::string, void *> KernelP::execute override (
-  std::vector<elixir::Data> dataList) {
+  std::vector<elixir::Data>& dataList) {
 
   // dataList contains
   assert(dataList.size() == 1);
