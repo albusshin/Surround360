@@ -39,7 +39,7 @@ public:
   }
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) override {
+    vector<elixir::Data>& dataList) {
     assert(dataList.empty());
 
     cv::VideoCapture cap(videoFilename_);
@@ -113,7 +113,7 @@ public:
   */
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) override {
+    vector<elixir::Data>& dataList) {
 
     // dataList contains
     assert(dataList.size() == 1);
@@ -222,7 +222,7 @@ public:
   prev_overlap_image_r_
 */
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) override {
+    vector<elixir::Data>& dataList) {
 
     /* Magic numbers fest */
     assert(dataList.size() == 3);
@@ -363,7 +363,7 @@ public:
 */
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) override {
+    vector<elixir::Data>& dataList) {
     assert(dataList.size() == 3);
     assert(dataList[0].data.size() == 1);
     assert(dataList[1].data.size() == 1);
@@ -484,7 +484,7 @@ public:
   pano
 */
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) override {
+    vector<elixir::Data>& dataList) {
 
     string chunkKey;
     if (left_) {
