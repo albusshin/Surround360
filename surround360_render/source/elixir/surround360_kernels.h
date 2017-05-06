@@ -5,8 +5,9 @@
 #include "render/ImageWarper.h"
 #include "optical_flow/NovelView.h"
 #include "util/MathUtil.h"
-#include "source/scanner_kernels/surround360.pb.h"
+// #include "source/scanner_kernels/surround360.pb.h"
 #include "optical_flow/NovelView.h"
+#include "kernel.h"
 
 #include <opencv2/video.hpp>
 #include <string>
@@ -111,7 +112,6 @@ public:
     Output:
     p_mat
   */
-
   unordered_map<string, void *> execute(
     vector<elixir::Data>& dataList) override {
 

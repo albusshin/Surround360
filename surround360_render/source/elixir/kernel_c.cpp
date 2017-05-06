@@ -1,4 +1,5 @@
 #include "surround360_kernels.h"
+#include <string>
 
 typedef int i32;
 

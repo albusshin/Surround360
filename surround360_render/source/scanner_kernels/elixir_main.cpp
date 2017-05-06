@@ -65,7 +65,8 @@ namespace surround360 {
 
   class ProjectSphericalKernelCPUExtracted {
   public:
-    ProjectSphericalKernelCPUExtracted(const surround360::proto::ProjectSphericalArgs &args) {
+    ProjectSphericalKernelCPUExtracted(
+        const surround360::proto::ProjectSphericalArgs &args) {
       args_ = args;
       // Initialize camera rig
       rig_.reset(new RigDescription(args_.camera_rig_path()));
@@ -532,6 +533,7 @@ int main(int argc, char *argv[]) {
   int offset = 1;
   for (int i = 0; i < numCamera; ++i) {
     int cameraId = i + offset;
+
     surround360::ProjectSphericalKernelCPUExtracted *project_kernel =
       new surround360::ProjectSphericalKernelCPUExtracted(project_args);
     project_kernels.push_back(project_kernel);
@@ -560,7 +562,8 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Before execution of kernel" << std::endl;
     // Calculate right project
-    project_kernels[i]->execute(frame_col_mats[i], i, projects[i]);
+    int camIdx = (i + offset) % numCamera;
+    project_kernels[i]->execute(frame_col_mats[i], camIdx, projects[i]);
     std::cout << "[Main]\t"
               << "Done project["
               << i
@@ -571,13 +574,14 @@ int main(int argc, char *argv[]) {
               << " * "
               << projects[i].channels()
               << std::endl;
-
+/*
     cv::Mat towrite;
     cv::cvtColor(projects[i], towrite, CV_BGRA2BGR);
 
     std::stringstream ss;
     ss << "/home/ubuntu/o/projects_elixir_" << i << ".jpg";
     cv::imwrite(ss.str(), towrite);
+    */
   }
   time_t after_step1 = time(0);
   std::cout << "[Main]\t"
@@ -633,7 +637,7 @@ int main(int argc, char *argv[]) {
               << " * "
               << left_flows[i].channels()
               << std::endl;
-
+/*
     cv::Mat towrite_left;
     cv::cvtColor(left_flows[i], towrite_left, CV_BGRA2BGR);
 
@@ -646,6 +650,7 @@ int main(int argc, char *argv[]) {
     ss.clear();
     ss << "/home/ubuntu/o/right_flow_elixir_" << i << ".jpg";
     cv::imwrite(ss.str(), towrite_right);
+    */
   }
 
   time_t after_step2 = time(0);
@@ -683,7 +688,8 @@ int main(int argc, char *argv[]) {
               << "]"
               << std::endl;
 
-    render_kernels[i]->new_frame_info(left_flows[i].cols, left_flows[i].rows);
+    // render_kernels[i]->new_frame_info(left_flows[i].cols, left_flows[i].rows);
+    render_kernels[i]->new_frame_info(projects[i].cols, projects[i].rows);
 
 
     std::cout << "[Main]\t"
@@ -719,7 +725,7 @@ int main(int argc, char *argv[]) {
               << " * "
               << chunkLs[i].channels()
               << std::endl;
-
+/*
     cv::Mat towrite_left;
     cv::cvtColor(chunkLs[i], towrite_left, CV_BGRA2BGR);
 
@@ -732,6 +738,7 @@ int main(int argc, char *argv[]) {
     ss.clear();
     ss << "/home/ubuntu/o/chunkR_elixir" << i << ".jpg";
     cv::imwrite(ss.str(), towrite_right);
+    */
 
   }
 

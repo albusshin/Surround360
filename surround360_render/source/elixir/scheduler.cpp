@@ -24,8 +24,11 @@ namespace elixir {
   }
 
   Node *Scheduler::fifoPickAJob(int workerId) {
-    Node *node = this->runnableJobs.front();
-    this->runnableJobs.pop_front();
+    Node *node = NULL;
+    if (this->runnableJobs.size() != 0) {
+      node = this->runnableJobs.front();
+      this->runnableJobs.pop_front();
+    }
     return node;
   }
 
@@ -64,7 +67,6 @@ namespace elixir {
     // select job from job queue
     // Delete the node from the runnableQueue
     Node *node = pickAJob(workerId);
-    assert(node != NULL);
 
     // Add the node to the runningMap
     this->runningJobs[workerId] = node;
