@@ -45,7 +45,7 @@ void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
   }
 }
 
-std::unordered_map<std::string, void *> KernelR::execute(
+std::unordered_map<std::string, void *> KernelR::execute override (
   std::vector<elixir::Data> dataList) {
 
   assert(dataList.size() == 3);

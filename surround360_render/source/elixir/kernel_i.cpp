@@ -2,7 +2,7 @@
 
 typedef int i32;
 
-std::unordered_map<std::string, void *> KernelI::execute(
+std::unordered_map<std::string, void *> KernelI::execute override (
   std::vector<elixir::Data> dataList) {
   assert(dataList.empty());
 
