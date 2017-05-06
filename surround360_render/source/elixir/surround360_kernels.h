@@ -18,6 +18,8 @@
 #include "kernel.h"
 
 typedef int i32;
+using namespace std;
+using namespace surround360;
 
 class KernelI : public elixir::Kernel {
 public:
@@ -34,8 +36,8 @@ public:
     frameNumber++;
   }
 
-  std::unordered_map<std::string, void *> execute(
-    std::vector<elixir::Data> dataList) override;
+  unordered_map<string, void *> execute(
+    vector<elixir::Data> dataList);
 
 private:
   string videoFilename_;
@@ -88,11 +90,11 @@ public:
     p_mat
   */
 
-  std::unordered_map<std::string, void *> execute(
-    std::vector<elixir::Data> dataList) override;
+  unordered_map<string, void *> execute(
+    vector<elixir::Data> dataList);
 
 private:
-  std::unique_ptr<RigDescription> rig_;
+  unique_ptr<RigDescription> rig_;
   string camera_rig_path_;
   size_t eqr_width_;
   size_t eqr_height_;
@@ -132,8 +134,8 @@ public:
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
-  std::unordered_map<std::string, void *> execute(
-    std::vector<elixir::Data> dataList) override;
+  unordered_map<string, void *> execute(
+    vector<elixir::Data> dataList);
 
 private:
   string camera_rig_path_;
@@ -178,12 +180,12 @@ public:
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
-  std::unordered_map<std::string, void *> execute(
-    std::vector<elixir::Data> dataList) override;
+  unordered_map<string, void *> execute(
+    vector<elixir::Data> dataList);
 
 private:
   int camImageHeight_;
-  std::unique_ptr<RigDescription> rig_;
+  unique_ptr<RigDescription> rig_;
   float fov_horizontal_radians_;
   int overlap_image_width_;
   int num_novel_views_;
@@ -195,8 +197,8 @@ private:
   float zero_parallax_dist;
   float interpupilary_dist;
 
-  std::unique_ptr<NovelViewGenerator> novel_view_gen_;
-  std::unique_ptr<LazyNovelViewBuffer> lazy_view_buffer_;
+  unique_ptr<NovelViewGenerator> novel_view_gen_;
+  unique_ptr<LazyNovelViewBuffer> lazy_view_buffer_;
 };
 
 class KernelC : public elixir::Kernel{
@@ -234,11 +236,11 @@ public:
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
-  std::unordered_map<std::string, void *> execute(
-    std::vector<elixir::Data> dataList) override;
+  unordered_map<string, void *> execute(
+    vector<elixir::Data> dataList);
 
 private:
-  std::unique_ptr<RigDescription> rig_;
+  unique_ptr<RigDescription> rig_;
   float zeroParallaxNovelViewShiftPixels_;
   int camImageWidth_;
   int camImageHeight_;
