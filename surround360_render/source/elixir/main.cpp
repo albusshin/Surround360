@@ -26,13 +26,18 @@ string get_video_filename(int camId) {
 Graph *loadGraph() {
   size_t frameNum = 1;
   size_t nodeNum = 58;
+  size_t iNodeNum = 14;
+  size_t pNodeNum = 14;
+  size_t fNodeNum = 14;
+  size_t rNodeNum = 14;
+  size_t cNodeNum = 2;
 
   // Create a graph object
   Graph *graph = new Graph(nodeNum, frameNum);
 
   // Add I nodes
   int depth = 0;
-  for (int i = 0; i < 14; ++i) {
+  for (int i = 0; i < iNodeNum; ++i) {
     // Create parent list, child list
     vector<int> parent; // Empty
     vector<int> children;
@@ -50,9 +55,11 @@ Graph *loadGraph() {
   }
 
   // Add P nodes
+  size_t start = iNodeNum;
+  size_t end = iNodeNum + pNodeNum;
   int offset = 1;
   depth += 1;
-  for (int i = 14; i < 28; ++i) {
+  for (int i = start; i < end; ++i) {
     // Create parent list, child list
     vector<int> parent;
     vector<int> children;
@@ -62,14 +69,14 @@ Graph *loadGraph() {
 
     // Children: right f => left f => right r => left r
     children.push_back(i + 14);
-    if (i == 14) {
+    if (i == start) {
       children.push_back(i + 27);
     } else {
       children.push_back(i + 13);
     }
 
     children.push_back(i + 28);
-    if (i == 14) {
+    if (i == start) {
       children.push_back(i + 41);
     } else {
       children.push_back(i + 27);
@@ -87,20 +94,22 @@ Graph *loadGraph() {
   }
 
   // Add F nodes
+  start = end;
+  end = start + fNodeNum;
   depth += 1;
-  for (int i = 28; i < 42; ++i) {
+  for (int i = start; i < end; ++i) {
     // Create parent list, child list
     vector<int> parent;
     vector<int> children;
 
     // Parent sequence: left p => right p => previous f
     parent.push_back(i - 14);
-    if (i == 41) {
+    if (i == end - 1) {
       parent.push_back(i - 27);
     } else {
       parent.push_back(i - 13);
     }
-    parent.push_back(i - 58);
+    parent.push_back(i - nodeNum);
 
     vector<int> dummyNextLayer;
     dummyNextLayer.push_back(i);
@@ -112,13 +121,13 @@ Graph *loadGraph() {
     dummyRawData["left_flow"] = (void *) new cv::Mat();
     dummyRawData["right_flow"] = (void *) new cv::Mat();
     Data *dummyData = new Data(dummyRawData,
-                               i - 58,
+                               i - nodeNum,
                                dummyNextLayer);
-    Scheduler::getScheduler().addDummyData(i - 58, dummyData);
+    Scheduler::getScheduler().addDummyData(i - nodeNum, dummyData);
 
     // Children sequence: r => later f
     children.push_back(i + 14);
-    children.push_back(i + 58);
+    children.push_back(i + nodeNum);
 
     // Create a node
     elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
@@ -131,14 +140,16 @@ Graph *loadGraph() {
 
   // Add R nodes
   depth += 1;
-  for (int i = 42; i < 56; ++i) {
+  start = end;
+  end = start + rNodeNum;
+  for (int i = start; i < end; ++i) {
     // Create parent list, child list
     vector<int> parent;
     vector<int> children;
 
     // Parent sequence: left p => right p => f
     parent.push_back(i - 28);
-    if (i == 42) {
+    if (i == end - 1) {
       parent.push_back(i - 41);
     } else {
       parent.push_back(i - 27);
@@ -147,8 +158,8 @@ Graph *loadGraph() {
     parent.push_back(i - 14);
 
     // Children sequence: left c => right c
-    children.push_back(i + 14);
-    children.push_back(i + 15);
+    children.push_back(i + end);
+    children.push_back(i + end + 1);
 
     // Create a node
     elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
@@ -166,13 +177,15 @@ Graph *loadGraph() {
 
   // Add C nodes
   depth += 1;
-  for (int i = 56; i < 58; ++i) {
+  start = end;
+  end = start + rNodeNum;
+  for (int i = start; i < end - 1; ++i) {
     // Create parent list, child list
     vector<int> parent;
     vector<int> children; // Empty
 
-    // Parent sequence: all r from 28 to 41
-    for (int j = 42; j < 56; ++j) {
+    // Parent sequence: all r from 42 to 56
+    for (int j = end - rNodeNum; j < end; ++j) {
       parent.push_back(j);
     }
 
@@ -185,7 +198,7 @@ Graph *loadGraph() {
                                flow_algo,
                                zero_parallax_dist,
                                interpupilary_dist,
-                               i == 56); // If i == 56 then it's left, otherwise it's right.
+                               i == start); // If i == 56 then it's left, otherwise it's right.
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
