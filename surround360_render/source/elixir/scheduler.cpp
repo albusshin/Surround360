@@ -6,6 +6,7 @@
 #include <string>
 #include <assert.h>
 #include <stdexcept>
+#include <limits.h>
 
 #include "scheduler.h"
 #include "graph.h"
