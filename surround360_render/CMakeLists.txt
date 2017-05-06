@@ -15,6 +15,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/source/optical_flow)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/source/camera_isp)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/source/calibration)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/source/render)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/source/elixir)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
 INCLUDE_DIRECTORIES(/usr/local/include/eigen3)
 
@@ -523,6 +524,7 @@ TARGET_LINK_LIBRARIES(
   ${PLATFORM_SPECIFIC_LIBS}
 )
 
+# Scanner
 
 IF (USE_SCANNER)
   SET(SCANNER_PATH "~/m/scanner/")
@@ -542,18 +544,25 @@ IF (USE_SCANNER)
     ${OpenCV_LIBS})
 ENDIF()
 
+# Elixir
+
 IF (USE_ELIXIR)
   SET(SCANNER_PATH "~/m/scanner/")
   include(${SCANNER_PATH}/cmake/Util/Op.cmake)
-  build_op(
-    LIB_NAME elixirmain
-    CPP_SRCS
-    source/scanner_kernels/elixir_main.cpp
-    PROTO_SRC source/scanner_kernels/surround360.proto)
+  build_op(LIB_NAME elixirmain
+          CPP_SRCS
+          source/elixir/graph.cpp
+          source/elixir/kernel_c.cpp
+          source/elixir/kernel_f.cpp
+          source/elixir/kernel_i.cpp
+          source/elixir/kernel_p.cpp
+          source/elixir/kernel_r.cpp
+          source/elixir/main.cpp
+          source/elixir/scheduler.cpp
+          source/elixir/worker.cpp)
   ADD_EXECUTABLE(
-    ElixirMain
-    source/scanner_kernels/elixir_main.cpp
-    )
+          ElixirMain
+          source/elixir/main.cpp)
   TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
   TARGET_LINK_LIBRARIES(
     ElixirMain
