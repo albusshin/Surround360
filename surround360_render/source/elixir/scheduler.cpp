@@ -175,7 +175,7 @@ namespace elixir {
   }
 
   bool Scheduler::isJobBatchTooDeep(int batchId) {
-    const int LAYERS_THRESHOLD = 3;
+    const int LAYERS_THRESHOLD = 1;
 
     if (runnableJobs.empty()) {
       return false;
