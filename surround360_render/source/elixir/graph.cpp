@@ -131,11 +131,14 @@ namespace elixir {
 
     pthread_t tid = pthread_self();
     cout << "[Graph]\t"
-           << tid
-           << " erasing "
-           << nodeKey
-           << " from graph.nodes"
-           << endl;
+         << tid
+         << " erasing "
+         << nodeKey
+         << " from graph.nodes, graph.nodes.size() == "
+         << nodes.size()
+         << ", newKey == "
+         << newKey
+         << endl;
     nodes.erase(nodeKey);
     nodes[newKey] = node;
 
