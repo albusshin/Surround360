@@ -9,6 +9,6 @@ public:
 
 extern NullBuffer null_buffer;
 
-extern std::ostream null_stream(&null_buffer);
+extern std::ostream null_stream;
 
 #endif /* ELIXIR_NULLBUF_H */
