@@ -12,10 +12,10 @@ namespace elixir {
   class Data {
     int fromNodeKey;
 
+  public:
     // toNodeKey (children)
     vector<int> toNodeKeys;
 
-  public:
     Data(unordered_map<string, void *> data,
          int fromNodeKey,
          vector<int> children)

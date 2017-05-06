@@ -1,10 +1,18 @@
+#include <iostream>
 #include <vector>
+#include <pthread.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <assert.h>
 
 #include "graph.h"
 #include "scheduler.h"
+#include "nullbuf.h"
+
+#define DEBUG
+
+//#define logger cout
+#define logger null_stream
 
 namespace elixir {
   using namespace std;
@@ -29,17 +37,41 @@ namespace elixir {
     for (auto pair: nodes) {
       int nodeKey = pair.first;
       Node *node = pair.second;
+
+      pthread_t tid = pthread_self();
+      logger << "[Graph]\t"
+             << tid
+             << "getRunnableJob(): nodeKey: "
+             << nodeKey
+             << " ids: "
+             << node->nodeId
+             << ", "
+             << node->batchId
+             << endl;
       assert(node != nullptr);
+
+      if (node->batchId >= numBatches) {
+        continue;
+      }
 
       // Criterion: check if the batchId of the job is too deep.
       // If so, we don't add this job to the queue even if it's runnable.
-      int minBatchIdInRunnableQueue =
-        Scheduler::getScheduler().getMinBatchIdInRunnableJobs();
 
-      if (minBatchIdInRunnableQueue + layers_threshold < node->batchId) {
+      bool tooDeep = Scheduler::getScheduler().isJobBatchTooDeep(node->batchId);
+
+      if (tooDeep) {
         continue;
       }
-      
+      logger << "[Graph]\t"
+             << tid
+             << "getRunnableJob(): not too deep: "
+             << nodeKey
+             << " ids: "
+             << node->nodeId
+             << ", "
+             << node->batchId
+             << endl;
+
       bool nodeIsRunnable = true;
       // Check if all the parents are finished
       for (int parentNodeKey : node->parents) {
@@ -49,6 +81,15 @@ namespace elixir {
         }
       }
       if (nodeIsRunnable) {
+        logger << "[Graph]\t"
+               << tid
+               << "getRunnableJob(): node is runnable:"
+               << nodeKey
+               << " ids: "
+               << node->nodeId
+               << ", "
+               << node->batchId
+               << endl;
         // Return runnable job
         Node *result = new Node(node->nodeId, node->batchId, node->depth,
                                 node->graph, node->parents, node->children);
@@ -70,10 +111,10 @@ namespace elixir {
 
   void Graph::updateGraphNode(int nodeKey) {
     //TODO check implementation correctness
-    lock();
     assertThatInvariantsHold();
 
     Node *node = nodes[nodeKey];
+    assert(node != nullptr);
     for (size_t i = 0; i < node->parents.size(); ++i) {
       // Update every dependency to the next layer.
       node->parents[i] += totalNodes;
@@ -88,11 +129,21 @@ namespace elixir {
     // update node batchId
     node->batchId++;
     node->kernel->updateToNextLayer();
+
+    pthread_t tid = pthread_self();
     nodes.erase(nodeKey);
     nodes[newKey] = node;
+    cout << "[Graph]\t"
+         << tid
+         << " after erasing "
+         << nodeKey
+         << " from graph.nodes, graph.nodes.size() == "
+         << nodes.size()
+         << ", newKey == "
+         << newKey
+         << endl;
 
     assertThatInvariantsHold();
-    unlock();
   }
 
   void Graph::assertThatInvariantsHold() {
@@ -113,10 +164,24 @@ namespace elixir {
   }
 
   void Graph::lock() {
+    pthread_t tid = pthread_self();
+    logger << "[Graph]\t"
+           << tid
+           << ": lock()"
+           << endl;
     pthread_mutex_lock(&graphlock);
+    logger << "[Graph]\t"
+           << tid
+           << ": acquired lock."
+           << endl;
   }
 
   void Graph::unlock() {
+    pthread_t tid = pthread_self();
+    logger << "[Graph]\t"
+           << tid
+           << ": unlock()"
+           << endl;
     pthread_mutex_unlock(&graphlock);
   }
 

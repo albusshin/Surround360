@@ -31,7 +31,7 @@ namespace elixir {
 
     Data *getDataByNodeKey(int nodeKey);
 
-    int getMinBatchIdInRunnableJobs();
+    bool isJobBatchTooDeep(int batchId);
 
     static Scheduler& getScheduler();
 

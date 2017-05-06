@@ -40,7 +40,7 @@ namespace elixir {
     // TODO:
     // Should be a variable that can be adjust based on core number and first
     // layer node number. Should > (core number / first layer node number)
-    const int layers_threshold = 3;
+    // const int layers_threshold = 3;
 
     pthread_mutex_t graphlock;
 

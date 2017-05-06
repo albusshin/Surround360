@@ -565,6 +565,8 @@ IF (USE_ELIXIR)
     source/elixir/scheduler.cpp
     source/elixir/worker.h
     source/elixir/worker.cpp
+    source/elixir/nullbuf.h
+    source/elixir/nullbuf.cpp
     source/elixir/main.cpp)
   target_link_libraries(elixirmain PRIVATE
     LibVrCamera
@@ -593,6 +595,8 @@ IF (USE_ELIXIR)
     source/elixir/scheduler.cpp
     source/elixir/worker.h
     source/elixir/worker.cpp
+    source/elixir/nullbuf.h
+    source/elixir/nullbuf.cpp
     source/elixir/main.cpp)
   TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
   TARGET_LINK_LIBRARIES(

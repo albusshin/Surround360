@@ -1,4 +1,6 @@
 #include "surround360_kernels.h"
+#include "pthread.h"
+#include "nullbuf.h"
 
 typedef int i32;
 
@@ -6,6 +8,11 @@ std::unordered_map<std::string, void *> KernelI::execute (
   std::vector<elixir::Data *>& dataList) {
   assert(dataList.empty());
 
+  pthread_t tid = pthread_self();
+  logger << "[KernelI]\t"
+         << "tid: " << tid
+         << "execute()"
+         << endl;
   cv::VideoCapture cap(videoFilename_);
   if(!cap.isOpened()){
     std::cout << "I: Cannot open video file "

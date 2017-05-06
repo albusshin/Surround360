@@ -1,4 +1,6 @@
 #include "surround360_kernels.h"
+#include "pthread.h"
+#include "nullbuf.h"
 
 typedef int i32;
 
@@ -12,6 +14,12 @@ typedef int i32;
 
 std::unordered_map<std::string, void *> KernelP::execute (
   std::vector<elixir::Data *>& dataList) {
+
+  pthread_t tid = pthread_self();
+  logger << "[KernelP]\t"
+         << "tid: " << tid
+         << "execute()"
+         << endl;
 
   // dataList contains
   assert(dataList.size() == 1);

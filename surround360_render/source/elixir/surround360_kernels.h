@@ -17,6 +17,12 @@
 #include <assert.h>
 
 #include "kernel.h"
+#include "nullbuf.h"
+
+#define DEBUG
+
+#define logger cout
+//#define logger null_stream
 
 typedef int i32;
 using namespace std;
@@ -29,7 +35,13 @@ public:
   KernelI(string videoFilename,
           int frameNumber)
     : videoFilename_(videoFilename),
-      frameNumber_(frameNumber) {}
+      frameNumber_(frameNumber) {
+    logger << "[KernelI]\t"
+           << "ctor()"
+           << "videoFileName == "
+           << videoFilename
+           << endl;
+  }
 
   KernelI *clone() override {
     return new KernelI(videoFilename_, frameNumber_);
@@ -62,6 +74,11 @@ public:
       eqr_height_(eqr_height),
       camera_rig_path_(camera_rig_path),
       camIdx_(camIdx) {
+    logger << "[KernelP]\t"
+           << "ctor()"
+           << "camIdx == "
+           << camIdx
+           << endl;
 
     // Initialize camera rig
     rig_.reset(new RigDescription(camera_rig_path));
@@ -128,6 +145,9 @@ public:
     : camera_rig_path_(camera_rig_path),
       flow_algo_(flow_algo)
     {
+      logger << "[KernelF]\t"
+             << "ctor()"
+             << endl;
 
       rig_.reset(new RigDescription(camera_rig_path));
 
@@ -175,6 +195,9 @@ public:
       zero_parallax_dist_(zero_parallax_dist),
       interpupilary_dist_(interpupilary_dist)
     {
+      logger << "[KernelR]\t"
+             << "ctor()"
+             << endl;
 
       rig_.reset(new RigDescription(camera_rig_path));
 
@@ -238,6 +261,10 @@ public:
       zero_parallax_dist_(zero_parallax_dist),
       interpupilary_dist_(interpupilary_dist),
       left_(left) {
+
+    logger << "[KernelC]\t"
+           << "ctor()"
+           << endl;
 
     rig_.reset(new RigDescription(camera_rig_path));
   }

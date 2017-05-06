@@ -1,3 +1,4 @@
+#include <iostream>
 #include <pthread.h>
 #include <string>
 #include <vector>
@@ -11,6 +12,13 @@
 
 #include "scheduler.h"
 #include "graph.h"
+#include "nullbuf.h"
+
+#define DEBUG
+
+//#define logger cout
+#define logger null_stream
+
 
 namespace elixir {
 
@@ -194,14 +202,14 @@ namespace elixir {
     Node* node = NULL;
 
     switch(this->policy) {
-      case SchedulerPolicy::Fifo:
-        node = fifoPickAJob(workerId);
-        break;
-      case SchedulerPolicy::Optimized:
-        node = optimizedPickAJob(workerId);
-        break;
-      default:
-        throw invalid_argument("Invalid Policy!!\n");
+    case SchedulerPolicy::Fifo:
+      node = fifoPickAJob(workerId);
+      break;
+    case SchedulerPolicy::Optimized:
+      node = optimizedPickAJob(workerId);
+      break;
+    default:
+      throw invalid_argument("Invalid Policy!!\n");
     }
 
     return node;
@@ -209,8 +217,14 @@ namespace elixir {
 
   Node *Scheduler::scheduleJob(int workerId) {
     lock();
+    assertThatInvariantsHold();
     // parse graph to find every runnable job
     vector<Node *> runnableJobs = this->graph->getRunnableJobs();
+    logger << "[Scheduler]\t"
+           << "workerId: " << workerId
+           << " runnableJobs.size() == "
+           << runnableJobs.size()
+           << endl;
 
     for (vector<Node *>::iterator it = runnableJobs.begin();
          it != runnableJobs.end(); ++it) {
@@ -221,9 +235,12 @@ namespace elixir {
     // Delete the node from the runnableQueue
     Node *node = pickAJob(workerId);
 
-    // Add the node to the runningMap
-    this->runningJobs[workerId] = node;
+    if (node != nullptr) {
+      // Add the node to the runningMap
+      this->runningJobs[workerId] = node;
+    }
 
+    assertThatInvariantsHold();
     unlock();
     return node;
   }
@@ -261,13 +278,12 @@ namespace elixir {
     dataMap[nodeKey] = outputData;
 
     // cleanup
-    Node *graphNode = graph->nodes[nodeKey];
+    assert(graph->nodes.find(nodeKey) == graph->nodes.end());
     Node *finishingNode = runningJobs[workerId];
-
-    assert(graphNode != finishingNode);
+    assert(finishingNode != nullptr);
 
     // remove from runningJobs
-    runningJobs.erase(nodeKey);
+    runningJobs.erase(workerId);
 
     // set job finished
     markJobFinished(nodeKey);
@@ -287,7 +303,14 @@ namespace elixir {
       Data *data = ite->second;
       // Deleting while iterating map as per
       // http://stackoverflow.com/a/8234813/1831275
-      if (isJobFinished(nodeKey)) {
+      bool allChildrenFinished = true;
+      for (int childNodeKey : data->toNodeKeys) {
+        if (!isJobFinished(childNodeKey)) {
+          allChildrenFinished = false;
+          break;
+        }
+      }
+      if (allChildrenFinished) {
         dataMap.erase(ite++);
         //Free up memory
         delete data;
@@ -298,16 +321,13 @@ namespace elixir {
   }
 
   bool Scheduler::isJobFinished(int nodeKey) {
-    lock();
     assertThatInvariantsHold();
     if (nodeKey < 0) {
       // treat all nodes with nodeKey less than 0 as finished
-      unlock();
       return true;
     } else {
       bool result = finished.find(nodeKey) != finished.end();
       assertThatInvariantsHold();
-      unlock();
       return result;
     }
   }
@@ -322,12 +342,18 @@ namespace elixir {
     return result;
   }
 
-  int Scheduler::getMinBatchIdInRunnableJobs() {
-    int minBatchIdInRunnableQueue = INT_MAX;
-    for (Node *node: runnableJobs) {
-      minBatchIdInRunnableQueue = min(node->batchId, minBatchIdInRunnableQueue);
+  bool Scheduler::isJobBatchTooDeep(int batchId) {
+    const int LAYERS_THRESHOLD = 1;
+
+    if (runnableJobs.empty()) {
+      return false;
+    } else {
+      int minBatchIdInRunnableQueue = INT_MAX;
+      for (Node *node: runnableJobs) {
+        minBatchIdInRunnableQueue = min(node->batchId, minBatchIdInRunnableQueue);
+      }
+      return minBatchIdInRunnableQueue + LAYERS_THRESHOLD < batchId;
     }
-    return minBatchIdInRunnableQueue;
   }
 
   Scheduler& Scheduler::getScheduler() {
@@ -336,16 +362,28 @@ namespace elixir {
 
   // Privates
   void Scheduler::markJobFinished(int nodeKey) {
-    lock();
     finished.insert(nodeKey);
-    unlock();
   }
 
   void Scheduler::lock() {
+    pthread_t tid = pthread_self();
+    logger << "[Scheduler]\t"
+           << tid
+           << ": lock()"
+           << endl;
     pthread_mutex_lock(&schedulerLock);
+    logger << "[Scheduler]\t"
+           << tid
+           << ": acquired lock."
+           << endl;
   }
 
   void Scheduler::unlock() {
+    pthread_t tid = pthread_self();
+    logger << "[Scheduler]\t"
+           << tid
+           << ": unlock()"
+           << endl;
     pthread_mutex_unlock(&schedulerLock);
   }
 
@@ -353,15 +391,20 @@ namespace elixir {
 #ifdef DEBUG
     // Assert running jobs are not runnable and are not finished
     for (auto pair : runningJobs) {
-      int nodeKey = pair.first;
       Node *node = pair.second;
-      assert(Node::getNodeKeyByIds(node->nodeId, node->batchId) == nodeKey);
-      assert(runnableJobs.find(node) == runnableJobs.end());
+      assert(node != nullptr);
+      int nodeKey = Node::getNodeKeyByIds(node->nodeId, node->batchId);
+      for (Node *runnableJob : runnableJobs) {
+        assert(node != runnableJob);
+        assert(
+          Node::getNodeKeyByIds(node->nodeId, node->batchId)
+          != Node::getNodeKeyByIds(runnableJob->nodeId, runnableJob->batchId));
+      }
       assert(finished.find(nodeKey) == finished.end());
 
       // Assert graph does not contain running jobs
-      assert(graph->nodes.find(nodeKey) == graph->nodes.end())
-        }
+      assert(graph->nodes.find(nodeKey) == graph->nodes.end());
+    }
 
     // Assert runnable jobs are not in graph
     for (Node *node : runnableJobs) {
