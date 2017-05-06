@@ -11,11 +11,11 @@ namespace elixir {
   class Kernel {
   public:
 
-    virtual unordered_map<string, void *> execute(vector<Data *>& dataList);
+    virtual unordered_map<string, void *> execute(vector<Data *>& dataList) = 0;
 
-    virtual Kernel* clone();
+    virtual Kernel* clone() = 0;
 
-    virtual void updateToNextLayer();
+    virtual void updateToNextLayer() = 0;
   };
 
 
