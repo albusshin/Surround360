@@ -39,8 +39,12 @@ public:
     frameNumber_++;
   }
 
+<<<<<<< Updated upstream
   unordered_map<string, void *> execute(
     vector<elixir::Data *>& dataList);
+=======
+  unordered_map<string, void *> execute(vector<elixir::Data>& dataList);
+>>>>>>> Stashed changes
 
 private:
   string videoFilename_;
@@ -93,8 +97,12 @@ public:
     p_mat
   */
 
+<<<<<<< Updated upstream
   unordered_map<string, void *> execute(
     vector<elixir::Data *>& dataList);
+=======
+  unordered_map<string, void *> execute(vector<elixir::Data>& dataList);
+>>>>>>> Stashed changes
 
 private:
   unique_ptr<RigDescription> rig_;
@@ -188,8 +196,12 @@ public:
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
+<<<<<<< Updated upstream
   unordered_map<string, void *> execute(
     vector<elixir::Data *>& dataList);
+=======
+  unordered_map<string, void *> execute(vector<elixir::Data>& dataList);
+>>>>>>> Stashed changes
 
 private:
   int camImageHeight_;
@@ -244,8 +256,12 @@ public:
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
+<<<<<<< Updated upstream
   unordered_map<string, void *> execute(
     vector<elixir::Data *>& dataList);
+=======
+  unordered_map<string, void *> execute(vector<elixir::Data>& dataList);
+>>>>>>> Stashed changes
 
 private:
   unique_ptr<RigDescription> rig_;
