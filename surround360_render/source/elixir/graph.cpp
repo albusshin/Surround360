@@ -130,17 +130,17 @@ namespace elixir {
     node->kernel->updateToNextLayer();
 
     pthread_t tid = pthread_self();
+    nodes.erase(nodeKey);
+    nodes[newKey] = node;
     cout << "[Graph]\t"
          << tid
-         << " erasing "
+         << " after erasing "
          << nodeKey
          << " from graph.nodes, graph.nodes.size() == "
          << nodes.size()
          << ", newKey == "
          << newKey
          << endl;
-    nodes.erase(nodeKey);
-    nodes[newKey] = node;
 
     assertThatInvariantsHold();
   }
