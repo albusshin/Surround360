@@ -39,7 +39,7 @@ public:
   }
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList);
+    vector<elixir::Data *>& dataList);
 
 private:
   string videoFilename_;
@@ -93,7 +93,7 @@ public:
   */
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList);
+    vector<elixir::Data *>& dataList);
 
 private:
   unique_ptr<RigDescription> rig_;
@@ -137,7 +137,7 @@ public:
   void new_frame_info(int camImageWidth, int camImageHeight);
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList);
+    vector<elixir::Data *>& dataList);
 
 private:
   string camera_rig_path_;
@@ -188,7 +188,7 @@ public:
   void new_frame_info(int camImageWidth, int camImageHeight);
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList);
+    vector<elixir::Data *>& dataList);
 
 private:
   int camImageHeight_;
@@ -244,7 +244,7 @@ public:
   void new_frame_info(int camImageWidth, int camImageHeight);
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList);
+    vector<elixir::Data *>& dataList);
 
 private:
   unique_ptr<RigDescription> rig_;

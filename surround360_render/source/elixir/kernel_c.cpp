@@ -46,7 +46,7 @@ void KernelC::new_frame_info(
   pano
 */
 std::unordered_map<std::string, void *> KernelC::execute (
-  std::vector<elixir::Data>& dataList) {
+  std::vector<elixir::Data *>& dataList) {
 
   string chunkKey;
   if (left_) {
