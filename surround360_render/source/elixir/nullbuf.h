@@ -7,7 +7,8 @@ public:
   int overflow(int c) { return c; }
 };
 
-NullBuffer null_buffer;
-std::ostream null_stream(&null_buffer);
+extern NullBuffer null_buffer;
+
+extern std::ostream null_stream(&null_buffer);
 
 #endif /* ELIXIR_NULLBUF_H */
