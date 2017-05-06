@@ -1,6 +1,7 @@
 #include "scheduler.h"
 #include "graph.h"
 #include "surround360_kernels.h"
+#include "worker.h"
 
 #include <pthread.h>
 #include <string>
@@ -19,7 +20,6 @@ string get_video_filename(int camId) {
   assert(camId >= 0 && camId <= 16);
   std::stringstream ss;
   ss << "/home/ubuntu/d/a/palace3/rgb/cam" << camId << "/vid.mp4";
-  ss >> outstr;
   return ss.str();
 }
 
@@ -183,8 +183,8 @@ void *worker_thread(void *arg) {
             << " Up and running."
             << std::endl;
 
-  Worker worker = new Worker(tid);
-  worker.workerThread();
+  elixir::Worker *worker = new Worker(tid);
+  worker->workerThread();
   
   std::cout << "[T " << tid << "]\t"
             << "Finished. "
@@ -205,7 +205,7 @@ int main() {
 
   // join worker threads
   for (int i = 0; i < 32; ++i) {
-    pthread_join(&threads[i], NULL);
+    pthread_join(threads[i], NULL);
   }
 
   std::cout << "[Main]\t"
