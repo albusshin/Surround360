@@ -26,7 +26,7 @@ namespace elixir {
       // get datalist and add data to datalist
       vector<Data *> dataList;
       for (int parentNodeKey : node->parents) {
-        dataList.push_back(Scheduler::getScheduler().dataMap[parentNodeKey]);
+        dataList.push_back(Scheduler::getScheduler().getDataByNodeKey(parentNodeKey));
       }
 
       unordered_map<string, void *> outputRawData = node->kernel->execute(dataList);

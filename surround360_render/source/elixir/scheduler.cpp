@@ -153,16 +153,13 @@ namespace elixir {
   }
 
   bool Scheduler::isJobFinished(int nodeKey) {
-    lock();
     assertThatInvariantsHold();
     if (nodeKey < 0) {
       // treat all nodes with nodeKey less than 0 as finished
-      unlock();
       return true;
     } else {
       bool result = finished.find(nodeKey) != finished.end();
       assertThatInvariantsHold();
-      unlock();
       return result;
     }
   }
