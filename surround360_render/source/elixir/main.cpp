@@ -101,14 +101,14 @@ Graph *loadGraph() {
 
     vector<int> dummyNextLayer;
     dummyNextLayer.push_back(i);
-    vector<string, void *> dummyRawData;
+    unordered_map<string, void *> dummyRawData;
     dummyRawData["prev_overlap_image_l_"] = (void *) new cv::Mat();
     dummyRawData["prev_overlap_image_r_"] = (void *) new cv::Mat();
     dummyRawData["prev_frame_flow_l_to_r_"] = (void *) new cv::Mat();
     dummyRawData["prev_frame_flow_r_to_l_"] = (void *) new cv::Mat();
-    Data *dummyData = new Data((void *) dummyRawData,
-                                i - 58,
-                                dummyNextLayer);
+    Data *dummyData = new Data(dummyRawData,
+                               i - 58,
+                               dummyNextLayer);
     Scheduler::getScheduler().addDummyData(i - 58, dummyData);
 
     // Children sequence: r => later f
@@ -197,7 +197,7 @@ void *worker_thread(void *arg) {
 
   elixir::Worker *worker = new Worker(tid);
   worker->workerThread();
-  
+
   std::cout << "[T " << tid << "]\t"
             << "Finished. "
             << std::endl;
