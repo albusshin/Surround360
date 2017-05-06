@@ -14,6 +14,14 @@ string flow_algo = "pixflow_search_20";
 float zero_parallax_dist = 10000;
 float interpupilary_dist = 6.4;
 
+string get_video_filename(int camId) {
+  assert(camId >= 0 && camId <= 16);
+  std::stringstream ss;
+  ss << "/home/ubuntu/d/a/palace3/rgb/cam" << camId << "/vid.mp4";
+  ss >> outstr;
+  return ss.str();
+}
+
 Graph *loadGraph() {
   size_t frameNum = 1;
   size_t nodeNum = 58;
@@ -33,12 +41,13 @@ Graph *loadGraph() {
     // Create a node
     Node *node = new Node(i, 0, graph, parent, children);
 
-    // TODO: CREATE KERNEL
+    node->kernel = new KernelI(get_video_filename(i), 0);
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
   }
 
+  int offset = 1;
   // Add P nodes
   for (int i = 14; i < 28; ++i) {
     // Create parent list, child list
@@ -66,8 +75,9 @@ Graph *loadGraph() {
     // Create a node
     Node *node = new Node(i, 0, graph, parent, children);
 
-    // TODO: cameraId == i for now.
-    node->kernel = new KernelP(eqr_width, eqr_height, camera_rig_path, i);
+    int camIdx = ((i - 14) + offset) % 14;
+
+    node->kernel = new KernelP(eqr_width, eqr_height, camera_rig_path, camIdx);
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
