@@ -144,6 +144,13 @@ namespace elixir {
     unlock();
   }
 
+  void Scheduler::addDummyData(int dummyNodeKey, Data *dummyData) {
+    lock();
+    dataMap[dummyNodeKey] = dummyData;
+    assertThatInvariantsHold();
+    unlock();
+  }
+
   void Scheduler::dataMapCleanup() {
     for (auto ite = dataMap.begin(); ite != dataMap.end();) {
       int nodeKey = ite->first;

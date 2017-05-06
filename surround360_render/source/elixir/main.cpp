@@ -97,11 +97,13 @@ Graph *loadGraph() {
     } else {
       parent.push_back(i - 13);
     }
-    parent.push_back(i - 44);
+    parent.push_back(i - 58);
+    cv::Mat *dummyCVMat = new cv::Mat();
+    Scheduler::getScheduler().addDummyData(i - 58, dummyData);
 
     // Children sequence: r => later f
     children.push_back(i + 14);
-    children.push_back(i + 44);
+    children.push_back(i + 58);
 
     // Create a node
     elixir::Node *node = new elixir::Node(i, 0, graph, parent, children);
