@@ -46,6 +46,10 @@ namespace elixir {
            << endl;
       assert(node != nullptr);
 
+      if (node->batchId >= numBatches) {
+        continue;
+      }
+
       // Criterion: check if the batchId of the job is too deep.
       // If so, we don't add this job to the queue even if it's runnable.
 
