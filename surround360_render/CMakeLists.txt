@@ -546,20 +546,48 @@ ENDIF()
 
 # Elixir
 IF (USE_ELIXIR)
-  ADD_EXECUTABLE(ElixirMain
-                 source/elixir/main.cpp
-                 source/elixir/graph.cpp
-                 source/elixir/kernel_c.cpp
-                 source/elixir/kernel_f.cpp
-                 source/elixir/kernel_i.cpp
-                 source/elixir/kernel_p.cpp
-                 source/elixir/kernel_r.cpp
-                 source/elixir/main.cpp
-                 source/elixir/scheduler.cpp
-                 source/elixir/worker.cpp)
+  SET(SCANNER_PATH "~/m/scanner/")
+  include(${SCANNER_PATH}/cmake/Util/Op.cmake)
+  build_op(
+    LIB_NAME elixirmain
+    CPP_SRCS
+    source/elixir/main.cpp
+    source/elixir/graph.cpp
+    source/elixir/kernel_c.cpp
+    source/elixir/kernel_f.cpp
+    source/elixir/kernel_i.cpp
+    source/elixir/kernel_p.cpp
+    source/elixir/kernel_r.cpp
+    source/elixir/main.cpp
+    source/elixir/scheduler.cpp
+    source/elixir/worker.cpp)
+  target_link_libraries(elixirmain PUBLIC
+    LibVrCamera
+    LibJSON
+    gflags
+    glog
+    boost_filesystem
+    boost_system
+    double-conversion
+    folly
+    ${OpenCV_LIBS}
+    ${PLATFORM_SPECIFIC_LIBS})
+  ADD_EXECUTABLE(
+    ElixirMain
+    source/elixir/main.cpp
+    source/elixir/graph.cpp
+    source/elixir/kernel_c.cpp
+    source/elixir/kernel_f.cpp
+    source/elixir/kernel_i.cpp
+    source/elixir/kernel_p.cpp
+    source/elixir/kernel_r.cpp
+    source/elixir/main.cpp
+    source/elixir/scheduler.cpp
+    source/elixir/worker.cpp)
   TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
   TARGET_LINK_LIBRARIES(
     ElixirMain
+    elixirmain
     LibVrCamera
     LibJSON
     gflags
