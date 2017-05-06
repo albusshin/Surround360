@@ -2,11 +2,6 @@
 #include "pthread.h"
 #include "nullbuf.h"
 
-#define DEBUG
-
-//#define logger cout
-#define logger null_stream
-
 typedef int i32;
 
 void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
