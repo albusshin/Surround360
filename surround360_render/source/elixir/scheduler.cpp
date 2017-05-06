@@ -1,6 +1,6 @@
+#include <iostream>
 #include <pthread.h>
 #include <string>
-#include <iostream>
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
@@ -206,10 +206,20 @@ namespace elixir {
   }
 
   void Scheduler::lock() {
+    pthread_t tid = pthread_self();
+    cout << "[Scheduler]\t"
+         << tid
+         << ": lock()"
+         << endl;
     pthread_mutex_lock(&schedulerLock);
   }
 
   void Scheduler::unlock() {
+    pthread_t tid = pthread_self();
+    cout << "[Scheduler]\t"
+         << tid
+         << "unlock()"
+         << endl;
     pthread_mutex_unlock(&schedulerLock);
   }
 

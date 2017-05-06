@@ -1,4 +1,6 @@
+#include <iostream>
 #include <vector>
+#include <pthread.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <assert.h>
@@ -115,10 +117,20 @@ namespace elixir {
   }
 
   void Graph::lock() {
+    pthread_t tid = pthread_self();
+    cout << "[Graph]\t"
+         << tid
+         << "lock()"
+         << endl;
     pthread_mutex_lock(&graphlock);
   }
 
   void Graph::unlock() {
+    pthread_t tid = pthread_self();
+    cout << "[Graph]\t"
+         << tid
+         << "unlock()"
+         << endl;
     pthread_mutex_unlock(&graphlock);
   }
 
