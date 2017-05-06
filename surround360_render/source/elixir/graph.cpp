@@ -128,6 +128,14 @@ namespace elixir {
     // update node batchId
     node->batchId++;
     node->kernel->updateToNextLayer();
+
+    pthread_t tid = pthread_self();
+    cout << "[Graph]\t"
+           << tid
+           << " erasing "
+           << nodeKey
+           << " from graph.nodes"
+           << endl;
     nodes.erase(nodeKey);
     nodes[newKey] = node;
 
