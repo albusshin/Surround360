@@ -29,7 +29,7 @@ public:
       frameNumber_(frameNumber) {}
 
   KernelI *clone() override {
-    return new KernelI(videoFileName, frameNumber);
+    return new KernelI(videoFileName_, frameNumber_);
   };
 
   void updateToNextLayer() override {
@@ -76,7 +76,7 @@ public:
   KernelP *clone() override {
     return new KernelP(eqr_width_,
                        eqr_height_,
-                       camera_rig_path,
+                       camera_rig_path_,
                        camIdx_);
   };
 
