@@ -14,6 +14,8 @@ namespace elixir {
     virtual unordered_map<string, void *> execute(vector<Data *>& dataList);
 
     virtual Kernel* clone();
+
+    virtual void updateToNextLayer();
   };
 
 

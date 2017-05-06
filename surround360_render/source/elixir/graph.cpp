@@ -49,7 +49,9 @@ namespace elixir {
         // Return runnable job
         Node *result = new Node(node->nodeId, node->batchId, node->graph,
                                 node->parents, node->children);
-        UpdateGraphNode(nodeKey);
+        result->kernel = node->kernel->clone();
+
+        updateGraphNode(nodeKey);
         assert(result != nullptr);
 
         assertThatInvariantsHold();
@@ -64,7 +66,7 @@ namespace elixir {
   }
 
   //TODO
-  void Graph::UpdateGraphNode(int nodeKey) {
+  void Graph::updateGraphNode(int nodeKey) {
     //TODO check implementation correctness
     lock();
     assertThatInvariantsHold();
@@ -83,6 +85,7 @@ namespace elixir {
     int newKey = nodeKey + totalNodes;
     // update node batchId
     node->batchId++;
+    node->kernel->updateToNextLayer();
     nodes.erase(nodeKey);
     nodes[newKey] = node;
 

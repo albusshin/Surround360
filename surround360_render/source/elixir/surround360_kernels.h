@@ -28,6 +28,10 @@ public:
     return new KernelI(videoFileName, frameNumber);
   };
 
+  void updateToNextLayer() override {
+    frameNumber++;
+  }
+
   std::unordered_map<std::string, void *> execute(
     std::vector<elixir::Data> dataList) override;
 
@@ -72,6 +76,7 @@ public:
                        camIdx_);
   };
 
+  void updateToNextLayer() override {}
 
   /*
     Accept:
@@ -121,6 +126,8 @@ public:
     return new KernelF(camera_rig_path_, flow_algo_);
   };
 
+  void updateToNextLayer() override {}
+
   void new_frame_info(int camImageWidth, int camImageHeight);
 
   std::unordered_map<std::string, void *> execute(
@@ -164,6 +171,8 @@ public:
                        zero_parallax_dist_,
                        interpupilary_dist_);
   };
+
+  void updateToNextLayer() override {}
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
@@ -218,6 +227,8 @@ public:
                        interpupilary_dist_,
                        left_);
   };
+
+  void updateToNextLayer() override {}
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 

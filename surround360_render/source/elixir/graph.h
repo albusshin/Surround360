@@ -28,7 +28,7 @@ namespace elixir {
 
     vector<Node *> getRunnableJobs();
 
-    void UpdateGraphNode(int nodeKey);
+    void updateGraphNode(int nodeKey);
 
     void assertThatInvariantsHold();
 
