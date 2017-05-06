@@ -560,7 +560,7 @@ IF (USE_ELIXIR)
     source/elixir/main.cpp
     source/elixir/scheduler.cpp
     source/elixir/worker.cpp)
-  target_link_libraries(elixirmain PUBLIC
+  target_link_libraries(elixirmain PRIVATE
     LibVrCamera
     LibJSON
     gflags
