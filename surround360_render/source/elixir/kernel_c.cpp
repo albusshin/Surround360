@@ -58,7 +58,7 @@ std::unordered_map<std::string, void *> KernelC::execute(
   i32 num_chunks = dataList.size();
   assert(num_chunks == 14);
 
-  cv::Mat& tmp_input_chunk = *(cv::Mat *) dataList[0]->data[chunkKey];
+  cv::Mat& tmp_input_chunk = *(cv::Mat *) dataList[0].data[chunkKey];
 
   int camImageWidth = tmp_input_chunk.cols;
   int camImageHeight = tmp_input_chunk.rows;
@@ -74,8 +74,8 @@ std::unordered_map<std::string, void *> KernelC::execute(
 
   std::vector<cv::Mat> pano_chunks(num_chunks, Mat());
   for (i32 c = 0; c < num_chunks; ++c) {
-    cv::Mat& input_chunk = *(cv::Mat *) dataList[c]->data[chunkKey];
-    assert(dataList[c]->data.size() == 2);
+    cv::Mat& input_chunk = *(cv::Mat *) dataList[c].data[chunkKey];
+    assert(dataList[c].data.size() == 2);
     cv::cvtColor(input_chunk, pano_chunks[c], CV_BGRA2BGR);
   }
   cv::Mat *pano = new cv::Mat();
@@ -84,7 +84,7 @@ std::unordered_map<std::string, void *> KernelC::execute(
   *pano = offsetHorizontalWrap(pano, zeroParallaxNovelViewShiftPixels_);
 
   std::unordered_map<std::string, void *> outputData;
-  outputData["pano"]((void *) pano);
+  outputData["pano"] = ((void *) pano);
 
   return outputData;
 }

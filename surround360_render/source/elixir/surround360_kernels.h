@@ -20,6 +20,7 @@
 typedef int i32;
 using namespace std;
 using namespace surround360;
+using namespace surround360::optical_flow;
 
 class KernelI : public elixir::Kernel {
 public:
@@ -140,6 +141,7 @@ public:
 private:
   string camera_rig_path_;
   string flow_algo_;
+  int camImageHeight_;
 
   std::unique_ptr<RigDescription> rig_;
   int overlap_image_width_;

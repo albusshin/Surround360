@@ -27,7 +27,7 @@ std::unordered_map<std::string, void *> KernelI::execute(
   }
 
   std::unordered_map<std::string, void *> outputData;
-  outputData["frame_col_mat"]((void *) frame_col_mat);
+  outputData["frame_col_mat"] = ((void *) frame_col_mat);
 
   return outputData;
 }

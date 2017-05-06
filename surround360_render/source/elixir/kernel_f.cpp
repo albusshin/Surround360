@@ -39,13 +39,13 @@ std::unordered_map<std::string, void *> KernelF::execute(
 
   /* Magic numbers fest */
   assert(dataList.size() == 3);
-  assert(dataList[0].size() == 1);
-  cv::Mat& left_input = *(cv::Mat *) dataList[0]->data["p_mat"];
+  assert(dataList[0].data.size() == 1);
+  cv::Mat& left_input = *(cv::Mat *) dataList[0].data["p_mat"];
   int camImageWidthL = left_input.cols;
   int camImageHeightL = left_input.rows;
 
-  assert(dataList[1].size() == 1);
-  cv::Mat& right_input = *(cv::Mat *) dataList[1]->data["p_mat"];
+  assert(dataList[1].data.size() == 1);
+  cv::Mat& right_input = *(cv::Mat *) dataList[1].data["p_mat"];
   int camImageWidthR = right_input.cols;
   int camImageHeightR = right_input.rows;
 
@@ -54,11 +54,11 @@ std::unordered_map<std::string, void *> KernelF::execute(
 
   new_frame_info(camImageWidthL, camImageHeightL);
 
-  assert(dataList[1].size() == 6);
-  cv::Mat prev_overlap_image_l_ = *(cv::Mat *) dataList[2]->data["prev_overlap_image_l_"];
-  cv::Mat prev_overlap_image_r_ = *(cv::Mat *) dataList[2]->data["prev_overlap_image_r_"];
-  cv::Mat prev_frame_flow_l_to_r_ = *(cv::Mat *) dataList[2]->data["prev_frame_flow_l_to_r_"];
-  cv::Mat prev_frame_flow_r_to_l_ = *(cv::Mat *) dataList[2]->data["prev_frame_flow_r_to_l_"];
+  assert(dataList[1].data.size() == 6);
+  cv::Mat prev_overlap_image_l_ = *(cv::Mat *) dataList[2].data["prev_overlap_image_l_"];
+  cv::Mat prev_overlap_image_r_ = *(cv::Mat *) dataList[2].data["prev_overlap_image_r_"];
+  cv::Mat prev_frame_flow_l_to_r_ = *(cv::Mat *) dataList[2].data["prev_frame_flow_l_to_r_"];
+  cv::Mat prev_frame_flow_r_to_l_ = *(cv::Mat *) dataList[2].data["prev_frame_flow_r_to_l_"];
 
   assert(overlap_image_width_ != -1);
 
@@ -109,12 +109,12 @@ std::unordered_map<std::string, void *> KernelF::execute(
   *right_flow = novel_view_gen_->getFlowRtoL();
 
   std::unordered_map<std::string, void *> outputData;
-  outputData["left_flow"]((void *) left_flow);
-  outputData["right_flow"]((void *) right_flow);
-  outputData["prev_frame_flow_l_to_r_"]((void *) new_prev_frame_flow_l_to_r_);
-  outputData["prev_frame_flow_r_to_l_"]((void *) new_prev_frame_flow_r_to_l_);
-  outputData["prev_overlap_image_l_"]((void *) new_prev_overlap_image_l_);
-  outputData["prev_overlap_image_r_"]((void *) new_prev_overlap_image_r_);
+  outputData["left_flow"] = ((void *) left_flow);
+  outputData["right_flow"] = ((void *) right_flow);
+  outputData["prev_frame_flow_l_to_r_"] = ((void *) new_prev_frame_flow_l_to_r_);
+  outputData["prev_frame_flow_r_to_l_"] = ((void *) new_prev_frame_flow_r_to_l_);
+  outputData["prev_overlap_image_l_"] = ((void *) new_prev_overlap_image_l_);
+  outputData["prev_overlap_image_r_"] = ((void *) new_prev_overlap_image_r_);
 
   return outputData;
 }

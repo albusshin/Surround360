@@ -15,9 +15,9 @@ std::unordered_map<std::string, void *> KernelP::execute(
 
   // dataList contains
   assert(dataList.size() == 1);
-  assert(dataList[0]->data.size() == 1);
+  assert(dataList[0].data.size() == 1);
 
-  cv::Mat& frame_col_mat = *(cv::Mat *) dataList[0]["frame_col_mat"];
+  cv::Mat& frame_col_mat = *(cv::Mat *) dataList[0].data["frame_col_mat"];
 
   size_t output_image_width = eqr_width_ * hRadians_ / (2 * M_PI);
   size_t output_image_height = eqr_height_ * vRadians_ / M_PI;
