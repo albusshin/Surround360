@@ -6,6 +6,8 @@
 #include "graph.h"
 #include "scheduler.h"
 
+#define DEBUG
+
 namespace elixir {
   using namespace std;
 
@@ -33,10 +35,10 @@ namespace elixir {
 
       // Criterion: check if the batchId of the job is too deep.
       // If so, we don't add this job to the queue even if it's runnable.
-      int minBatchIdInRunnableQueue =
-        Scheduler::getScheduler().getMinBatchIdInRunnableJobs();
 
-      if (minBatchIdInRunnableQueue + layers_threshold < node->batchId) {
+      bool tooDeep = Scheduler::getScheduler().isJobBatchTooDeep(node->batchId);
+
+      if (tooDeep) {
         continue;
       }
       

@@ -11,6 +11,8 @@
 #include "scheduler.h"
 #include "graph.h"
 
+#define DEBUG
+
 namespace elixir {
 
   using namespace std;
@@ -58,6 +60,11 @@ namespace elixir {
     lock();
     // parse graph to find every runnable job
     vector<Node *> runnableJobs = this->graph->getRunnableJobs();
+    cout << "[Scheduler]\t"
+         << "workerId: " << workerId
+         << " runnableJobs.size() == "
+         << runnableJobs.size()
+         << endl;
 
     for (vector<Node *>::iterator it = runnableJobs.begin();
          it != runnableJobs.end(); ++it) {
@@ -169,12 +176,21 @@ namespace elixir {
     return result;
   }
 
-  int Scheduler::getMinBatchIdInRunnableJobs() {
-    int minBatchIdInRunnableQueue = INT_MAX;
-    for (Node *node: runnableJobs) {
-      minBatchIdInRunnableQueue = min(node->batchId, minBatchIdInRunnableQueue);
+  bool Scheduler::isJobBatchTooDeep(int batchId) {
+    const int LAYERS_THRESHOLD = 3;
+
+    lock();
+    if (runnableJobs.empty()) {
+      unlock();
+      return false;
+    } else {
+      int minBatchIdInRunnableQueue = INT_MAX;
+      for (Node *node: runnableJobs) {
+        minBatchIdInRunnableQueue = min(node->batchId, minBatchIdInRunnableQueue);
+      }
+      unlock();
+      return minBatchIdInRunnableQueue + LAYERS_THRESHOLD < batchId;
     }
-    return minBatchIdInRunnableQueue;
   }
 
   Scheduler& Scheduler::getScheduler() {
