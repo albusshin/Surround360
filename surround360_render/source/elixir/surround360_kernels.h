@@ -39,30 +39,7 @@ public:
   }
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) {
-    std::vector<elixir::Data>& dataList) {
-    assert(dataList.empty());
-
-    cv::VideoCapture cap(videoFilename_);
-    if(!cap.isOpened()){
-      std::cout << "I: Cannot open video file "
-                << videoFilename_
-                << std::endl;
-      assert(false);
-    }
-
-    cap.set(CV_CAP_PROP_POS_FRAMES, frameNumber_);
-
-    cv::Mat *frame_col_mat = new cv::Mat();
-    cap >> *frame_col_mat;
-
-    std::unordered_map<std::string, void *> outputData;
-    outputData["frame_col_mat"] = ((void *) frame_col_mat);
-
-    return outputData;
-  }
-
-  unordered_map<string, void *> execute(vector<Data *>& dataList) = 0;
+    vector<elixir::Data>& dataList);
 
 private:
   string videoFilename_;
@@ -116,53 +93,7 @@ public:
   */
 
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) {
-
-    // dataList contains
-    assert(dataList.size() == 1);
-    assert(dataList[0].data.size() == 1);
-
-    cv::Mat& frame_col_mat = *(cv::Mat *) dataList[0].data["frame_col_mat"];
-
-    size_t output_image_width = eqr_width_ * hRadians_ / (2 * M_PI);
-    size_t output_image_height = eqr_height_ * vRadians_ / M_PI;
-    size_t output_image_size = output_image_width * output_image_height * 4;
-
-    int channels = 4;
-    int cv_type = CV_8U;
-    int cv_madetype = CV_MAKETYPE(cv_type, channels);
-
-
-    std::cout << "P: output = "
-              << frame_col_mat.cols
-              << " * "
-              << frame_col_mat.rows
-              << " * "
-              << frame_col_mat.channels()
-              << std::endl;
-
-    cv::Mat tmp;
-    cv::cvtColor(frame_col_mat, tmp, CV_BGR2BGRA);
-    std::cout << "after cvtColor()" << std::endl;
-
-    cv::Mat *output_mat = new cv::Mat(output_image_height, output_image_width, cv_madetype);
-
-    surround360::warper::bicubicRemapToSpherical(
-      *output_mat, //dst
-      tmp, //src
-      rig_->rigSideOnly[camIdx_],
-      leftAngle_,
-      rightAngle_,
-      topAngle_,
-      bottomAngle_);
-
-    std::unordered_map<std::string, void *> outputData;
-
-    outputData["p_mat"] = ((void *) output_mat);
-    std::cout << "after bicubicRemapToSpherical" << std::endl;
-
-    return outputData;
-  }
+    vector<elixir::Data>& dataList);
 
 private:
   unique_ptr<RigDescription> rig_;
@@ -205,109 +136,8 @@ public:
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
-/*
-  Accept:
-  [0]: p_mat
-
-  [1]: p_mat
-
-  [2]: prev_overlap_image_l_
-  [2]: prev_overlap_image_r_
-  [2]: prev_frame_flow_l_to_r_
-  [2]: prev_frame_flow_r_to_l_
-
-  Output:
-  left_flow
-  right_flow
-  prev_frame_flow_l_to_r_
-  prev_frame_flow_r_to_l_
-  prev_overlap_image_l_
-  prev_overlap_image_r_
-*/
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) {
-
-    /* Magic numbers fest */
-    assert(dataList.size() == 3);
-    assert(dataList[0].data.size() == 1);
-    cv::Mat& left_input = *(cv::Mat *) dataList[0].data["p_mat"];
-    int camImageWidthL = left_input.cols;
-    int camImageHeightL = left_input.rows;
-
-    assert(dataList[1].data.size() == 1);
-    cv::Mat& right_input = *(cv::Mat *) dataList[1].data["p_mat"];
-    int camImageWidthR = right_input.cols;
-    int camImageHeightR = right_input.rows;
-
-    assert(camImageWidthL == camImageWidthR);
-    assert(camImageHeightL == camImageHeightR);
-
-    new_frame_info(camImageWidthL, camImageHeightL);
-
-    assert(dataList[1].data.size() == 6);
-    cv::Mat prev_overlap_image_l_ = *(cv::Mat *) dataList[2].data["prev_overlap_image_l_"];
-    cv::Mat prev_overlap_image_r_ = *(cv::Mat *) dataList[2].data["prev_overlap_image_r_"];
-    cv::Mat prev_frame_flow_l_to_r_ = *(cv::Mat *) dataList[2].data["prev_frame_flow_l_to_r_"];
-    cv::Mat prev_frame_flow_r_to_l_ = *(cv::Mat *) dataList[2].data["prev_frame_flow_r_to_l_"];
-
-    assert(overlap_image_width_ != -1);
-
-    size_t output_image_width = overlap_image_width_;
-    size_t output_image_height = camImageHeight_;
-
-    std::cout << "T: left_input = "
-              << left_input.cols
-              << " * "
-              << left_input.rows
-              << " * "
-              << left_input.channels()
-              << std::endl;
-
-    cv::Mat left_overlap_input =
-      left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
-                          overlap_image_width_, left_input.rows));
-    cv::Mat right_overlap_input =
-      right_input(cv::Rect(0, 0,
-                           overlap_image_width_, right_input.rows));
-
-    std::cout << "T: left_overlap_input = "
-              << left_overlap_input.cols
-              << " * "
-              << left_overlap_input.rows
-              << " * "
-              << left_overlap_input.channels()
-              << std::endl;
-
-    novel_view_gen_->prepare(left_overlap_input, right_overlap_input,
-                             prev_frame_flow_l_to_r_, prev_frame_flow_r_to_l_,
-                             prev_overlap_image_l_, prev_overlap_image_r_);
-
-    cv::Mat *new_prev_overlap_image_l_ = new cv::Mat();
-    cv::Mat *new_prev_overlap_image_r_ = new cv::Mat();
-    cv::Mat *new_prev_frame_flow_l_to_r_ = new cv::Mat();
-    cv::Mat *new_prev_frame_flow_r_to_l_ = new cv::Mat();
-
-    *new_prev_frame_flow_l_to_r_ = novel_view_gen_->getFlowLtoR();
-    *new_prev_frame_flow_r_to_l_ = novel_view_gen_->getFlowRtoL();
-    left_overlap_input.copyTo(*new_prev_overlap_image_l_);
-    right_overlap_input.copyTo(*new_prev_overlap_image_r_);
-
-    cv::Mat *left_flow = new cv::Mat();
-    cv::Mat *right_flow = new cv::Mat();
-
-    *left_flow = novel_view_gen_->getFlowLtoR();
-    *right_flow = novel_view_gen_->getFlowRtoL();
-
-    std::unordered_map<std::string, void *> outputData;
-    outputData["left_flow"] = ((void *) left_flow);
-    outputData["right_flow"] = ((void *) right_flow);
-    outputData["prev_frame_flow_l_to_r_"] = ((void *) new_prev_frame_flow_l_to_r_);
-    outputData["prev_frame_flow_r_to_l_"] = ((void *) new_prev_frame_flow_r_to_l_);
-    outputData["prev_overlap_image_l_"] = ((void *) new_prev_overlap_image_l_);
-    outputData["prev_overlap_image_r_"] = ((void *) new_prev_overlap_image_r_);
-
-    return outputData;
-  }
+    vector<elixir::Data>& dataList);
 
 private:
   string camera_rig_path_;
@@ -357,72 +187,8 @@ public:
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
-/*
-  Accept:
-  [0]: frame_col_mat
-
-  Output:
-  p_mat
-*/
-
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) {
-    assert(dataList.size() == 3);
-    assert(dataList[0].data.size() == 1);
-    assert(dataList[1].data.size() == 1);
-    assert(dataList[2].data.size() == 6);
-
-    cv::Mat& left_input = *(cv::Mat *) dataList[0].data["p_mat"];
-    cv::Mat& right_input = *(cv::Mat *) dataList[1].data["p_mat"];
-    int camImageWidthL = left_input.cols;
-    int camImageHeightL = left_input.rows;
-    int camImageWidthR = right_input.cols;
-    int camImageHeightR = right_input.rows;
-
-    assert(camImageWidthL == camImageWidthR);
-    assert(camImageHeightL == camImageHeightR);
-
-    cv::Mat& left_flow = *(cv::Mat *) dataList[2].data["left_flow"];
-    cv::Mat& right_flow = *(cv::Mat *) dataList[2].data["right_flow"];
-
-    new_frame_info(camImageWidthL, camImageHeightL);
-
-    assert(overlap_image_width_ != -1);
-
-    size_t output_image_width = num_novel_views_;
-    size_t output_image_height = camImageHeight_;
-    size_t output_image_size =
-      output_image_width * output_image_height * 4;
-
-    cv::Mat left_overlap_input =
-      left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
-                          overlap_image_width_, left_input.rows));
-    cv::Mat right_overlap_input =
-      right_input(cv::Rect(0, 0,
-                           overlap_image_width_, right_input.rows));
-
-
-    // Initialize NovelViewGenerator with images and flow since we are
-    // bypassing the prepare method
-    novel_view_gen_->setImageL(left_overlap_input);
-    novel_view_gen_->setImageR(right_overlap_input);
-    novel_view_gen_->setFlowLtoR(left_flow);
-    novel_view_gen_->setFlowRtoL(right_flow);
-    std::pair<Mat, Mat> lazyNovelChunksLR =
-      novel_view_gen_->combineLazyNovelViews(*lazy_view_buffer_.get());
-
-    cv::Mat *chunkL = new cv::Mat();
-    cv::Mat *chunkR = new cv::Mat();
-    *chunkL = lazyNovelChunksLR.first;
-    *chunkR = lazyNovelChunksLR.second;
-
-    std::unordered_map<std::string, void *> outputData;
-    outputData["chunkL"] = ((void *) chunkL);
-    outputData["chunkR"] = ((void *) chunkR);
-
-    return outputData;
-
-  }
+    vector<elixir::Data>& dataList);
 
 private:
   int camImageHeight_;
@@ -477,58 +243,8 @@ public:
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
-/*
-  Accept:
-  [0]: chunkL / chunkR
-  ...
-  [13]: chunkL / chunkR
-
-  Output:
-  pano
-*/
   unordered_map<string, void *> execute(
-    vector<elixir::Data>& dataList) {
-
-    string chunkKey;
-    if (left_) {
-      chunkKey = "chunkL";
-    } else {
-      chunkKey = "chunkR";
-    }
-
-    i32 num_chunks = dataList.size();
-    assert(num_chunks == 14);
-
-    cv::Mat& tmp_input_chunk = *(cv::Mat *) dataList[0].data[chunkKey];
-
-    int camImageWidth = tmp_input_chunk.cols;
-    int camImageHeight = tmp_input_chunk.rows;
-
-    new_frame_info(camImageWidth, camImageHeight);
-
-    size_t output_image_width = camImageWidth_ * num_chunks;
-    size_t output_image_height = camImageHeight_;
-    output_image_width += (output_image_width % 2);
-    output_image_height += (output_image_height % 2);
-    size_t output_image_size =
-      output_image_width * output_image_height * 3;
-
-    std::vector<cv::Mat> pano_chunks(num_chunks, Mat());
-    for (i32 c = 0; c < num_chunks; ++c) {
-      cv::Mat& input_chunk = *(cv::Mat *) dataList[c].data[chunkKey];
-      assert(dataList[c].data.size() == 2);
-      cv::cvtColor(input_chunk, pano_chunks[c], CV_BGRA2BGR);
-    }
-    cv::Mat *pano = new cv::Mat();
-
-    *pano = stackHorizontal(pano_chunks);
-    *pano = offsetHorizontalWrap(*pano, zeroParallaxNovelViewShiftPixels_);
-
-    std::unordered_map<std::string, void *> outputData;
-    outputData["pano"] = ((void *) pano);
-
-    return outputData;
-  }
+    vector<elixir::Data>& dataList);
 
 private:
   unique_ptr<RigDescription> rig_;
