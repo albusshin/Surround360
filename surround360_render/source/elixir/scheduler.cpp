@@ -212,13 +212,17 @@ namespace elixir {
          << ": lock()"
          << endl;
     pthread_mutex_lock(&schedulerLock);
+    cout << "[Scheduler]\t"
+         << tid
+         << ": acquired lock."
+         << endl;
   }
 
   void Scheduler::unlock() {
     pthread_t tid = pthread_self();
     cout << "[Scheduler]\t"
          << tid
-         << "unlock()"
+         << ": unlock()"
          << endl;
     pthread_mutex_unlock(&schedulerLock);
   }

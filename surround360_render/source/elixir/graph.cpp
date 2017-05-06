@@ -120,16 +120,20 @@ namespace elixir {
     pthread_t tid = pthread_self();
     cout << "[Graph]\t"
          << tid
-         << "lock()"
+         << ": lock()"
          << endl;
     pthread_mutex_lock(&graphlock);
+    cout << "[Graph]\t"
+         << tid
+         << ": acquired lock."
+         << endl;
   }
 
   void Graph::unlock() {
     pthread_t tid = pthread_self();
     cout << "[Graph]\t"
          << tid
-         << "unlock()"
+         << ": unlock()"
          << endl;
     pthread_mutex_unlock(&graphlock);
   }
