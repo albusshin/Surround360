@@ -33,7 +33,7 @@ public:
   };
 
   void updateToNextLayer() override {
-    frameNumber++;
+    frameNumber_++;
   }
 
   unordered_map<string, void *> execute(
@@ -140,6 +140,9 @@ public:
 private:
   string camera_rig_path_;
   string flow_algo_;
+
+  std::unique_ptr<RigDescription> rig_;
+  int overlap_image_width_;
 
 };
 

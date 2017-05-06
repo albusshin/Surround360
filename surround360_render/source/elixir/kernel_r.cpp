@@ -1,16 +1,4 @@
-#include "render/RigDescription.h"
-#include "render/ImageWarper.h"
-#include "optical_flow/NovelView.h"
-#include "util/MathUtil.h"
-#include "source/scanner_kernels/surround360.pb.h"
-#include "optical_flow/NovelView.h"
-
-#include <opencv2/video.hpp>
-#include <string>
-#include <sstream>
-#include <ctime>
-#include <unordered_map>
-#include <assert.h>
+#include "surround360_kernels.h"
 
 typedef int i32;
 
