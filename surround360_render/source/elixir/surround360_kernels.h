@@ -40,7 +40,6 @@ public:
 
   unordered_map<string, void *> execute(
     vector<elixir::Data>& dataList) {
-    std::vector<elixir::Data>& dataList) {
     assert(dataList.empty());
 
     cv::VideoCapture cap(videoFilename_);
@@ -61,8 +60,6 @@ public:
 
     return outputData;
   }
-
-  unordered_map<string, void *> execute(vector<Data *>& dataList) = 0;
 
 private:
   string videoFilename_;
