@@ -99,7 +99,13 @@ Graph *loadGraph() {
     }
     parent.push_back(i - 58);
     cv::Mat *dummyCVMat = new cv::Mat();
-    Scheduler::getScheduler().addDummyData(i - 58, dummyCVMat);
+
+    vector<int> dummyNextLayer;
+    dummyNextLayer.push_back(i);
+    Data *dummyData = new Data((void *) dummyCVMat,
+                                i - 58,
+                                dummyNextLayer);
+    Scheduler::getScheduler().addDummyData(i - 58, dummyData);
 
     // Children sequence: r => later f
     children.push_back(i + 14);
