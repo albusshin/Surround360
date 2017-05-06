@@ -1,4 +1,11 @@
 #include "surround360_kernels.h"
+#include "pthread.h"
+#include "nullbuf.h"
+
+#define DEBUG
+
+//#define logger cout
+#define logger null_stream
 
 typedef int i32;
 
@@ -47,6 +54,12 @@ void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
 
 std::unordered_map<std::string, void *> KernelR::execute (
   std::vector<elixir::Data *>& dataList) {
+
+  pthread_t tid = pthread_self();
+  logger << "[KernelR]\t"
+         << "tid: " << tid
+         << "execute()"
+         << endl;
 
   assert(dataList.size() == 3);
   assert(dataList[0]->data.size() == 1);

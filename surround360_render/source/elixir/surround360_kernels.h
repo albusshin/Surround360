@@ -38,7 +38,7 @@ public:
       frameNumber_(frameNumber) {
     logger << "[KernelI]\t"
            << "ctor()"
-           << "videlFileName == "
+           << "videoFileName == "
            << videoFilename
            << endl;
   }

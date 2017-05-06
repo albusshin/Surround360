@@ -1,5 +1,12 @@
-#include "surround360_kernels.h"
 #include <string>
+#include "surround360_kernels.h"
+#include "pthread.h"
+#include "nullbuf.h"
+
+#define DEBUG
+
+//#define logger cout
+#define logger null_stream
 
 typedef int i32;
 
@@ -48,6 +55,12 @@ void KernelC::new_frame_info(
 */
 std::unordered_map<std::string, void *> KernelC::execute (
   std::vector<elixir::Data *>& dataList) {
+
+  pthread_t tid = pthread_self();
+  logger << "[KernelC]\t"
+         << "tid: " << tid
+         << "execute()"
+         << endl;
 
   string chunkKey;
   if (left_) {
