@@ -4,6 +4,12 @@
 #include <string>
 #include <unistd.h>
 #include <unordered_map>
+#include "nullbuf.h"
+
+#define DEBUG
+
+#define logger cout
+//#define logger null_stream
 
 namespace elixir {
 
@@ -36,10 +42,21 @@ namespace elixir {
                                                         node->batchId),
                                   node->children);
 
+      pthread_t tid = pthread_self();
+      logger << "[Worker]\t tid:"
+             << tid
+             << "Work done."
+             << endl;
+
       Scheduler::getScheduler().onJobFinishing(
         Node::getNodeKeyByIds(node->nodeId, node->batchId),
         outputData,
         workerId);
+
+      logger << "[Worker]\t tid:"
+             << tid
+             << "After onJobFinishing"
+             << endl;
     }
   }
 }

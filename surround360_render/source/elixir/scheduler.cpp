@@ -201,9 +201,7 @@ namespace elixir {
 
   // Privates
   void Scheduler::markJobFinished(int nodeKey) {
-    lock();
     finished.insert(nodeKey);
-    unlock();
   }
 
   void Scheduler::lock() {
