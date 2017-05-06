@@ -150,7 +150,14 @@ namespace elixir {
       Data *data = ite->second;
       // Deleting while iterating map as per
       // http://stackoverflow.com/a/8234813/1831275
-      if (isJobFinished(nodeKey)) {
+      bool allChildrenFinished = true;
+      for (int childNodeKey : data->toNodeKeys) {
+        if (!isJobFinished(childNodeKey)) {
+          allChildrenFinished = false;
+          break;
+        }
+      }
+      if (allChildrenFinished) {
         dataMap.erase(ite++);
         //Free up memory
         delete data;
