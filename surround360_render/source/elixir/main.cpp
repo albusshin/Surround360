@@ -15,28 +15,49 @@ float zero_parallax_dist = 10000;
 float interpupilary_dist = 6.4;
 
 Graph *loadGraph() {
-  size_t frameNum = 10;
-  size_t nodeNum = 44;
+  size_t frameNum = 1;
+  size_t nodeNum = 58;
 
   // Create a graph object
   Graph *graph = new Graph(nodeNum, frameNum);
 
-  // Add P nodes
+  // Add I nodes
   for (int i = 0; i < 14; ++i) {
     // Create parent list, child list
     vector<int> parent; // Empty
     vector<int> children;
 
+    // Children: p
+    children.push_back(i + 14);
+
+    // Create a node
+    Node *node = new Node(i, 0, graph, parent, children);
+
+    // TODO: CREATE KERNEL
+
+    // Add to node list
+    graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
+  }
+
+  // Add P nodes
+  for (int i = 14; i < 28; ++i) {
+    // Create parent list, child list
+    vector<int> parent;
+    vector<int> children;
+
+    // Parent: p
+    parent.push_back(i - 14);
+
     // Children: right f => left f => right r => left r
     children.push_back(i + 14);
-    if (i == 0) {
+    if (i == 14) {
       children.push_back(i + 27);
     } else {
       children.push_back(i + 13);
     }
 
     children.push_back(i + 28);
-    if (i == 0) {
+    if (i == 14) {
       children.push_back(i + 41);
     } else {
       children.push_back(i + 27);
@@ -53,14 +74,14 @@ Graph *loadGraph() {
   }
 
   // Add F nodes
-  for (int i = 14; i < 28; ++i) {
+  for (int i = 28; i < 42; ++i) {
     // Create parent list, child list
     vector<int> parent;
     vector<int> children;
 
     // Parent sequence: left p => right p => previous f
     parent.push_back(i - 14);
-    if (i == 27) {
+    if (i == 41) {
       parent.push_back(i - 27);
     } else {
       parent.push_back(i - 13);
@@ -81,14 +102,14 @@ Graph *loadGraph() {
   }
 
   // Add R nodes
-  for (int i = 28; i < 42; ++i) {
+  for (int i = 42; i < 56; ++i) {
     // Create parent list, child list
     vector<int> parent;
     vector<int> children;
 
     // Parent sequence: left p => right p => f
     parent.push_back(i - 28);
-    if (i == 28) {
+    if (i == 42) {
       parent.push_back(i - 41);
     } else {
       parent.push_back(i - 27);
@@ -115,13 +136,13 @@ Graph *loadGraph() {
   }
 
   // Add C nodes
-  for (int i = 42; i < 44; ++i) {
+  for (int i = 56; i < 58; ++i) {
     // Create parent list, child list
     vector<int> parent;
     vector<int> children; // Empty
 
     // Parent sequence: all r from 28 to 41
-    for (int j = 18; j < 42; ++j) {
+    for (int j = 42; j < 56; ++j) {
       parent.push_back(j);
     }
 
@@ -134,7 +155,7 @@ Graph *loadGraph() {
                                flow_algo,
                                zero_parallax_dist,
                                interpupilary_dist,
-                               i == 42); //If i == 42 then it's left, otherwise it's right.
+                               i == 56); //If i == 42 then it's left, otherwise it's right.
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
