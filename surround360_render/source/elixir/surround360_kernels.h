@@ -29,7 +29,7 @@ public:
       frameNumber_(frameNumber) {}
 
   KernelI *clone() override {
-    return new KernelI(videoFileName_, frameNumber_);
+    return new KernelI(videoFilename_, frameNumber_);
   };
 
   void updateToNextLayer() override {
@@ -143,6 +143,7 @@ private:
 
   std::unique_ptr<RigDescription> rig_;
   int overlap_image_width_;
+  std::unique_ptr<surround360::optical_flow::NovelViewGenerator> novel_view_gen_;
 
 };
 
@@ -193,15 +194,15 @@ private:
   int overlap_image_width_;
   int num_novel_views_;
 
-  size_t eqr_width;
-  size_t eqr_height;
-  string camera_rig_path;
-  string flow_algo;
-  float zero_parallax_dist;
-  float interpupilary_dist;
+  size_t eqr_width_;
+  size_t eqr_height_;
+  string camera_rig_path_;
+  string flow_algo_;
+  float zero_parallax_dist_;
+  float interpupilary_dist_;
 
-  unique_ptr<NovelViewGenerator> novel_view_gen_;
-  unique_ptr<LazyNovelViewBuffer> lazy_view_buffer_;
+  unique_ptr<surround360::optical_flow::NovelViewGenerator> novel_view_gen_;
+  unique_ptr<surround360::optical_flow::LazyNovelViewBuffer> lazy_view_buffer_;
 };
 
 class KernelC : public elixir::Kernel{
@@ -248,13 +249,13 @@ private:
   int camImageWidth_;
   int camImageHeight_;
 
-  size_t eqr_width;
-  size_t eqr_height;
-  string &camera_rig_path;
-  string &flow_algo;
-  float zero_parallax_dist;
-  float interpupilary_dist;
-  bool left;
+  size_t eqr_width_;
+  size_t eqr_height_;
+  string &camera_rig_path_;
+  string &flow_algo_;
+  float zero_parallax_dist_;
+  float interpupilary_dist_;
+  bool left_;
 };
 
 #endif /* SURROUND360_KERNELS_ELIXIR */
