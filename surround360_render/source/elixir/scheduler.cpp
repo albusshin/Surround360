@@ -15,6 +15,9 @@ namespace elixir {
 
   using namespace std;
 
+  enum Scheduler::SchedulerPolicy Scheduler::policy;
+  Scheduler Scheduler::INSTANCE;
+
   void Scheduler::init(Graph *graph) {
     this->graph = graph;
     this->policy = SchedulerPolicy::Fifo;

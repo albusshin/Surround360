@@ -9,6 +9,9 @@
 namespace elixir {
   using namespace std;
 
+  size_t Graph::totalNodes;
+  size_t Graph::numBatches;
+
   //publics for Graph
   vector<Node *> Graph::getRunnableJobs() {
     vector<Node *> result;
