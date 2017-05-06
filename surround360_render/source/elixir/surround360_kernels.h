@@ -15,6 +15,8 @@
 #include <unordered_map>
 #include <assert.h>
 
+#include "kernel.h"
+
 typedef int i32;
 
 class KernelI : public elixir::Kernel {
