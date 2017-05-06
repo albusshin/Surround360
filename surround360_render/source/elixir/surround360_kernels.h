@@ -21,15 +21,19 @@ class KernelI : public elixir::Kernel {
 public:
   KernelI(string videoFilename,
           int frameNumber)
-    : videoFilename(videoFilename),
-      frameNumber(frameNumber) {}
+    : videoFilename_(videoFilename),
+      frameNumber_(frameNumber) {}
+
+  KernelI *clone() override {
+    return new KernelI(videoFileName, frameNumber);
+  };
 
   std::unordered_map<std::string, void *> execute(
     std::vector<elixir::Data> dataList) override;
 
 private:
-  string videoFilename;
-  int frameNumber;
+  string videoFilename_;
+  int frameNumber_;
 };
 
 class KernelP : public elixir::Kernel {
@@ -41,6 +45,7 @@ public:
           int camIdx)
     : eqr_width_(eqr_width),
       eqr_height_(eqr_height),
+      camera_rig_path_(camera_rig_path),
       camIdx_(camIdx) {
 
     // Initialize camera rig
@@ -60,6 +65,14 @@ public:
     bottomAngle_ = -vRadians_ / 2;
   }
 
+  KernelP *clone() override {
+    return new KernelP(eqr_width_,
+                       eqr_height_,
+                       camera_rig_path,
+                       camIdx_);
+  };
+
+
   /*
     Accept:
     [0]: frame_col_mat
@@ -73,6 +86,7 @@ public:
 
 private:
   std::unique_ptr<RigDescription> rig_;
+  string camera_rig_path_;
   size_t eqr_width_;
   size_t eqr_height_;
 
@@ -90,20 +104,31 @@ class KernelF : public elixir::Kernel {
 
 public:
   KernelF(string &camera_rig_path,
-          string &flow_algo) {
+          string &flow_algo)
+    : camera_rig_path_(camera_rig_path),
+      flow_algo_(flow_algo)
+    {
 
-    rig_.reset(new RigDescription(camera_rig_path));
+      rig_.reset(new RigDescription(camera_rig_path));
 
-    overlap_image_width_ = -1;
-    novel_view_gen_.reset(
-      new NovelViewGeneratorAsymmetricFlow(flow_algo));
+      overlap_image_width_ = -1;
+      novel_view_gen_.reset(
+        new NovelViewGeneratorAsymmetricFlow(flow_algo));
 
-  }
+    }
+
+  KernelF *clone() override {
+    return new KernelF(camera_rig_path_, flow_algo_);
+  };
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
   std::unordered_map<std::string, void *> execute(
     std::vector<elixir::Data> dataList) override;
+
+private:
+  string camera_rig_path_;
+  string flow_algo_;
 
 };
 
@@ -116,12 +141,12 @@ public:
     string &flow_algo,
     float zero_parallax_dist,
     float interpupilary_dist)
-    : eqr_width(eqr_width),
-      eqr_height(eqr_height),
-      camera_rig_path(camera_rig_path),
-      flow_algo(flow_algo),
-      zero_parallax_dist(zero_parallax_dist),
-      interpupilary_dist(interpupilary_dist)
+    : eqr_width_(eqr_width),
+      eqr_height_(eqr_height),
+      camera_rig_path_(camera_rig_path),
+      flow_algo_(flow_algo),
+      zero_parallax_dist_(zero_parallax_dist),
+      interpupilary_dist_(interpupilary_dist)
     {
 
       rig_.reset(new RigDescription(camera_rig_path));
@@ -130,6 +155,15 @@ public:
       novel_view_gen_.reset(
         new NovelViewGeneratorAsymmetricFlow(flow_algo));
     }
+
+  KernelR *clone() override {
+    return new KernelR(eqr_width_,
+                       eqr_height_,
+                       camera_rig_path_,
+                       flow_algo_,
+                       zero_parallax_dist_,
+                       interpupilary_dist_);
+  };
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
@@ -164,16 +198,26 @@ public:
     float zero_parallax_dist,
     float interpupilary_dist,
     bool left)
-    : eqr_width(eqr_width),
-      eqr_height(eqr_height),
-      camera_rig_path(camera_rig_path),
-      flow_algo(flow_algo),
-      zero_parallax_dist(zero_parallax_dist),
-      interpupilary_dist(interpupilary_dist),
-      left(left) {
+    : eqr_width_(eqr_width),
+      eqr_height_(eqr_height),
+      camera_rig_path_(camera_rig_path),
+      flow_algo_(flow_algo),
+      zero_parallax_dist_(zero_parallax_dist),
+      interpupilary_dist_(interpupilary_dist),
+      left_(left) {
 
     rig_.reset(new RigDescription(camera_rig_path));
   }
+
+  KernelC *clone() override {
+    return new KernelC(eqr_width_,
+                       eqr_height_,
+                       camera_rig_path_,
+                       flow_algo_,
+                       zero_parallax_dist_,
+                       interpupilary_dist_,
+                       left_);
+  };
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 

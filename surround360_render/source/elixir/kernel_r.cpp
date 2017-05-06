@@ -30,17 +30,17 @@ void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
     camImageWidth - overlap_image_width_; // per image pair
 
   const float v =
-    atanf(zero_parallax_dist / (interpupilary_dist / 2.0f));
+    atanf(zero_parallax_dist_ / (interpupilary_dist_ / 2.0f));
   const float psi =
-    asinf(sinf(v) * (interpupilary_dist / 2.0f) / cameraRingRadius);
+    asinf(sinf(v) * (interpupilary_dist_ / 2.0f) / cameraRingRadius);
   const float vergeAtInfinitySlabDisplacement =
     psi * (float(camImageWidth) / fov_horizontal_radians_);
   const float theta = -M_PI / 2.0f + v + psi;
   const float zeroParallaxNovelViewShiftPixels =
-    float(eqr_width) * (theta / (2.0f * M_PI));
+    float(eqr_width_) * (theta / (2.0f * M_PI));
 
   int currChunkX = 0;
-  lazy_view_buffer_.reset(new LazyNovelViewBuffer(eqr_width / numCams,
+  lazy_view_buffer_.reset(new LazyNovelViewBuffer(eqr_width_ / numCams,
                                                   camImageHeight));
   for (int nvIdx = 0; nvIdx < num_novel_views_; ++nvIdx) {
     const float shift = float(nvIdx) / float(num_novel_views_);
@@ -67,16 +67,16 @@ std::unordered_map<std::string, void *> KernelR::execute(
 
   cv::Mat& left_input = *(cv::Mat *) dataList[0]->data["p_mat"];
   cv::Mat& right_input = *(cv::Mat *) dataList[1]->data["p_mat"];
-  int camImageWidthL = left_flow.cols;
-  int camImageHeightL = left_flow.rows;
-
-  cv::Mat& left_flow = *(cv::Mat *) dataList[2]->data["left_flow"];
-  cv::Mat& right_flow = *(cv::Mat *) dataList[2]->data["right_flow"];
-  int camImageWidthR = right_flow.cols;
-  int camImageHeightR = right_flow.rows;
+  int camImageWidthL = left_input.cols;
+  int camImageHeightL = left_input.rows;
+  int camImageWidthR = right_input.cols;
+  int camImageHeightR = right_input.rows;
 
   assert(camImageWidthL == camImageWidthR);
   assert(camImageHeightL == camImageHeightR);
+
+  cv::Mat& left_flow = *(cv::Mat *) dataList[2]->data["left_flow"];
+  cv::Mat& right_flow = *(cv::Mat *) dataList[2]->data["right_flow"];
 
   new_frame_info(camImageWidthL, camImageHeightL);
 

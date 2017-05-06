@@ -6,23 +6,23 @@ std::unordered_map<std::string, void *> KernelI::execute(
   std::vector<elixir::Data> dataList) {
   assert(dataList.empty());
 
-  cv::VideoCapture cap(videoFilename);
+  cv::VideoCapture cap(videoFilename_);
   if(!cap.isOpened()){
     std::cout << "I: Cannot open video file "
-              << videoFilename
+              << videoFilename_
               << std::endl;
     assert(false);
   }
 
-  cap.set(CV_CAP_PROP_POS_FRAMES, frameNumber);
+  cap.set(CV_CAP_PROP_POS_FRAMES, frameNumber_);
 
   cv::Mat *frame_col_mat = new cv::Mat();
   bool success = cap.read(frame_col_mat);
   if (!success){
     std::cout << "I: Cannot read frame_col_mat "
-              << frameNumber
+              << frameNumber_
               << "from video file "
-              << videoFilename
+              << videoFilename_
               << std::endl;
   }
 

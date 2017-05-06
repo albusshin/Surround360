@@ -23,15 +23,15 @@ void KernelC::new_frame_info(
     float(camImageWidth) * (overlapAngleDegrees / camFovHorizontalDegrees);
 
   const float v =
-    atanf(zero_parallax_dist / (interpupilary_dist / 2.0f));
+    atanf(zero_parallax_dist_ / (interpupilary_dist_ / 2.0f));
   const float psi =
-    asinf(sinf(v) * (interpupilary_dist / 2.0f) / cameraRingRadius);
+    asinf(sinf(v) * (interpupilary_dist_ / 2.0f) / cameraRingRadius);
   const float vergeAtInfinitySlabDisplacement =
     psi * (float(camImageWidth) / fovHorizontalRadians);
   const float theta = -M_PI / 2.0f + v + psi;
   zeroParallaxNovelViewShiftPixels_ =
-    float(eqr_width) * (theta / (2.0f * M_PI));
-  if (!left) {
+    float(eqr_width_) * (theta / (2.0f * M_PI));
+  if (!left_) {
     zeroParallaxNovelViewShiftPixels_ *= -1;
   }
 }
@@ -49,7 +49,7 @@ std::unordered_map<std::string, void *> KernelC::execute(
   std::vector<elixir::Data> dataList) {
 
   string chunkKey;
-  if (left) {
+  if (left_) {
     chunkKey = "chunkL";
   } else {
     chunkKey = "chunkR";
