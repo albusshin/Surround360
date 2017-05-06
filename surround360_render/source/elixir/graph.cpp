@@ -39,6 +39,10 @@ namespace elixir {
            << tid
            << "getRunnableJob(): nodeKey: "
            << nodeKey
+           << " ids: "
+           << node->nodeId
+           << ", "
+           << node->batchId
            << endl;
       assert(node != nullptr);
 
@@ -54,6 +58,10 @@ namespace elixir {
            << tid
            << "getRunnableJob(): not too deep: "
            << nodeKey
+           << " ids: "
+           << node->nodeId
+           << ", "
+           << node->batchId
            << endl;
       
       bool nodeIsRunnable = true;
@@ -69,6 +77,10 @@ namespace elixir {
              << tid
              << "getRunnableJob(): node is runnable:"
              << nodeKey
+             << " ids: "
+             << node->nodeId
+             << ", "
+             << node->batchId
              << endl;
         // Return runnable job
         Node *result = new Node(node->nodeId, node->batchId, node->graph,

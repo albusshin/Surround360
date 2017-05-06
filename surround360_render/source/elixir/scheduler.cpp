@@ -180,16 +180,13 @@ namespace elixir {
   bool Scheduler::isJobBatchTooDeep(int batchId) {
     const int LAYERS_THRESHOLD = 3;
 
-    lock();
     if (runnableJobs.empty()) {
-      unlock();
       return false;
     } else {
       int minBatchIdInRunnableQueue = INT_MAX;
       for (Node *node: runnableJobs) {
         minBatchIdInRunnableQueue = min(node->batchId, minBatchIdInRunnableQueue);
       }
-      unlock();
       return minBatchIdInRunnableQueue + LAYERS_THRESHOLD < batchId;
     }
   }
