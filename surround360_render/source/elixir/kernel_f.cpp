@@ -62,7 +62,7 @@ std::unordered_map<std::string, void *> KernelF::execute (
 
   new_frame_info(camImageWidthL, camImageHeightL);
 
-  assert(dataList[1]->data.size() == 6);
+  assert(dataList[2]->data.size() == 6);
   cv::Mat prev_overlap_image_l_ = *(cv::Mat *) dataList[2]->data["prev_overlap_image_l_"];
   cv::Mat prev_overlap_image_r_ = *(cv::Mat *) dataList[2]->data["prev_overlap_image_r_"];
   cv::Mat prev_frame_flow_l_to_r_ = *(cv::Mat *) dataList[2]->data["prev_frame_flow_l_to_r_"];
