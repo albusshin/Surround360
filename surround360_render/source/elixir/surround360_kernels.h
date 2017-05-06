@@ -17,6 +17,21 @@
 
 typedef int i32;
 
+class KernelI : public elixir::Kernel {
+public:
+  KernelI(string videoFilename,
+          int frameNumber)
+    : videoFilename(videoFilename),
+      frameNumber(frameNumber) {}
+
+  std::unordered_map<std::string, void *> execute(
+    std::vector<elixir::Data> dataList) override;
+
+private:
+  string videoFilename;
+  int frameNumber;
+};
+
 class KernelP : public elixir::Kernel {
 
 public:
@@ -109,12 +124,12 @@ public:
       interpupilary_dist(interpupilary_dist)
     {
 
-    rig_.reset(new RigDescription(camera_rig_path));
+      rig_.reset(new RigDescription(camera_rig_path));
 
-    overlap_image_width_ = -1;
-    novel_view_gen_.reset(
-      new NovelViewGeneratorAsymmetricFlow(flow_algo));
-  }
+      overlap_image_width_ = -1;
+      novel_view_gen_.reset(
+        new NovelViewGeneratorAsymmetricFlow(flow_algo));
+    }
 
   void new_frame_info(int camImageWidth, int camImageHeight);
 
