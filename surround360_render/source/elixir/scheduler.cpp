@@ -11,8 +11,13 @@
 
 #include "scheduler.h"
 #include "graph.h"
+#include "nullbuf.h"
 
 #define DEBUG
+
+//#define logger cout
+#define logger null_stream
+
 
 namespace elixir {
 
@@ -61,11 +66,11 @@ namespace elixir {
     lock();
     // parse graph to find every runnable job
     vector<Node *> runnableJobs = this->graph->getRunnableJobs();
-    cout << "[Scheduler]\t"
-         << "workerId: " << workerId
-         << " runnableJobs.size() == "
-         << runnableJobs.size()
-         << endl;
+    logger << "[Scheduler]\t"
+           << "workerId: " << workerId
+           << " runnableJobs.size() == "
+           << runnableJobs.size()
+           << endl;
 
     for (vector<Node *>::iterator it = runnableJobs.begin();
          it != runnableJobs.end(); ++it) {
@@ -203,23 +208,23 @@ namespace elixir {
 
   void Scheduler::lock() {
     pthread_t tid = pthread_self();
-    cout << "[Scheduler]\t"
-         << tid
-         << ": lock()"
-         << endl;
+    logger << "[Scheduler]\t"
+           << tid
+           << ": lock()"
+           << endl;
     pthread_mutex_lock(&schedulerLock);
-    cout << "[Scheduler]\t"
-         << tid
-         << ": acquired lock."
-         << endl;
+    logger << "[Scheduler]\t"
+           << tid
+           << ": acquired lock."
+           << endl;
   }
 
   void Scheduler::unlock() {
     pthread_t tid = pthread_self();
-    cout << "[Scheduler]\t"
-         << tid
-         << ": unlock()"
-         << endl;
+    logger << "[Scheduler]\t"
+           << tid
+           << ": unlock()"
+           << endl;
     pthread_mutex_unlock(&schedulerLock);
   }
 

@@ -7,8 +7,12 @@
 
 #include "graph.h"
 #include "scheduler.h"
+#include "nullbuf.h"
 
 #define DEBUG
+
+//#define logger cout
+#define logger null_stream
 
 namespace elixir {
   using namespace std;
@@ -35,15 +39,15 @@ namespace elixir {
       Node *node = pair.second;
 
       pthread_t tid = pthread_self();
-      cout << "[Graph]\t"
-           << tid
-           << "getRunnableJob(): nodeKey: "
-           << nodeKey
-           << " ids: "
-           << node->nodeId
-           << ", "
-           << node->batchId
-           << endl;
+      logger << "[Graph]\t"
+             << tid
+             << "getRunnableJob(): nodeKey: "
+             << nodeKey
+             << " ids: "
+             << node->nodeId
+             << ", "
+             << node->batchId
+             << endl;
       assert(node != nullptr);
 
       if (node->batchId >= numBatches) {
@@ -58,16 +62,16 @@ namespace elixir {
       if (tooDeep) {
         continue;
       }
-      cout << "[Graph]\t"
-           << tid
-           << "getRunnableJob(): not too deep: "
-           << nodeKey
-           << " ids: "
-           << node->nodeId
-           << ", "
-           << node->batchId
-           << endl;
-      
+      logger << "[Graph]\t"
+             << tid
+             << "getRunnableJob(): not too deep: "
+             << nodeKey
+             << " ids: "
+             << node->nodeId
+             << ", "
+             << node->batchId
+             << endl;
+
       bool nodeIsRunnable = true;
       // Check if all the parents are finished
       for (int parentNodeKey : node->parents) {
@@ -77,15 +81,15 @@ namespace elixir {
         }
       }
       if (nodeIsRunnable) {
-        cout << "[Graph]\t"
-             << tid
-             << "getRunnableJob(): node is runnable:"
-             << nodeKey
-             << " ids: "
-             << node->nodeId
-             << ", "
-             << node->batchId
-             << endl;
+        logger << "[Graph]\t"
+               << tid
+               << "getRunnableJob(): node is runnable:"
+               << nodeKey
+               << " ids: "
+               << node->nodeId
+               << ", "
+               << node->batchId
+               << endl;
         // Return runnable job
         Node *result = new Node(node->nodeId, node->batchId, node->graph,
                                 node->parents, node->children);
@@ -149,23 +153,23 @@ namespace elixir {
 
   void Graph::lock() {
     pthread_t tid = pthread_self();
-    cout << "[Graph]\t"
-         << tid
-         << ": lock()"
-         << endl;
+    logger << "[Graph]\t"
+           << tid
+           << ": lock()"
+           << endl;
     pthread_mutex_lock(&graphlock);
-    cout << "[Graph]\t"
-         << tid
-         << ": acquired lock."
-         << endl;
+    logger << "[Graph]\t"
+           << tid
+           << ": acquired lock."
+           << endl;
   }
 
   void Graph::unlock() {
     pthread_t tid = pthread_self();
-    cout << "[Graph]\t"
-         << tid
-         << ": unlock()"
-         << endl;
+    logger << "[Graph]\t"
+           << tid
+           << ": unlock()"
+           << endl;
     pthread_mutex_unlock(&graphlock);
   }
 
