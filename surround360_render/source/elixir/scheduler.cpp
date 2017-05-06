@@ -64,6 +64,7 @@ namespace elixir {
 
   Node *Scheduler::scheduleJob(int workerId) {
     lock();
+    assertThatInvariantsHold();
     // parse graph to find every runnable job
     vector<Node *> runnableJobs = this->graph->getRunnableJobs();
     logger << "[Scheduler]\t"
@@ -86,6 +87,7 @@ namespace elixir {
       this->runningJobs[workerId] = node;
     }
 
+    assertThatInvariantsHold();
     unlock();
     return node;
   }
