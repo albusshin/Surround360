@@ -269,7 +269,7 @@ namespace elixir {
     // Assert keys in dataMap are all finished
     for (auto pair: dataMap) {
       int nodeKey = pair.first;
-      assert(finished.find(nodeKey) != finished.end());
+      assert(nodeKey < 0 || finished.find(nodeKey) != finished.end());
     }
 
 #endif
