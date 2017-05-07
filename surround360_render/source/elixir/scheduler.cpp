@@ -34,7 +34,7 @@ namespace elixir {
 
   void Scheduler::printRunnableJobs() {
     for (std::list<Node *>::iterator it = this->runnableJobs.begin();
-         it != this->runningJobs.end(); ++it) {
+         it != this->runnableJobs.end(); ++it) {
       fprintf(stdout, "[RunnableJobs] nodeID: %d, batchID: %d\n",
               (*it)->nodeId, (*it)->batchId);
     }
