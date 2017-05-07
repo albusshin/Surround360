@@ -32,6 +32,14 @@ namespace elixir {
     this->policy = SchedulerPolicy::Fifo;
   }
 
+  void Scheduler::printRunnableJobs() {
+    for (std::list<Node *>::iterator it = this->runnableJobs.begin();
+         it != this->runningJobs.end(); ++it) {
+      fprintf(stdout, "[RunnableJobs] nodeID: %d, batchID: %d\n",
+              (*it)->nodeId, (*it)->batchId);
+    }
+  }
+
   Node *Scheduler::fifoPickAJob(int workerId) {
     Node *node = NULL;
     if (this->runnableJobs.size() != 0) {

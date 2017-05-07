@@ -20,6 +20,8 @@ namespace elixir {
     pthread_mutex_t schedulerLock;
 
   public:
+    void printRunnableJobs();
+
     void init(Graph *graph);
 
     Node *scheduleJob(int workerId);
