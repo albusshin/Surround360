@@ -95,5 +95,11 @@ std::unordered_map<std::string, void *> KernelC::execute (
   std::unordered_map<std::string, void *> outputData;
   outputData["pano"] = ((void *) pano);
 
+  if (left) {
+    cv::imwrite( "/home/ubuntu/o/panoL-elixir.jpg", *pano);
+  } else {
+    cv::imwrite( "/home/ubuntu/o/panoR-elixir.jpg", *pano);
+  }
+
   return outputData;
 }
