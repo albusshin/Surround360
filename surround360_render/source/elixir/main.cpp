@@ -10,7 +10,7 @@ using namespace elixir;
 using namespace std;
 
 size_t eqr_width = 8400;
-size_t eqr_height = 8400;
+size_t eqr_height = 4096;
 string camera_rig_path = "/home/ubuntu/d/a/palace3/camera_rig.json";
 string flow_algo = "pixflow_search_20";
 float zero_parallax_dist = 10000;
