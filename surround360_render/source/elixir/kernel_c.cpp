@@ -9,12 +9,13 @@ void KernelC::new_frame_info(
   int camImageWidth, int camImageHeight) {
   camImageWidth_ = camImageWidth;
   camImageHeight_ = camImageHeight;
-  std::cout << "[Concat]\t"
-            << "new_frame_info: "
-            << "camImageWidth = "
-            << camImageWidth
-            << "camImageHeight = "
-            << camImageHeight;
+  logger << "[Concat]\t"
+         << "new_frame_info: "
+         << "camImageWidth = "
+         << camImageWidth
+         << "camImageHeight = "
+         << camImageHeight
+         << std::endl;
   const int numCams = 14;
   const float cameraRingRadius = rig_->getRingRadius();
   const float camFovHorizontalDegrees =
@@ -95,7 +96,7 @@ std::unordered_map<std::string, void *> KernelC::execute (
   std::unordered_map<std::string, void *> outputData;
   outputData["pano"] = ((void *) pano);
 
-  if (left) {
+  if (left_) {
     cv::imwrite( "/home/ubuntu/o/panoL-elixir.jpg", *pano);
   } else {
     cv::imwrite( "/home/ubuntu/o/panoR-elixir.jpg", *pano);

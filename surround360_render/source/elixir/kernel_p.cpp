@@ -36,17 +36,17 @@ std::unordered_map<std::string, void *> KernelP::execute (
   int cv_madetype = CV_MAKETYPE(cv_type, channels);
 
 
-  std::cout << "P: output = "
-            << frame_col_mat.cols
-            << " * "
-            << frame_col_mat.rows
-            << " * "
-            << frame_col_mat.channels()
-            << std::endl;
+  logger << "P: output = "
+         << frame_col_mat.cols
+         << " * "
+         << frame_col_mat.rows
+         << " * "
+         << frame_col_mat.channels()
+         << std::endl;
 
   cv::Mat tmp;
   cv::cvtColor(frame_col_mat, tmp, CV_BGR2BGRA);
-  std::cout << "after cvtColor()" << std::endl;
+  logger << "after cvtColor()" << std::endl;
 
   cv::Mat *output_mat = new cv::Mat(output_image_height, output_image_width, cv_madetype);
 
@@ -62,7 +62,7 @@ std::unordered_map<std::string, void *> KernelP::execute (
   std::unordered_map<std::string, void *> outputData;
 
   outputData["p_mat"] = ((void *) output_mat);
-  std::cout << "after bicubicRemapToSpherical" << std::endl;
+  logger << "after bicubicRemapToSpherical" << std::endl;
 
   return outputData;
 }
