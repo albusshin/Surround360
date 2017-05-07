@@ -48,7 +48,7 @@ Graph *loadGraph() {
     // Create a node
     elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
 
-    node->kernel = new KernelI(get_video_filename(i), 0);
+    node->kernel = new KernelI(get_video_filename(i + 1), 0);
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;
