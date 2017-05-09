@@ -1,6 +1,7 @@
 #include "surround360_kernels.h"
 #include "pthread.h"
 #include "nullbuf.h"
+#include "worker.h"
 
 typedef int i32;
 using namespace elixir;
