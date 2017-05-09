@@ -10,7 +10,7 @@ std::unordered_map<std::string, void *> KernelI::execute (
   assert(dataList.empty());
 
   logger << "[KernelI T"
-         << Worker::getWorkerId()
+         << elixir::Worker::getWorkerId()
          << "]\t"
          << "execute()"
          << endl;

@@ -17,7 +17,7 @@ std::unordered_map<std::string, void *> KernelP::execute (
   std::vector<elixir::Data *>& dataList) {
 
   logger << "[KernelP T"
-         << Worker::getWorkerId()
+         << elixir::Worker::getWorkerId()
          << "]\t"
          << "execute()"
          << endl;

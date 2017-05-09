@@ -41,7 +41,7 @@ std::unordered_map<std::string, void *> KernelF::execute (
   std::vector<elixir::Data *>& dataList) {
 
   logger << "[KernelF T"
-         << Worker::getWorkerId()
+         << elixir::Worker::getWorkerId()
          << "]\t"
          << "execute()"
          << endl;

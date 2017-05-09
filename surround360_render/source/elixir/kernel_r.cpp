@@ -52,7 +52,7 @@ std::unordered_map<std::string, void *> KernelR::execute (
   std::vector<elixir::Data *>& dataList) {
 
   logger << "[KernelR T"
-         << Worker::getWorkerId()
+         << elixir::Worker::getWorkerId()
          << "]\t"
          << "execute()"
          << endl;
