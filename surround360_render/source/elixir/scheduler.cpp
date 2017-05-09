@@ -388,6 +388,10 @@ namespace elixir {
         minBatchIdInRunnableQueue = min(node->batchId,
                                         minBatchIdInRunnableQueue);
       }
+      for (auto pair: runningJobs) {
+        minBatchIdInRunnableQueue = min(pair.second->batchId,
+                                        minBatchIdInRunnableQueue);
+      }
       return minBatchIdInRunnableQueue + Scheduler::LAYERS_THRESHOLD < batchId;
     }
   }
