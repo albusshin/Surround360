@@ -100,7 +100,7 @@ namespace elixir {
     Node *preRunningJob = runningJobs[workerId];
 
     int previousNodeKey = preRunningJob->getNodeKeyByIds(
-        preRunningJob->nodeId, preRunningJob->batchId);
+      preRunningJob->nodeId, preRunningJob->batchId);
 
     for (std::map<int, Node *>::iterator it = jobs.begin();
          it != jobs.end();) {
@@ -233,35 +233,49 @@ namespace elixir {
   Node *Scheduler::scheduleJob(int workerId) {
     lock();
     assertThatInvariantsHold();
-    // parse graph to find every runnable job
-    vector<Node *> runnableJobs = this->graph->getRunnableJobs();
-    logger << "[Scheduler]\t"
-           << "workerId: " << workerId
-           << " runnableJobs.size() == "
-           << runnableJobs.size()
-           << endl;
 
-    for (vector<Node *>::iterator it = runnableJobs.begin();
-         it != runnableJobs.end(); ++it) {
-      this->runnableJobs.push_back(*it);
+    Node *node = nullptr;
+    while (true) {
+      // parse graph to find every runnable job
+      vector<Node *> runnableJobs = this->graph->getRunnableJobs();
+      logger << "[Scheduler]\t"
+             << "workerId: " << workerId
+             << " runnableJobs.size() == "
+             << runnableJobs.size()
+             << endl;
+
+      for (vector<Node *>::iterator it = runnableJobs.begin();
+           it != runnableJobs.end(); ++it) {
+        this->runnableJobs.push_back(*it);
+      }
+
+      // select job from job queue
+      // Delete the node from the runnableQueue
+      if ((node = pickAJob(workerId)) == nullptr) {
+        if (allFinished()) {
+          assertThatInvariantsHold();
+          unlock();
+          return nullptr;
+        }
+        pthread_cond_wait(&schedulerCondVar, &schedulerLock);
+      } else {
+
+        // Add the node to the runningMap
+        this->runningJobs[workerId] = node;
+
+        assertThatInvariantsHold();
+        unlock();
+        return node;
+      }
     }
 
-    // select job from job queue
-    // Delete the node from the runnableQueue
-    Node *node = pickAJob(workerId);
-
-    if (node != nullptr) {
-      // Add the node to the runningMap
-      this->runningJobs[workerId] = node;
-    }
-
-    assertThatInvariantsHold();
+    // Make g++ happy
+    assert(false);
     unlock();
-    return node;
+    return nullptr;
   }
 
   bool Scheduler::allFinished() {
-    lock();
     assertThatInvariantsHold();
     if (!runnableJobs.empty()) {
       unlock();
@@ -281,7 +295,6 @@ namespace elixir {
     }
     assertThatInvariantsHold();
     assert(finished.size() == graph->totalNodes * graph->numBatches);
-    unlock();
     return true;
   }
 
@@ -308,6 +321,8 @@ namespace elixir {
 
     dataMapCleanup();
 
+    // Broadcast every scheduler
+    pthread_cond_broadcast(&schedulerCondVar);
     assertThatInvariantsHold();
     unlock();
   }

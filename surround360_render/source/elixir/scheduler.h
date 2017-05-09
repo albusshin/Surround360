@@ -18,6 +18,7 @@ namespace elixir {
 
   class Scheduler {
     pthread_mutex_t schedulerLock;
+    pthread_cond_t schedulerCondVar;
 
   public:
     void printRunnableJobs();
@@ -25,8 +26,6 @@ namespace elixir {
     void init(Graph *graph);
 
     Node *scheduleJob(int workerId);
-
-    bool allFinished();
 
     void onJobFinishing(int nodeKey, Data *outputData, int workerId);
 
@@ -49,9 +48,11 @@ namespace elixir {
 
     Scheduler() {
         pthread_mutex_init(&schedulerLock, NULL);
+        pthread_cond_init(&schedulerCondVar, NULL);
     }
     ~Scheduler() {
         pthread_mutex_destroy(&schedulerLock);
+        pthread_cond_destroy(&schedulerCondVar);
     }
 
     // the priority queue
@@ -72,6 +73,8 @@ namespace elixir {
     void lock();
 
     void unlock();
+
+    bool allFinished();
 
     void dataMapCleanup();
 

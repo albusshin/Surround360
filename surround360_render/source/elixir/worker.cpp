@@ -1,6 +1,7 @@
 #include "worker.h"
 #include "scheduler.h"
 
+#include <assert.h>
 #include <string>
 #include <unistd.h>
 #include <unordered_map>
@@ -25,12 +26,7 @@ namespace elixir {
 
       Node *node = Scheduler::getScheduler().scheduleJob(workerId);
       if (node == nullptr) {
-        if (Scheduler::getScheduler().allFinished()) {
-          break;
-        } else {
-          sleep(1);
-          continue;
-        }
+        break;
       }
 
       // get datalist and add data to datalist
