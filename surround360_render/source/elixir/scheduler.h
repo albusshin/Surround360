@@ -48,6 +48,7 @@ namespace elixir {
   private:
 
     Scheduler() {}
+    ~Scheduler() {}
 
     // the priority queue
     list<Node *> runnableJobs;

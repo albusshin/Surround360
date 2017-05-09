@@ -81,6 +81,10 @@ namespace elixir {
         children(children),
         depth(depth){}
 
+    ~Node() {
+        delete kernel;
+    }
+
     static int getNodeKeyByIds(int nodeId, int batchId);
 
     static int getNodeIdByNodeKey(int nodeKey);
