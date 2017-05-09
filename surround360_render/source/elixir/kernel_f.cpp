@@ -55,22 +55,24 @@ std::unordered_map<std::string, void *> KernelF::execute (
 
   vector<cv::Mat>& left_inputs = *(vector<cv::Mat> *) dataList[0]->data["p_mats"];
   vector<cv::Mat>& right_inputs = *(vector<cv::Mat> *) dataList[1]->data["p_mats"];
-  vector<cv::Mat>& prev_overlap_image_l_s = *(vector<cv::Mat> *) dataList[2]->data["prev_overlap_image_l_s"];
-  vector<cv::Mat>& prev_overlap_image_r_s = *(vector<cv::Mat> *) dataList[2]->data["prev_overlap_image_r_s"];
-  vector<cv::Mat>& prev_frame_flow_l_to_r_s = *(vector<cv::Mat> *) dataList[2]->data["prev_frame_flow_l_to_r_s"];
-  vector<cv::Mat>& prev_frame_flow_r_to_l_s = *(vector<cv::Mat> *) dataList[2]->data["prev_frame_flow_r_to_l_s"];
+  cv::Mat& prev_overlap_image_l = *(cv::Mat *) dataList[2]->data["prev_overlap_image_l"];
+  cv::Mat& prev_overlap_image_r = *(cv::Mat *) dataList[2]->data["prev_overlap_image_r"];
+  cv::Mat& prev_frame_flow_l_to_r = *(cv::Mat *) dataList[2]->data["prev_frame_flow_l_to_r"];
+  cv::Mat& prev_frame_flow_r_to_l = *(cv::Mat *) dataList[2]->data["prev_frame_flow_r_to_l"];
+
   assert(left_inputs.size() == right_inputs.size());
-  assert(left_inputs.size() == prev_overlap_image_l_s.size());
-  assert(left_inputs.size() == prev_overlap_image_r_s.size());
-  assert(left_inputs.size() == prev_frame_flow_l_to_r_s.size());
-  assert(left_inputs.size() == prev_frame_flow_r_to_l_s.size());
 
   vector<cv::Mat> *left_flows = new vector<cv::Mat>();
   vector<cv::Mat> *right_flows = new vector<cv::Mat>();
-  vector<cv::Mat> *new_prev_frame_flow_l_to_r_s = new vector<cv::Mat>();
-  vector<cv::Mat> *new_prev_frame_flow_r_to_l_s = new vector<cv::Mat>();
-  vector<cv::Mat> *new_prev_overlap_image_l_s = new vector<cv::Mat>();
-  vector<cv::Mat> *new_prev_overlap_image_r_s = new vector<cv::Mat>();
+  cv::Mat *new_prev_overlap_image_l_ = new cv::Mat();
+  cv::Mat *new_prev_overlap_image_r_ = new cv::Mat();
+  cv::Mat *new_prev_frame_flow_l_to_r_ = new cv::Mat();
+  cv::Mat *new_prev_frame_flow_r_to_l_ = new cv::Mat();
+
+  *new_prev_overlap_image_l_ = prev_overlap_image_l;
+  *new_prev_overlap_image_r = prev_overlap_image_r;
+  *new_prev_frame_flow_l_to_r = prev_frame_flow_l_to_r;
+  *new_prev_frame_flow_r_to_l = prev_frame_flow_r_to_l;
 
   for (int frameNum = 0; frameNum < left_inputs.size(); ++frameNum) {
     cv::Mat& left_input = left_inputs[frameNum];
@@ -86,11 +88,6 @@ std::unordered_map<std::string, void *> KernelF::execute (
     assert(camImageHeightL == camImageHeightR);
 
     new_frame_info(camImageWidthL, camImageHeightL);
-
-    cv::Mat& prev_overlap_image_l_ = prev_overlap_image_l_s[frameNum];
-    cv::Mat& prev_overlap_image_r_ = prev_overlap_image_r_s[frameNum];
-    cv::Mat& prev_frame_flow_l_to_r_ = prev_frame_flow_l_to_r_s[frameNum];
-    cv::Mat& prev_frame_flow_r_to_l_ = prev_frame_flow_r_to_l_s[frameNum];
 
     assert(overlap_image_width_ != -1);
 
@@ -120,19 +117,17 @@ std::unordered_map<std::string, void *> KernelF::execute (
               << left_overlap_input.channels()
               << std::endl;
 
-    novel_view_gen_->prepare(left_overlap_input, right_overlap_input,
-                             prev_frame_flow_l_to_r_, prev_frame_flow_r_to_l_,
-                             prev_overlap_image_l_, prev_overlap_image_r_);
+    novel_view_gen_->prepare(left_overlap_input,
+                             right_overlap_input,
+                             *new_prev_frame_flow_l_to_r_,
+                             *new_prev_frame_flow_r_to_l_,
+                             *new_prev_overlap_image_l_,
+                             *new_prev_overlap_image_r_);
 
-    cv::Mat new_prev_overlap_image_l_;
-    cv::Mat new_prev_overlap_image_r_;
-    cv::Mat new_prev_frame_flow_l_to_r_;
-    cv::Mat new_prev_frame_flow_r_to_l_;
-
-    new_prev_frame_flow_l_to_r_ = novel_view_gen_->getFlowLtoR();
-    new_prev_frame_flow_r_to_l_ = novel_view_gen_->getFlowRtoL();
-    left_overlap_input.copyTo(new_prev_overlap_image_l_);
-    right_overlap_input.copyTo(new_prev_overlap_image_r_);
+    *new_prev_frame_flow_l_to_r_ = novel_view_gen_->getFlowLtoR();
+    *new_prev_frame_flow_r_to_l_ = novel_view_gen_->getFlowRtoL();
+    left_overlap_input.copyTo(*new_prev_overlap_image_l_);
+    right_overlap_input.copyTo(*new_prev_overlap_image_r_);
 
     cv::Mat left_flow;
     cv::Mat right_flow;
@@ -142,19 +137,15 @@ std::unordered_map<std::string, void *> KernelF::execute (
 
     left_flows->push_back(left_flow);
     right_flows->push_back(right_flow);
-    new_prev_frame_flow_l_to_r_s->push_back(new_prev_frame_flow_l_to_r_);
-    new_prev_frame_flow_r_to_l_s->push_back(new_prev_frame_flow_r_to_l_);
-    new_prev_overlap_image_l_s->push_back(new_prev_overlap_image_l_);
-    new_prev_overlap_image_r_s->push_back(new_prev_overlap_image_r_);
   }
 
   std::unordered_map<std::string, void *> outputData;
   outputData["left_flows"] = ((void *) left_flows);
   outputData["right_flows"] = ((void *) right_flows);
-  outputData["prev_frame_flow_l_to_r_s"] = ((void *) new_prev_frame_flow_l_to_r_s);
-  outputData["prev_frame_flow_r_to_l_s"] = ((void *) new_prev_frame_flow_r_to_l_s);
-  outputData["prev_overlap_image_l_s"] = ((void *) new_prev_overlap_image_l_s);
-  outputData["prev_overlap_image_r_s"] = ((void *) new_prev_overlap_image_r_s);
+  outputData["prev_overlap_image_l_"] = ((void *) new_prev_overlap_image_l_);
+  outputData["prev_overlap_image_r_"] = ((void *) new_prev_overlap_image_r_);
+  outputData["prev_frame_flow_l_to_r_"] = ((void *) new_prev_frame_flow_l_to_r_);
+  outputData["prev_frame_flow_r_to_l_"] = ((void *) new_prev_frame_flow_r_to_l_);
 
   return outputData;
 }
