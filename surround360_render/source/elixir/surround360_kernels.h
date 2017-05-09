@@ -32,24 +32,22 @@ using namespace surround360::math_util;
 
 class KernelI : public elixir::Kernel {
 public:
-  KernelI(cv::VideoCapture* cap,
+  KernelI(string videoFilename,
           int startFrameIndex,
           size_t batchSize)
-    : cap_(cap),
+    : videoFilename_(videoFilename),
       startFrameIndex_(startFrameIndex),
       batchSize_(batchSize) {
 
-    assert(cap->isOpened());
-    cap->set(CV_CAP_PROP_POS_FRAMES, startFrameIndex_);
     logger << "[KernelI]\t"
            << "ctor()"
-           << "cap == "
-           << cap
+           << "videoFileName == "
+           << videoFilename
            << endl;
   }
 
   KernelI *clone() override {
-    return new KernelI(cap, startFrameIndex_, batchSize_);
+    return new KernelI(videoFilename_, startFrameIndex_, batchSize_);
   };
 
   void updateToNextLayer() override {
@@ -60,9 +58,9 @@ public:
     vector<elixir::Data *>& dataList);
 
 private:
+  string videoFilename_;
   int startFrameIndex_;
   size_t batchSize_;
-  cv::VideoCapture *cap_;
 };
 
 class KernelP : public elixir::Kernel {
