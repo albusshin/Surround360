@@ -30,7 +30,7 @@ namespace elixir {
 
   void Scheduler::init(Graph *graph) {
     this->graph = graph;
-    this->policy = SchedulerPolicy::Fifo;
+    this->policy = SchedulerPolicy::Optimized;
   }
 
   void Scheduler::printRunnableJobs() {
