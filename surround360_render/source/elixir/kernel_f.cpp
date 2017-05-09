@@ -70,9 +70,9 @@ std::unordered_map<std::string, void *> KernelF::execute (
   cv::Mat *new_prev_frame_flow_r_to_l_ = new cv::Mat();
 
   *new_prev_overlap_image_l_ = prev_overlap_image_l;
-  *new_prev_overlap_image_r = prev_overlap_image_r;
-  *new_prev_frame_flow_l_to_r = prev_frame_flow_l_to_r;
-  *new_prev_frame_flow_r_to_l = prev_frame_flow_r_to_l;
+  *new_prev_overlap_image_r_ = prev_overlap_image_r;
+  *new_prev_frame_flow_l_to_r_ = prev_frame_flow_l_to_r;
+  *new_prev_frame_flow_r_to_l_ = prev_frame_flow_r_to_l;
 
   for (int frameNum = 0; frameNum < left_inputs.size(); ++frameNum) {
     cv::Mat& left_input = left_inputs[frameNum];
