@@ -24,7 +24,10 @@ namespace elixir {
     Graph (size_t totalNodes, size_t numFrames) {
       Graph::totalNodes = totalNodes;
       Graph::numBatches = (numFrames + batchSize - 1) / batchSize;
-      pthread_mutex_init(&graphlock);
+      pthread_mutex_init(&graphlock, NULL);
+    }
+    ~Graph() {
+        pthread_mutex_destroy(&graphlock);
     }
 
     vector<Node *> getRunnableJobs();

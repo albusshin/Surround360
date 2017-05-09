@@ -48,9 +48,11 @@ namespace elixir {
   private:
 
     Scheduler() {
-        pthread_mutex_init(&schedulerLock);
+        pthread_mutex_init(&schedulerLock, NULL);
     }
-    ~Scheduler() {}
+    ~Scheduler() {
+        pthread_mutex_destroy(&schedulerLock);
+    }
 
     // the priority queue
     list<Node *> runnableJobs;
