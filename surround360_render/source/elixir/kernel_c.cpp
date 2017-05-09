@@ -3,6 +3,8 @@
 #include "pthread.h"
 #include "nullbuf.h"
 #include "worker.h"
+#include <thread>
+#include <mutex>
 
 typedef int i32;
 using namespace elixir;
