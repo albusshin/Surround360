@@ -105,14 +105,14 @@ std::unordered_map<std::string, void *> KernelC::execute (
     ss <<  "/home/ubuntu/o/panoL-elixir" << counter << ".jpg";
     string name = ss.str();
     ss.clear();
-    fprintf(stdout, "[c-kernel] name: %s\n", name);
+    fprintf(stdout, "[c-kernel] name: %s\n", name.c_str());
     cv::imwrite(name, *pano);
   } else {
     stringstream ss;
     ss <<  "/home/ubuntu/o/panoR-elixir" << counter << ".jpg";
     string name = ss.str();
     ss.clear();
-    fprintf(stdout, "[c-kernel] name: %s\n", name);
+    fprintf(stdout, "[c-kernel] name: %s\n", name.c_str());
     cv::imwrite(name, *pano);
   }
 
