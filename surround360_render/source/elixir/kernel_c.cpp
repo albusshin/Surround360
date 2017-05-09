@@ -117,7 +117,9 @@ std::unordered_map<std::string, void *> KernelC::execute (
   }
 
   fprintf(stdout, "[c-kernel] finish save\n");
-  counter += 1;
+  if (!left_) {
+    counter += 1;
+  }
   fprintf(stdout, "[c-kernel] counter: %d\n", counter);
 
   return outputData;
