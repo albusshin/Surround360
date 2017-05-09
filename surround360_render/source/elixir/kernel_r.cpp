@@ -58,6 +58,9 @@ std::unordered_map<std::string, void *> KernelR::execute (
          << "execute()"
          << endl;
 
+  time_t t = time(0);
+  printf("[Kernel-R-start]: %ld: %d\n", t, elixir::Worker::getWorkerId());
+
   assert(dataList.size() == 3);
   assert(dataList[0]->data.size() == 1);
   assert(dataList[1]->data.size() == 1);
@@ -126,6 +129,9 @@ std::unordered_map<std::string, void *> KernelR::execute (
   std::unordered_map<std::string, void *> outputData;
   outputData["chunkLs"] = ((void *) chunkLs);
   outputData["chunkRs"] = ((void *) chunkRs);
+
+  t = time(0);
+  printf("[Kernel-R-end]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   return outputData;
 }

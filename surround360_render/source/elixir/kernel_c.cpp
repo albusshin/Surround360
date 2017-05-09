@@ -3,11 +3,14 @@
 #include "pthread.h"
 #include "nullbuf.h"
 #include "worker.h"
+#include <thread>
+#include <mutex>
 
 typedef int i32;
 using namespace elixir;
 
 int counter = 0;
+std::mutex mtx;
 
 void KernelC::new_frame_info(
   int camImageWidth, int camImageHeight) {
@@ -62,6 +65,9 @@ std::unordered_map<std::string, void *> KernelC::execute (
          << "execute()"
          << endl;
 
+  time_t t = time(0);
+  printf("[Kernel-C-start]: %ld: %d\n", t, elixir::Worker::getWorkerId());
+
   string chunkKey;
   if (left_) {
     chunkKey = "chunkLs";
@@ -105,24 +111,33 @@ std::unordered_map<std::string, void *> KernelC::execute (
 
     panos->push_back(pano);
 
-
     if (left_) {
       stringstream ss;
       ss <<  "/home/ubuntu/o/panoL-elixir" << counter << ".jpg";
       string name = ss.str();
       ss.clear();
-      fprintf(stdout, "[c-kernel] name: %s\n", name);
+      fprintf(stdout, "[c-kernel] name: %s\n", name.c_str());
       cv::imwrite(name, pano);
     } else {
       stringstream ss;
       ss <<  "/home/ubuntu/o/panoR-elixir" << counter << ".jpg";
       string name = ss.str();
       ss.clear();
-      fprintf(stdout, "[c-kernel] name: %s\n", name);
+      fprintf(stdout, "[c-kernel] name: %s\n", name.c_str());
       cv::imwrite(name, pano);
     }
+
     fprintf(stdout, "[c-kernel] finish save\n");
-    counter += 1;
+    fprintf(stdout, "[c-kernel] counter: %d\n", counter);
+    if (!left_) {
+      mtx.lock();
+      counter += 1;
+      mtx.unlock();
+    }
+    fprintf(stdout, "[c-kernel] counter: %d\n", counter);
+
+    t = time(0);
+    printf("[Kernel-C-end]: %ld: %d\n", t, elixir::Worker::getWorkerId());
   }
   std::unordered_map<std::string, void *> outputData;
   outputData["panos"] = ((void *) panos);

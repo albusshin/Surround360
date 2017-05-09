@@ -10,6 +10,9 @@ std::unordered_map<std::string, void *> KernelI::execute (
   std::vector<elixir::Data *>& dataList) {
   assert(dataList.empty());
 
+  time_t t = time(0);
+  printf("[Kernel-I-start]: %ld: %d\n", t, elixir::Worker::getWorkerId());
+
   logger << "[KernelI T"
          << elixir::Worker::getWorkerId()
          << "]\t"
@@ -37,6 +40,9 @@ std::unordered_map<std::string, void *> KernelI::execute (
 
   std::unordered_map<std::string, void *> outputData;
   outputData["frame_col_mats"] = ((void *) outputMats);
+
+  t = time(0);
+  printf("[Kernel-I-end]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   return outputData;
 }
