@@ -5,6 +5,8 @@
 
 typedef int i32;
 
+int counter = 0;
+
 void KernelC::new_frame_info(
   int camImageWidth, int camImageHeight) {
   camImageWidth_ = camImageWidth;
@@ -97,10 +99,20 @@ std::unordered_map<std::string, void *> KernelC::execute (
   outputData["pano"] = ((void *) pano);
 
   if (left_) {
-    cv::imwrite( "/home/ubuntu/o/panoL-elixir.jpg", *pano);
+    stringstream ss;
+    ss <<  "/home/ubuntu/o/panoL-elixir" << counter << ".jpg";
+    string name = ss.str();
+    ss.clear();
+    cv::imwrite(name, *pano);
   } else {
-    cv::imwrite( "/home/ubuntu/o/panoR-elixir.jpg", *pano);
+    stringstream ss;
+    ss <<  "/home/ubuntu/o/panoR-elixir" << counter << ".jpg";
+    string name = ss.str();
+    ss.clear();
+    cv::imwrite(name, *pano);
   }
+
+  counter += 1;
 
   return outputData;
 }
