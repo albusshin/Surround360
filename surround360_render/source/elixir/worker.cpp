@@ -15,6 +15,10 @@ namespace elixir {
 
   using namespace std;
 
+  unordered_map<pthread_t, int> Worker::tidMap;
+
+  pthread_mutex_t Worker::tidMapLock;
+
   void Worker::workerThread() {
 
     while (true) {

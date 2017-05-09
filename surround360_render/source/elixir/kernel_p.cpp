@@ -15,9 +15,9 @@ typedef int i32;
 std::unordered_map<std::string, void *> KernelP::execute (
   std::vector<elixir::Data *>& dataList) {
 
-  pthread_t tid = pthread_self();
-  logger << "[KernelP]\t"
-         << "tid: " << tid
+  logger << "[KernelP T"
+         << Worker::getWorkerId()
+         << "]\t"
          << "execute()"
          << endl;
 

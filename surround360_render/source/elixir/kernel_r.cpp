@@ -50,9 +50,9 @@ void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
 std::unordered_map<std::string, void *> KernelR::execute (
   std::vector<elixir::Data *>& dataList) {
 
-  pthread_t tid = pthread_self();
-  logger << "[KernelR]\t"
-         << "tid: " << tid
+  logger << "[KernelR T"
+         << Worker::getWorkerId()
+         << "]\t"
          << "execute()"
          << endl;
 

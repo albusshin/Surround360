@@ -39,9 +39,9 @@ void KernelF::new_frame_info(int camImageWidth, int camImageHeight) {
 std::unordered_map<std::string, void *> KernelF::execute (
   std::vector<elixir::Data *>& dataList) {
 
-  pthread_t tid = pthread_self();
-  logger << "[KernelF]\t"
-         << "tid: " << tid
+  logger << "[KernelF T"
+         << Worker::getWorkerId()
+         << "]\t"
          << "execute()"
          << endl;
 

@@ -381,7 +381,6 @@ namespace elixir {
   }
 
   void Scheduler::lock() {
-    pthread_t tid = pthread_self();
     logger << "[Scheduler]\t"
            << tid
            << ": lock()"
@@ -394,7 +393,6 @@ namespace elixir {
   }
 
   void Scheduler::unlock() {
-    pthread_t tid = pthread_self();
     logger << "[Scheduler]\t"
            << tid
            << ": unlock()"

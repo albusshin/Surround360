@@ -207,7 +207,7 @@ Graph *loadGraph() {
   return graph;
 }
 
-#define NUM_CORES 32
+#define NUM_THREADS 32
 
 void *worker_thread(void *arg) {
   int tid = *(int *) arg;
@@ -216,6 +216,7 @@ void *worker_thread(void *arg) {
             << std::endl;
 
   elixir::Worker *worker = new Worker(tid);
+  pthread_barrier_wait(&barrier);
   worker->workerThread();
 
   std::cout << "[T " << tid << "]\t"
@@ -226,9 +227,10 @@ void *worker_thread(void *arg) {
 Graph *theGraph;
 Scheduler *theScheduler;
 
-pthread_t threads[NUM_CORES];
+pthread_t threads[NUM_THREADS];
+pthread_barrier_t barrier;
 
-int ids[NUM_CORES];
+int ids[NUM_THREADS];
 
 int main() {
   // build graph
@@ -236,14 +238,21 @@ int main() {
   theGraph = graph;
   Scheduler::getScheduler().init(graph);
   theScheduler = &(Scheduler::getScheduler());
+
+  pthread_mutex_init(&Worker::tidMapLock, NULL);
+
+  pthread_barrier_init(&barrier, NULL, (NUM_THREADS + 1));
   // spawn worker threads
-  for (int i = 0; i < 32; ++i) {
+  for (int i = 0; i < NUM_THREADS; ++i) {
     ids[i] = i;
     pthread_create(&threads[i], NULL, worker_thread, &ids[i]);
+    Worker::tidMap[threads[i]] = i;
   }
 
+  pthread_barrier_wait(&barrier);
+
   // join worker threads
-  for (int i = 0; i < 32; ++i) {
+  for (int i = 0; i < NUM_THREADS; ++i) {
     pthread_join(threads[i], NULL);
   }
 
