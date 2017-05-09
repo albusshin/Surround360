@@ -601,7 +601,7 @@ IF (USE_ELIXIR)
   TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
   TARGET_LINK_LIBRARIES(
     ElixirMain
-    elixirmain
+#    elixirmain
     LibVrCamera
     LibJSON
     gflags
