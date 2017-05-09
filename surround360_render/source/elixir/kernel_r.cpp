@@ -115,7 +115,7 @@ std::unordered_map<std::string, void *> KernelR::execute (
   outputData["chunkR"] = ((void *) chunkR);
 
   t = time(0);
-  printf("[Kernel-P-end]: %ld\n", t);
+  printf("[Kernel-R-end]: %ld\n", t);
 
   return outputData;
 }
