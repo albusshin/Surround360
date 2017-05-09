@@ -207,6 +207,7 @@ namespace elixir {
         itList++;
       }
       node = *itList;
+      runnableJobs.erase(itList);
     }
 
     return node;
