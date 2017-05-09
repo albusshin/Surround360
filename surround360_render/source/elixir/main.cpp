@@ -226,16 +226,16 @@ void *worker_thread(void *arg) {
 Graph *theGraph;
 Scheduler *theScheduler;
 
+pthread_t threads[NUM_CORES];
+
+int ids[NUM_CORES];
+
 int main() {
   // build graph
   Graph *graph = loadGraph();
   theGraph = graph;
   Scheduler::getScheduler().init(graph);
   theScheduler = &(Scheduler::getScheduler());
-
-  pthread_t threads[NUM_CORES];
-
-  int ids[NUM_CORES];
   // spawn worker threads
   for (int i = 0; i < 32; ++i) {
     ids[i] = i;
