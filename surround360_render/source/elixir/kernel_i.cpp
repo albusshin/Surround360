@@ -19,22 +19,12 @@ std::unordered_map<std::string, void *> KernelI::execute (
          << "execute()"
          << endl;
 
-  cv::VideoCapture cap(videoFilename_);
-  if(!cap.isOpened()){
-    std::cout << "I: Cannot open video file "
-              << videoFilename_
-              << std::endl;
-    assert(false);
-  }
-
-  cap.set(CV_CAP_PROP_POS_FRAMES, startFrameIndex_);
-
   std::vector<cv::Mat> *outputMats = new std::vector<cv::Mat>();
 
   for (int frameNum = 0; frameNum < batchSize_; ++frameNum) {
     //TODO ending: batchSize_ > frames left
     cv::Mat frame_col_mat;
-    cap >> frame_col_mat;
+    (*cap_) >> frame_col_mat;
     outputMats->push_back(frame_col_mat);
   }
 
