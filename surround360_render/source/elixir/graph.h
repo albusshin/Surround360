@@ -19,7 +19,7 @@ namespace elixir {
 
     static size_t totalNodes;
     static size_t numBatches;
-    const size_t batchSize = 2;
+    const size_t batchSize = 4;
 
     Graph (size_t totalNodes, size_t numFrames) {
       Graph::totalNodes = totalNodes;
