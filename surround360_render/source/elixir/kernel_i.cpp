@@ -3,6 +3,7 @@
 #include "nullbuf.h"
 
 typedef int i32;
+using namespace elixir;
 
 std::unordered_map<std::string, void *> KernelI::execute (
   std::vector<elixir::Data *>& dataList) {

@@ -3,6 +3,7 @@
 #include "nullbuf.h"
 
 typedef int i32;
+using namespace elixir;
 
 void KernelF::new_frame_info(int camImageWidth, int camImageHeight) {
   camImageHeight_ = camImageHeight;

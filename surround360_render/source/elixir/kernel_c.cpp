@@ -4,6 +4,7 @@
 #include "nullbuf.h"
 
 typedef int i32;
+using namespace elixir;
 
 int counter = 0;
 
