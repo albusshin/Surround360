@@ -72,12 +72,13 @@ std::unordered_map<std::string, void *> KernelC::execute (
   i32 num_chunks = dataList.size();
   assert(num_chunks == 14);
 
-  int batchSize = dataList[0]->data[chunkKey]->size();
+  int batchSize = ((vector<cv::Mat> *) dataList[0]->data[chunkKey])->size();
   vector<cv::Mat> *panos = new vector<cv::Mat>();
 
   for (int frameNum = 0; frameNum < batchSize; ++frameNum) {
 
-    cv::Mat& tmp_input_chunk = *(cv::Mat *) dataList[0]->data[chunkKey][frameNum];
+    cv::Mat& tmp_input_chunk =
+      (*(vector<cv::Mat> *) dataList[0]->data[chunkKey])[frameNum];
 
     int camImageWidth = tmp_input_chunk.cols;
     int camImageHeight = tmp_input_chunk.rows;
@@ -93,8 +94,8 @@ std::unordered_map<std::string, void *> KernelC::execute (
 
     std::vector<cv::Mat> pano_chunks(num_chunks, Mat());
     for (i32 c = 0; c < num_chunks; ++c) {
-      assert(dataList[c]->data.size() == 2);
-      cv::Mat& input_chunk = *(cv::Mat *) dataList[c]->data[chunkKey][frameNum];
+      vector<cv::Mat>& input_chunks = (*(vector<cv::Mat> *) dataList[c])->data[chunkKey];
+      cv::Mat& input_chunk = input_chunks[frameNum];
       cv::cvtColor(input_chunk, pano_chunks[c], CV_BGRA2BGR);
     }
     cv::Mat pano;
