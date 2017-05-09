@@ -64,15 +64,10 @@ std::unordered_map<std::string, void *> KernelF::execute (
 
   vector<cv::Mat> *left_flows = new vector<cv::Mat>();
   vector<cv::Mat> *right_flows = new vector<cv::Mat>();
-  cv::Mat *new_prev_overlap_image_l_ = new cv::Mat();
-  cv::Mat *new_prev_overlap_image_r_ = new cv::Mat();
-  cv::Mat *new_prev_frame_flow_l_to_r_ = new cv::Mat();
-  cv::Mat *new_prev_frame_flow_r_to_l_ = new cv::Mat();
-
-  *new_prev_overlap_image_l_ = prev_overlap_image_l;
-  *new_prev_overlap_image_r_ = prev_overlap_image_r;
-  *new_prev_frame_flow_l_to_r_ = prev_frame_flow_l_to_r;
-  *new_prev_frame_flow_r_to_l_ = prev_frame_flow_r_to_l;
+  cv::Mat *new_prev_overlap_image_l_ = new cv::Mat(prev_overlap_image_l);
+  cv::Mat *new_prev_overlap_image_r_ = new cv::Mat(prev_overlap_image_r);
+  cv::Mat *new_prev_frame_flow_l_to_r_ = new cv::Mat(prev_frame_flow_l_to_r);
+  cv::Mat *new_prev_frame_flow_r_to_l_ = new cv::Mat(prev_frame_flow_r_to_l);
 
   for (int frameNum = 0; frameNum < left_inputs.size(); ++frameNum) {
     cv::Mat& left_input = left_inputs[frameNum];
