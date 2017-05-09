@@ -247,6 +247,8 @@ int main() {
     pthread_join(threads[i], NULL);
   }
 
+  exit(0);
+
   std::cout << "[Main]\t"
             << "Joined all threads. Exiting."
             << std::endl;
