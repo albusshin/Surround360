@@ -3,6 +3,7 @@
 #include "nullbuf.h"
 
 typedef int i32;
+using namespace elixir;
 
 void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
   camImageHeight_ = camImageHeight;
@@ -50,9 +51,9 @@ void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
 std::unordered_map<std::string, void *> KernelR::execute (
   std::vector<elixir::Data *>& dataList) {
 
-  pthread_t tid = pthread_self();
-  logger << "[KernelR]\t"
-         << "tid: " << tid
+  logger << "[KernelR T"
+         << elixir::Worker::getWorkerId()
+         << "]\t"
          << "execute()"
          << endl;
 

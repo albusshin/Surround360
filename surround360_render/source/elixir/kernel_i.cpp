@@ -3,14 +3,15 @@
 #include "nullbuf.h"
 
 typedef int i32;
+using namespace elixir;
 
 std::unordered_map<std::string, void *> KernelI::execute (
   std::vector<elixir::Data *>& dataList) {
   assert(dataList.empty());
 
-  pthread_t tid = pthread_self();
-  logger << "[KernelI]\t"
-         << "tid: " << tid
+  logger << "[KernelI T"
+         << elixir::Worker::getWorkerId()
+         << "]\t"
          << "execute()"
          << endl;
   cv::VideoCapture cap(videoFilename_);

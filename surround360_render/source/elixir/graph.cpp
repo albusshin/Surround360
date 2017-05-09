@@ -8,6 +8,7 @@
 #include "graph.h"
 #include "scheduler.h"
 #include "nullbuf.h"
+#include "worker.h"
 
 #define DEBUG
 
@@ -38,9 +39,9 @@ namespace elixir {
       int nodeKey = pair.first;
       Node *node = pair.second;
 
-      pthread_t tid = pthread_self();
-      logger << "[Graph]\t"
-             << tid
+      logger << "[Graph T"
+             << Worker::getWorkerId()
+             << "]\t"
              << "getRunnableJob(): nodeKey: "
              << nodeKey
              << " ids: "
@@ -62,8 +63,9 @@ namespace elixir {
       if (tooDeep) {
         continue;
       }
-      logger << "[Graph]\t"
-             << tid
+      logger << "[Graph T"
+             << Worker::getWorkerId()
+             << "]\t"
              << "getRunnableJob(): not too deep: "
              << nodeKey
              << " ids: "
@@ -81,9 +83,10 @@ namespace elixir {
         }
       }
       if (nodeIsRunnable) {
-        logger << "[Graph]\t"
-               << tid
-               << "getRunnableJob(): node is runnable:"
+        logger << "[Graph T"
+               << Worker::getWorkerId()
+               << "]\t"
+               << ": getRunnableJob(): node is runnable:"
                << nodeKey
                << " ids: "
                << node->nodeId
@@ -130,18 +133,18 @@ namespace elixir {
     node->batchId++;
     node->kernel->updateToNextLayer();
 
-    pthread_t tid = pthread_self();
     nodes.erase(nodeKey);
     nodes[newKey] = node;
-    cout << "[Graph]\t"
-         << tid
-         << " after erasing "
-         << nodeKey
-         << " from graph.nodes, graph.nodes.size() == "
-         << nodes.size()
-         << ", newKey == "
-         << newKey
-         << endl;
+    logger << "[Graph T"
+           << Worker::getWorkerId()
+           << "]\t"
+           << " after erasing "
+           << nodeKey
+           << " from graph.nodes, graph.nodes.size() == "
+           << nodes.size()
+           << ", newKey == "
+           << newKey
+           << endl;
 
     assertThatInvariantsHold();
   }
@@ -164,22 +167,23 @@ namespace elixir {
   }
 
   void Graph::lock() {
-    pthread_t tid = pthread_self();
-    logger << "[Graph]\t"
-           << tid
+    logger << "[Graph T"
+           << Worker::getWorkerId()
+           << "]\t"
            << ": lock()"
            << endl;
     pthread_mutex_lock(&graphlock);
-    logger << "[Graph]\t"
-           << tid
+    logger << "[Graph T"
+           << Worker::getWorkerId()
+           << "]\t"
            << ": acquired lock."
            << endl;
   }
 
   void Graph::unlock() {
-    pthread_t tid = pthread_self();
-    logger << "[Graph]\t"
-           << tid
+    logger << "[Graph T"
+           << Worker::getWorkerId()
+           << "]\t"
            << ": unlock()"
            << endl;
     pthread_mutex_unlock(&graphlock);

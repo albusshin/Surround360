@@ -4,6 +4,7 @@
 #include "nullbuf.h"
 
 typedef int i32;
+using namespace elixir;
 
 int counter = 0;
 
@@ -54,9 +55,9 @@ void KernelC::new_frame_info(
 std::unordered_map<std::string, void *> KernelC::execute (
   std::vector<elixir::Data *>& dataList) {
 
-  pthread_t tid = pthread_self();
-  logger << "[KernelC]\t"
-         << "tid: " << tid
+  logger << "[KernelC T"
+         << elixir::Worker::getWorkerId()
+         << "]\t"
          << "execute()"
          << endl;
 
