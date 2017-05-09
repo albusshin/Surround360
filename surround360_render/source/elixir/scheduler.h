@@ -47,7 +47,9 @@ namespace elixir {
 
   private:
 
-    Scheduler() {}
+    Scheduler() {
+        pthread_mutex_init(&schedulerLock);
+    }
     ~Scheduler() {}
 
     // the priority queue
