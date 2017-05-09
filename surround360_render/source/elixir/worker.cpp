@@ -46,9 +46,9 @@ namespace elixir {
                                                         node->batchId),
                                   node->children);
 
-      pthread_t tid = pthread_self();
-      logger << "[Worker]\t tid:"
-             << tid
+      logger << "[Worker"
+             << workerId
+             << "]\t"
              << "Work done."
              << endl;
 
@@ -57,8 +57,9 @@ namespace elixir {
         outputData,
         workerId);
 
-      logger << "[Worker]\t tid:"
-             << tid
+      logger << "[Worker"
+             << workerId
+             << "]\t"
              << "After onJobFinishing"
              << endl;
     }
