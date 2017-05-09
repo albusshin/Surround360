@@ -33,10 +33,10 @@ using namespace surround360::math_util;
 class KernelI : public elixir::Kernel {
 public:
   KernelI(string videoFilename,
-          int frameNumber,
+          int startFrameIndex,
           size_t batchSize)
     : videoFilename_(videoFilename),
-      frameNumber_(frameNumber),
+      startFrameIndex_(startFrameIndex),
       batchSize_(batchSize) {
 
     logger << "[KernelI]\t"
@@ -47,11 +47,11 @@ public:
   }
 
   KernelI *clone() override {
-    return new KernelI(videoFilename_, frameNumber_, batchSize_);
+    return new KernelI(videoFilename_, startFrameIndex_, batchSize_);
   };
 
   void updateToNextLayer() override {
-    frameNumber_ += batchSize_;
+    startFrameIndex_ += batchSize_;
   }
 
   unordered_map<string, void *> execute(
@@ -59,7 +59,7 @@ public:
 
 private:
   string videoFilename_;
-  int frameNumber_;
+  int startFrameIndex_;
   size_t batchSize_;
 };
 

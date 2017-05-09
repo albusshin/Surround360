@@ -27,7 +27,7 @@ std::unordered_map<std::string, void *> KernelI::execute (
     assert(false);
   }
 
-  cap.set(CV_CAP_PROP_POS_FRAMES, frameNumber_);
+  cap.set(CV_CAP_PROP_POS_FRAMES, startFrameIndex_);
 
   std::vector<cv::Mat> *outputMats = new std::vector<cv::Mat>();
 
