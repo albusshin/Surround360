@@ -48,7 +48,7 @@ std::unordered_map<std::string, void *> KernelF::execute (
          << endl;
 
   time_t t = time(0);
-  printf("[Kernel-F-start]: %ld\n", t);
+  printf("[Kernel-F-start]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   /* Magic numbers fest */
   assert(dataList.size() == 3);
@@ -130,7 +130,7 @@ std::unordered_map<std::string, void *> KernelF::execute (
   outputData["prev_overlap_image_r_"] = ((void *) new_prev_overlap_image_r_);
 
   t = time(0);
-  printf("[Kernel-F-end]: %ld\n", t);
+  printf("[Kernel-F-end]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   return outputData;
 }

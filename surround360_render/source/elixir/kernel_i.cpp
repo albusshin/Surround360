@@ -11,7 +11,7 @@ std::unordered_map<std::string, void *> KernelI::execute (
   assert(dataList.empty());
 
   time_t t = time(0);
-  printf("[Kernel-I-start]: %ld\n", t);
+  printf("[Kernel-I-start]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   logger << "[KernelI T"
          << elixir::Worker::getWorkerId()
@@ -35,7 +35,7 @@ std::unordered_map<std::string, void *> KernelI::execute (
   outputData["frame_col_mat"] = ((void *) frame_col_mat);
 
   t = time(0);
-  printf("[Kernel-I-end]: %ld\n", t);
+  printf("[Kernel-I-end]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   return outputData;
 }

@@ -66,7 +66,7 @@ std::unordered_map<std::string, void *> KernelC::execute (
          << endl;
 
   time_t t = time(0);
-  printf("[Kernel-C-start]: %ld\n", t);
+  printf("[Kernel-C-start]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   string chunkKey;
   if (left_) {
@@ -132,7 +132,7 @@ std::unordered_map<std::string, void *> KernelC::execute (
   fprintf(stdout, "[c-kernel] counter: %d\n", counter);
 
   t = time(0);
-  printf("[Kernel-C-end]: %ld\n", t);
+  printf("[Kernel-C-end]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   return outputData;
 }
