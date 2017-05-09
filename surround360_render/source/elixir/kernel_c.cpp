@@ -97,7 +97,7 @@ std::unordered_map<std::string, void *> KernelC::execute (
       cv::Mat& input_chunk = *(cv::Mat *) dataList[c]->data[chunkKey][frameNum];
       cv::cvtColor(input_chunk, pano_chunks[c], CV_BGRA2BGR);
     }
-    cv::Mat pano();
+    cv::Mat pano;
 
     pano = stackHorizontal(pano_chunks);
     pano = offsetHorizontalWrap(pano, zeroParallaxNovelViewShiftPixels_);

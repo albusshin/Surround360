@@ -30,7 +30,7 @@ std::unordered_map<std::string, void *> KernelI::execute (
 
   for (int frameNum = 0; frameNum < batchSize_; ++frameNum) {
     //TODO ending: batchSize_ > frames left
-    cv::Mat frame_col_mat();
+    cv::Mat frame_col_mat;
     cap >> frame_col_mat;
     outputMats->push_back(frame_col_mat);
   }

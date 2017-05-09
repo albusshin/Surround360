@@ -114,8 +114,8 @@ std::unordered_map<std::string, void *> KernelR::execute (
     std::pair<Mat, Mat> lazyNovelChunksLR =
       novel_view_gen_->combineLazyNovelViews(*lazy_view_buffer_.get());
 
-    cv::Mat chunkL();
-    cv::Mat chunkR();
+    cv::Mat chunkL;
+    cv::Mat chunkR;
     chunkL = lazyNovelChunksLR.first;
     chunkR = lazyNovelChunksLR.second;
 
