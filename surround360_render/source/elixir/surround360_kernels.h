@@ -32,19 +32,19 @@ using namespace surround360::math_util;
 
 class KernelI : public elixir::Kernel {
 public:
-  KernelI(cv::VideoCapture* cap,
+  KernelI(cv::VideoCapture cap,
           int startFrameIndex,
           size_t batchSize)
     : cap_(cap),
       startFrameIndex_(startFrameIndex),
       batchSize_(batchSize) {
 
-    assert(cap->isOpened());
-    cap->set(CV_CAP_PROP_POS_FRAMES, startFrameIndex_);
+    assert(cap.isOpened());
+    cap.set(CV_CAP_PROP_POS_FRAMES, startFrameIndex_);
     logger << "[KernelI]\t"
            << "ctor()"
-           << "cap == "
-           << cap
+           << "startFrameIndex: "
+           << startFrameIndex
            << endl;
   }
 
@@ -62,7 +62,7 @@ public:
 private:
   int startFrameIndex_;
   size_t batchSize_;
-  cv::VideoCapture *cap_;
+  cv::VideoCapture cap_;
 };
 
 class KernelP : public elixir::Kernel {
