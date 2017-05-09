@@ -276,7 +276,6 @@ namespace elixir {
   }
 
   bool Scheduler::allFinished() {
-    lock();
     assertThatInvariantsHold();
     if (!runnableJobs.empty()) {
       unlock();
@@ -296,7 +295,6 @@ namespace elixir {
     }
     assertThatInvariantsHold();
     assert(finished.size() == graph->totalNodes * graph->numBatches);
-    unlock();
     return true;
   }
 

@@ -26,7 +26,6 @@ namespace elixir {
 
       Node *node = Scheduler::getScheduler().scheduleJob(workerId);
       if (node == nullptr) {
-        assert(Scheduler::getScheduler().allFinished());
         break;
       }
 

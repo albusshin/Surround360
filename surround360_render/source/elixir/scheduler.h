@@ -27,8 +27,6 @@ namespace elixir {
 
     Node *scheduleJob(int workerId);
 
-    bool allFinished();
-
     void onJobFinishing(int nodeKey, Data *outputData, int workerId);
 
     void addDummyData(int dummyNodeKey, Data *dummyData);
@@ -75,6 +73,8 @@ namespace elixir {
     void lock();
 
     void unlock();
+
+    bool allFinished();
 
     void dataMapCleanup();
 
