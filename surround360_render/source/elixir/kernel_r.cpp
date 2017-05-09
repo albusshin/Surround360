@@ -63,53 +63,69 @@ std::unordered_map<std::string, void *> KernelR::execute (
   assert(dataList[1]->data.size() == 1);
   assert(dataList[2]->data.size() == 6);
 
-  cv::Mat& left_input = *(cv::Mat *) dataList[0]->data["p_mat"];
-  cv::Mat& right_input = *(cv::Mat *) dataList[1]->data["p_mat"];
-  int camImageWidthL = left_input.cols;
-  int camImageHeightL = left_input.rows;
-  int camImageWidthR = right_input.cols;
-  int camImageHeightR = right_input.rows;
+  vector<cv::Mat>& left_inputs = *(vector<cv::Mat> *) dataList[0]->data["p_mats"];
+  vector<cv::Mat>& right_inputs = *(vector<cv::Mat> *) dataList[1]->data["p_mats"];
+  vector<cv::Mat>& left_flows = *(cv::Mat *) dataList[2]->data["left_flows"];
+  vector<cv::Mat>& right_flows = *(cv::Mat *) dataList[2]->data["right_flows"];
 
-  assert(camImageWidthL == camImageWidthR);
-  assert(camImageHeightL == camImageHeightR);
+  assert(left_inputs.size() == right_inputs.size());
+  assert(left_inputs.size() == left_flows.size());
+  assert(left_inputs.size() == right_flows.size());
 
-  cv::Mat& left_flow = *(cv::Mat *) dataList[2]->data["left_flow"];
-  cv::Mat& right_flow = *(cv::Mat *) dataList[2]->data["right_flow"];
+  vector<cv::Mat>* chunkLs = new vector<cv::Mat>();
+  vector<cv::Mat>* chunkRs = new vector<cv::Mat>();
 
-  new_frame_info(camImageWidthL, camImageHeightL);
+  for (int frameNum = 0; frameNum < left_inputs.size(); ++frameNum) {
+    cv::Mat& left_input = left_inputs[frameNum];
+    cv::Mat& right_input = right_inputs[frameNum];
+    int camImageWidthL = left_input.cols;
+    int camImageHeightL = left_input.rows;
+    int camImageWidthR = right_input.cols;
+    int camImageHeightR = right_input.rows;
 
-  assert(overlap_image_width_ != -1);
+    assert(camImageWidthL == camImageWidthR);
+    assert(camImageHeightL == camImageHeightR);
+    cv::Mat& left_flow = left_flows[frameNum];
+    cv::Mat& right_flow = right_flows[frameNum];
 
-  size_t output_image_width = num_novel_views_;
-  size_t output_image_height = camImageHeight_;
-  size_t output_image_size =
-    output_image_width * output_image_height * 4;
+    new_frame_info(camImageWidthL, camImageHeightL);
 
-  cv::Mat left_overlap_input =
-    left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
-                        overlap_image_width_, left_input.rows));
-  cv::Mat right_overlap_input =
-    right_input(cv::Rect(0, 0,
-                         overlap_image_width_, right_input.rows));
+    assert(overlap_image_width_ != -1);
+
+    size_t output_image_width = num_novel_views_;
+    size_t output_image_height = camImageHeight_;
+    size_t output_image_size =
+      output_image_width * output_image_height * 4;
+
+    cv::Mat left_overlap_input =
+      left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
+                          overlap_image_width_, left_input.rows));
+    cv::Mat right_overlap_input =
+      right_input(cv::Rect(0, 0,
+                           overlap_image_width_, right_input.rows));
 
 
-  // Initialize NovelViewGenerator with images and flow since we are
-  // bypassing the prepare method
-  novel_view_gen_->setImageL(left_overlap_input);
-  novel_view_gen_->setImageR(right_overlap_input);
-  novel_view_gen_->setFlowLtoR(left_flow);
-  novel_view_gen_->setFlowRtoL(right_flow);
-  std::pair<Mat, Mat> lazyNovelChunksLR =
-    novel_view_gen_->combineLazyNovelViews(*lazy_view_buffer_.get());
+    // Initialize NovelViewGenerator with images and flow since we are
+    // bypassing the prepare method
+    novel_view_gen_->setImageL(left_overlap_input);
+    novel_view_gen_->setImageR(right_overlap_input);
+    novel_view_gen_->setFlowLtoR(left_flow);
+    novel_view_gen_->setFlowRtoL(right_flow);
+    std::pair<Mat, Mat> lazyNovelChunksLR =
+      novel_view_gen_->combineLazyNovelViews(*lazy_view_buffer_.get());
 
-  cv::Mat *chunkL = new cv::Mat();
-  cv::Mat *chunkR = new cv::Mat();
-  *chunkL = lazyNovelChunksLR.first;
-  *chunkR = lazyNovelChunksLR.second;
+    cv::Mat chunkL();
+    cv::Mat chunkR();
+    chunkL = lazyNovelChunksLR.first;
+    chunkR = lazyNovelChunksLR.second;
+
+    chunkLs->push_back(chunkL);
+    chunkRs->push_back(chunkR);
+  }
 
   std::unordered_map<std::string, void *> outputData;
-  outputData["chunkL"] = ((void *) chunkL);
-  outputData["chunkR"] = ((void *) chunkR);
+  outputData["chunkLs"] = ((void *) chunkLs);
+  outputData["chunkRs"] = ((void *) chunkRs);
 
   return outputData;
 }

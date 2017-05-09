@@ -64,60 +64,67 @@ std::unordered_map<std::string, void *> KernelC::execute (
 
   string chunkKey;
   if (left_) {
-    chunkKey = "chunkL";
+    chunkKey = "chunkLs";
   } else {
-    chunkKey = "chunkR";
+    chunkKey = "chunkRs";
   }
 
   i32 num_chunks = dataList.size();
   assert(num_chunks == 14);
 
-  cv::Mat& tmp_input_chunk = *(cv::Mat *) dataList[0]->data[chunkKey];
+  int batchSize = dataList[0]->data[chunkKey].size();
+  vector<cv::Mat> *panos = new vector<cv::Mat>();
 
-  int camImageWidth = tmp_input_chunk.cols;
-  int camImageHeight = tmp_input_chunk.rows;
+  for (in frameNum = 0; frameNum < batchSize; ++frameNum) {
 
-  new_frame_info(camImageWidth, camImageHeight);
+    cv::Mat& tmp_input_chunk = *(cv::Mat *) dataList[0]->data[chunkKey][frameNum];
 
-  size_t output_image_width = camImageWidth_ * num_chunks;
-  size_t output_image_height = camImageHeight_;
-  output_image_width += (output_image_width % 2);
-  output_image_height += (output_image_height % 2);
-  size_t output_image_size =
-    output_image_width * output_image_height * 3;
+    int camImageWidth = tmp_input_chunk.cols;
+    int camImageHeight = tmp_input_chunk.rows;
 
-  std::vector<cv::Mat> pano_chunks(num_chunks, Mat());
-  for (i32 c = 0; c < num_chunks; ++c) {
-    cv::Mat& input_chunk = *(cv::Mat *) dataList[c]->data[chunkKey];
-    assert(dataList[c]->data.size() == 2);
-    cv::cvtColor(input_chunk, pano_chunks[c], CV_BGRA2BGR);
+    new_frame_info(camImageWidth, camImageHeight);
+
+    size_t output_image_width = camImageWidth_ * num_chunks;
+    size_t output_image_height = camImageHeight_;
+    output_image_width += (output_image_width % 2);
+    output_image_height += (output_image_height % 2);
+    size_t output_image_size =
+      output_image_width * output_image_height * 3;
+
+    std::vector<cv::Mat> pano_chunks(num_chunks, Mat());
+    for (i32 c = 0; c < num_chunks; ++c) {
+      assert(dataList[c]->data.size() == 2);
+      cv::Mat& input_chunk = *(cv::Mat *) dataList[c]->data[chunkKey][frameNum];
+      cv::cvtColor(input_chunk, pano_chunks[c], CV_BGRA2BGR);
+    }
+    cv::Mat pano();
+
+    pano = stackHorizontal(pano_chunks);
+    pano = offsetHorizontalWrap(pano, zeroParallaxNovelViewShiftPixels_);
+
+    panos->push_back(pano);
+
+
+    if (left_) {
+      stringstream ss;
+      ss <<  "/home/ubuntu/o/panoL-elixir" << counter << ".jpg";
+      string name = ss.str();
+      ss.clear();
+      fprintf(stdout, "[c-kernel] name: %s\n", name);
+      cv::imwrite(name, pano);
+    } else {
+      stringstream ss;
+      ss <<  "/home/ubuntu/o/panoR-elixir" << counter << ".jpg";
+      string name = ss.str();
+      ss.clear();
+      fprintf(stdout, "[c-kernel] name: %s\n", name);
+      cv::imwrite(name, pano);
+    }
+    fprintf(stdout, "[c-kernel] finish save\n");
+    counter += 1;
   }
-  cv::Mat *pano = new cv::Mat();
-
-  *pano = stackHorizontal(pano_chunks);
-  *pano = offsetHorizontalWrap(*pano, zeroParallaxNovelViewShiftPixels_);
-
   std::unordered_map<std::string, void *> outputData;
-  outputData["pano"] = ((void *) pano);
-
-  if (left_) {
-    stringstream ss;
-    ss <<  "/home/ubuntu/o/panoL-elixir" << counter << ".jpg";
-    string name = ss.str();
-    ss.clear();
-    fprintf(stdout, "[c-kernel] name: %s\n", name);
-    cv::imwrite(name, *pano);
-  } else {
-    stringstream ss;
-    ss <<  "/home/ubuntu/o/panoR-elixir" << counter << ".jpg";
-    string name = ss.str();
-    ss.clear();
-    fprintf(stdout, "[c-kernel] name: %s\n", name);
-    cv::imwrite(name, *pano);
-  }
-
-  fprintf(stdout, "[c-kernel] finish save\n");
-  counter += 1;
+  outputData["panos"] = ((void *) panos);
 
   return outputData;
 }
