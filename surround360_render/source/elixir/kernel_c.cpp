@@ -8,6 +8,7 @@ typedef int i32;
 using namespace elixir;
 
 int counter = 0;
+std::mutex mtx;
 
 void KernelC::new_frame_info(
   int camImageWidth, int camImageHeight) {
@@ -118,7 +119,11 @@ std::unordered_map<std::string, void *> KernelC::execute (
 
   fprintf(stdout, "[c-kernel] finish save\n");
   fprintf(stdout, "[c-kernel] counter: %d\n", counter);
-  counter += 1;
+  if (!left_) {
+    mtx.lock();
+    counter += 1;
+    mtx.unlock();
+  }
   fprintf(stdout, "[c-kernel] counter: %d\n", counter);
 
   return outputData;
