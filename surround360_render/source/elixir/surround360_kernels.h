@@ -49,7 +49,7 @@ public:
   }
 
   KernelI *clone() override {
-    return new KernelI(cap, startFrameIndex_, batchSize_);
+    return new KernelI(cap_, startFrameIndex_, batchSize_);
   };
 
   void updateToNextLayer() override {
