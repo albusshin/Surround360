@@ -25,7 +25,6 @@ string get_video_filename(int camId) {
 
 Graph *loadGraph() {
   size_t frameNum = 6;
-  size_t batchSize = 3;
   size_t nodeNum = 58;
   size_t iNodeNum = 14;
   size_t pNodeNum = 14;
@@ -49,7 +48,7 @@ Graph *loadGraph() {
     // Create a node
     elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
 
-    node->kernel = new KernelI(get_video_filename(i + 1), 0, batchSize);
+    node->kernel = new KernelI(get_video_filename(i + 1), 0, graph->batchSize);
 
     // Add to node list
     graph->nodes[node->getNodeKeyByIds(node->nodeId, node->batchId)] = node;

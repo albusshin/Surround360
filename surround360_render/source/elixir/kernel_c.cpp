@@ -137,10 +137,10 @@ std::unordered_map<std::string, void *> KernelC::execute (
     fprintf(stdout, "[c-kernel] counter: %d\n", counter);
 
     t = time(0);
-    printf("[Kernel-C-end]: %ld: %d\n", t, elixir::Worker::getWorkerId());
   }
   std::unordered_map<std::string, void *> outputData;
   outputData["panos"] = ((void *) panos);
+  printf("[Kernel-C-end]: %ld: %d\n", t, elixir::Worker::getWorkerId());
 
   return outputData;
 }
