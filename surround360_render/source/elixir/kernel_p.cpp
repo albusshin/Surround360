@@ -28,7 +28,7 @@ std::unordered_map<std::string, void *> KernelP::execute (
   assert(dataList[0]->data.size() == 1);
 
   vector<cv::Mat>& frame_col_mats =
-    *(vector<cv::Mat>) dataList[0]->data["frame_col_mats"];
+    *(vector<cv::Mat> *) dataList[0]->data["frame_col_mats"];
 
   vector<cv::Mat> *p_mats = new vector<cv::Mat>();
   for (cv::Mat& frame_col_mat : frame_col_mats) {

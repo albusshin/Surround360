@@ -65,8 +65,8 @@ std::unordered_map<std::string, void *> KernelR::execute (
 
   vector<cv::Mat>& left_inputs = *(vector<cv::Mat> *) dataList[0]->data["p_mats"];
   vector<cv::Mat>& right_inputs = *(vector<cv::Mat> *) dataList[1]->data["p_mats"];
-  vector<cv::Mat>& left_flows = *(cv::Mat *) dataList[2]->data["left_flows"];
-  vector<cv::Mat>& right_flows = *(cv::Mat *) dataList[2]->data["right_flows"];
+  vector<cv::Mat>& left_flows = *(vector<cv::Mat> *) dataList[2]->data["left_flows"];
+  vector<cv::Mat>& right_flows = *(vector<cv::Mat> *) dataList[2]->data["right_flows"];
 
   assert(left_inputs.size() == right_inputs.size());
   assert(left_inputs.size() == left_flows.size());

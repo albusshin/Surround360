@@ -72,10 +72,10 @@ std::unordered_map<std::string, void *> KernelC::execute (
   i32 num_chunks = dataList.size();
   assert(num_chunks == 14);
 
-  int batchSize = dataList[0]->data[chunkKey].size();
+  int batchSize = dataList[0]->data[chunkKey]->size();
   vector<cv::Mat> *panos = new vector<cv::Mat>();
 
-  for (in frameNum = 0; frameNum < batchSize; ++frameNum) {
+  for (int frameNum = 0; frameNum < batchSize; ++frameNum) {
 
     cv::Mat& tmp_input_chunk = *(cv::Mat *) dataList[0]->data[chunkKey][frameNum];
 
