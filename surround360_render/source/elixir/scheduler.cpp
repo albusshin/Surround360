@@ -297,7 +297,7 @@ namespace elixir {
     markJobFinished(nodeKey);
 
     //Free up memory
-    // delete finishingNode;
+    delete finishingNode;
 
     dataMapCleanup();
 
@@ -328,7 +328,7 @@ namespace elixir {
       if (allChildrenFinished) {
         dataMap.erase(ite++);
         //Free up memory
-        // delete data;
+        delete data;
       } else {
         ++ite;
       }
