@@ -12,6 +12,7 @@
 
 #include "scheduler.h"
 #include "graph.h"
+#include "worker.h"
 #include "nullbuf.h"
 
 #define DEBUG
@@ -97,7 +98,7 @@ namespace elixir {
                                       int workerId) {
     Node *preRunningJob = runningJobs[workerId];
     int previousNodeKey = preRunningJob->getNodeKeyByIds(
-        preRunningJob->nodeId, preRunningJob->batchId);
+      preRunningJob->nodeId, preRunningJob->batchId);
 
     for (std::map<int, Node *>::iterator it = jobs.begin();
          it != jobs.end();) {
@@ -381,20 +382,23 @@ namespace elixir {
   }
 
   void Scheduler::lock() {
-    logger << "[Scheduler]\t"
-           << tid
+    logger << "[Scheduler T"
+           << Worker::getWorkerId()
+           << "]\t"
            << ": lock()"
            << endl;
     pthread_mutex_lock(&schedulerLock);
-    logger << "[Scheduler]\t"
-           << tid
+    logger << "[Scheduler T"
+           << Worker::getWorkerId()
+           << "]\t"
            << ": acquired lock."
            << endl;
   }
 
   void Scheduler::unlock() {
-    logger << "[Scheduler]\t"
-           << tid
+    logger << "[Scheduler T"
+           << Worker::getWorkerId()
+           << "]\t"
            << ": unlock()"
            << endl;
     pthread_mutex_unlock(&schedulerLock);

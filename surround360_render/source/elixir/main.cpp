@@ -209,6 +209,15 @@ Graph *loadGraph() {
 
 #define NUM_THREADS 32
 
+pthread_barrier_t barrier;
+
+Graph *theGraph;
+Scheduler *theScheduler;
+
+pthread_t threads[NUM_THREADS];
+
+int ids[NUM_THREADS];
+
 void *worker_thread(void *arg) {
   int tid = *(int *) arg;
   std::cout << "[T " << tid << "]\t"
@@ -223,14 +232,6 @@ void *worker_thread(void *arg) {
             << "Finished. "
             << std::endl;
 }
-
-Graph *theGraph;
-Scheduler *theScheduler;
-
-pthread_t threads[NUM_THREADS];
-pthread_barrier_t barrier;
-
-int ids[NUM_THREADS];
 
 int main() {
   // build graph
