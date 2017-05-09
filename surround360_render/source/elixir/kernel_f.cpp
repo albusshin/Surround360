@@ -3,8 +3,12 @@
 #include "nullbuf.h"
 #include "worker.h"
 
+#include <sstream>
+
 typedef int i32;
 using namespace elixir;
+
+static std::atomic<int> filenameCounter = 0;
 
 void KernelF::new_frame_info(int camImageWidth, int camImageHeight) {
   camImageHeight_ = camImageHeight;
@@ -132,6 +136,17 @@ std::unordered_map<std::string, void *> KernelF::execute (
 
     left_flow = novel_view_gen_->getFlowLtoR();
     right_flow = novel_view_gen_->getFlowRtoL();
+
+    std::stringstream ss;
+    ss <<  "/home/ubuntu/o/kernel-F-leftflow-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), left_flow);
+
+    ss.clear();
+    ss <<  "/home/ubuntu/o/kernel-F-rightflow-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), right_flow);
+
 
     left_flows->push_back(left_flow);
     right_flows->push_back(right_flow);

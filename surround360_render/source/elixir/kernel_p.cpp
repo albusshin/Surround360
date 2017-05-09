@@ -3,9 +3,12 @@
 #include "nullbuf.h"
 #include "worker.h"
 
+#include <sstream>
+
 typedef int i32;
 using namespace elixir;
 
+static std::atomic<int> filenameCounter = 0;
 /*
   Accept:
   [0]: frame_col_mat
@@ -66,6 +69,11 @@ std::unordered_map<std::string, void *> KernelP::execute (
       rightAngle_,
       topAngle_,
       bottomAngle_);
+
+    stringstream ss;
+    ss <<  "/home/ubuntu/o/kernel-P-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), output_mat);
 
     p_mats->push_back(output_mat);
   }
