@@ -49,7 +49,7 @@ Graph *loadGraph() {
     elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
 
 
-    cv::VideoCapture cap(get_video_filename(i + 1));
+    cv::VideoCapture *cap = new cv::VideoCapture(get_video_filename(i + 1));
     node->kernel = new KernelI(cap, 0, graph->batchSize);
 
     // Add to node list
