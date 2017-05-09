@@ -47,6 +47,9 @@ std::unordered_map<std::string, void *> KernelF::execute (
          << "execute()"
          << endl;
 
+  time_t t = time(0);
+  printf("[Kernel-F-start]: %ld\n", t);
+
   /* Magic numbers fest */
   assert(dataList.size() == 3);
   assert(dataList[0]->data.size() == 1);
@@ -125,6 +128,9 @@ std::unordered_map<std::string, void *> KernelF::execute (
   outputData["prev_frame_flow_r_to_l_"] = ((void *) new_prev_frame_flow_r_to_l_);
   outputData["prev_overlap_image_l_"] = ((void *) new_prev_overlap_image_l_);
   outputData["prev_overlap_image_r_"] = ((void *) new_prev_overlap_image_r_);
+
+  t = time(0);
+  printf("[Kernel-F-end]: %ld\n", t);
 
   return outputData;
 }

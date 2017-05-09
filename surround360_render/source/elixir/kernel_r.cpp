@@ -58,6 +58,9 @@ std::unordered_map<std::string, void *> KernelR::execute (
          << "execute()"
          << endl;
 
+  time_t t = time(0);
+  printf("[Kernel-R-start]: %ld\n", t);
+
   assert(dataList.size() == 3);
   assert(dataList[0]->data.size() == 1);
   assert(dataList[1]->data.size() == 1);
@@ -110,6 +113,9 @@ std::unordered_map<std::string, void *> KernelR::execute (
   std::unordered_map<std::string, void *> outputData;
   outputData["chunkL"] = ((void *) chunkL);
   outputData["chunkR"] = ((void *) chunkR);
+
+  t = time(0);
+  printf("[Kernel-P-end]: %ld\n", t);
 
   return outputData;
 }

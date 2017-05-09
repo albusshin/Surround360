@@ -63,6 +63,9 @@ std::unordered_map<std::string, void *> KernelC::execute (
          << "execute()"
          << endl;
 
+  time_t t = time(0);
+  printf("[Kernel-C-start]: %ld\n", t);
+
   string chunkKey;
   if (left_) {
     chunkKey = "chunkL";
@@ -125,6 +128,9 @@ std::unordered_map<std::string, void *> KernelC::execute (
     mtx.unlock();
   }
   fprintf(stdout, "[c-kernel] counter: %d\n", counter);
+
+  t = time(0);
+  printf("[Kernel-C-end]: %ld\n", t);
 
   return outputData;
 }

@@ -23,6 +23,9 @@ std::unordered_map<std::string, void *> KernelP::execute (
          << "execute()"
          << endl;
 
+  time_t t = time(0);
+  printf("[Kernel-P-start]: %ld\n", t);
+
   // dataList contains
   assert(dataList.size() == 1);
   assert(dataList[0]->data.size() == 1);
@@ -65,6 +68,9 @@ std::unordered_map<std::string, void *> KernelP::execute (
 
   outputData["p_mat"] = ((void *) output_mat);
   logger << "after bicubicRemapToSpherical" << std::endl;
+
+  t = time(0);
+  printf("[Kernel-P-end]: %ld\n", t);
 
   return outputData;
 }
