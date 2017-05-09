@@ -115,10 +115,10 @@ Graph *loadGraph() {
     vector<int> dummyNextLayer;
     dummyNextLayer.push_back(i);
     unordered_map<string, void *> dummyRawData;
-    dummyRawData["prev_overlap_image_l_"] = (void *) new cv::Mat();
-    dummyRawData["prev_overlap_image_r_"] = (void *) new cv::Mat();
-    dummyRawData["prev_frame_flow_l_to_r_"] = (void *) new cv::Mat();
-    dummyRawData["prev_frame_flow_r_to_l_"] = (void *) new cv::Mat();
+    dummyRawData["prev_overlap_image_l"] = (void *) new cv::Mat();
+    dummyRawData["prev_overlap_image_r"] = (void *) new cv::Mat();
+    dummyRawData["prev_frame_flow_l_to_r"] = (void *) new cv::Mat();
+    dummyRawData["prev_frame_flow_r_to_l"] = (void *) new cv::Mat();
     dummyRawData["left_flows"] = (void *) new vector<cv::Mat>(1, cv::Mat());
     dummyRawData["right_flows"] = (void *) new vector<cv::Mat>(1, cv::Mat());
     Data *dummyData = new Data(dummyRawData,
