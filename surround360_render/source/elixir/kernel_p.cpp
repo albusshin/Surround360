@@ -8,7 +8,7 @@
 typedef int i32;
 using namespace elixir;
 
-static std::atomic<int> filenameCounter = 0;
+static std::atomic_int filenameCounter(0);
 /*
   Accept:
   [0]: frame_col_mat

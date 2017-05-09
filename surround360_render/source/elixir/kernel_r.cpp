@@ -8,7 +8,7 @@
 typedef int i32;
 using namespace elixir;
 
-static std::atomic<int> filenameCounter = 0;
+static std::atomic_int filenameCounter(0);
 
 void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
   camImageHeight_ = camImageHeight;
