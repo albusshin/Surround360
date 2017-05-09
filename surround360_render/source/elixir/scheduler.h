@@ -67,6 +67,8 @@ namespace elixir {
 
     static SchedulerPolicy policy;
 
+    const int LAYERS_THRESHOLD = 3;
+
     void lock();
 
     void unlock();

@@ -365,16 +365,15 @@ namespace elixir {
   }
 
   bool Scheduler::isJobBatchTooDeep(int batchId) {
-    const int LAYERS_THRESHOLD = 1;
-
     if (runnableJobs.empty()) {
       return false;
     } else {
       int minBatchIdInRunnableQueue = INT_MAX;
       for (Node *node: runnableJobs) {
-        minBatchIdInRunnableQueue = min(node->batchId, minBatchIdInRunnableQueue);
+        minBatchIdInRunnableQueue = min(node->batchId,
+                                        minBatchIdInRunnableQueue);
       }
-      return minBatchIdInRunnableQueue + LAYERS_THRESHOLD < batchId;
+      return minBatchIdInRunnableQueue + Scheduler::LAYERS_THRESHOLD < batchId;
     }
   }
 
