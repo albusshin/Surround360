@@ -96,9 +96,11 @@ namespace elixir {
 
   void Scheduler::getJobsWithLocality(std::map<int, Node *> &jobs,
                                       int workerId) {
+    assert(runningJobs.find(workerId) != runningJobs.end());
     Node *preRunningJob = runningJobs[workerId];
+
     int previousNodeKey = preRunningJob->getNodeKeyByIds(
-      preRunningJob->nodeId, preRunningJob->batchId);
+        preRunningJob->nodeId, preRunningJob->batchId);
 
     for (std::map<int, Node *>::iterator it = jobs.begin();
          it != jobs.end();) {
@@ -179,7 +181,10 @@ namespace elixir {
           std::map<int, Node *>::iterator it = jobs.begin();
           jobIdx = it->first;
         } else {
-          getJobsWithLocality(jobs, workerId);
+
+          if (runningJobs.find(workerId) != runningJobs.end()) {
+            getJobsWithLocality(jobs, workerId);
+          }
 
           if (jobs.size() == 1) {
             std::map<int, Node *>::iterator it = jobs.begin();
