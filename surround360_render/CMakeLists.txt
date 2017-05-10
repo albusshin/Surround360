@@ -546,39 +546,39 @@ ENDIF()
 
 # Elixir
 IF (USE_ELIXIR)
-  SET(SCANNER_PATH "~/m/scanner/")
-  include(${SCANNER_PATH}/cmake/Util/Op.cmake)
-  build_op(
-    LIB_NAME elixirmain
-    CPP_SRCS
-    source/elixir/data.h
-    source/elixir/graph.h
-    source/elixir/kernel.h
-    source/elixir/graph.cpp
-    source/elixir/surround360_kernels.h
-    source/elixir/kernel_c.cpp
-    source/elixir/kernel_f.cpp
-    source/elixir/kernel_i.cpp
-    source/elixir/kernel_p.cpp
-    source/elixir/kernel_r.cpp
-    source/elixir/scheduler.h
-    source/elixir/scheduler.cpp
-    source/elixir/worker.h
-    source/elixir/worker.cpp
-    source/elixir/nullbuf.h
-    source/elixir/nullbuf.cpp
-    source/elixir/main.cpp)
-  target_link_libraries(elixirmain PRIVATE
-    LibVrCamera
-    LibJSON
-    gflags
-    glog
-    boost_filesystem
-    boost_system
-    double-conversion
-    folly
-    ${OpenCV_LIBS}
-    ${PLATFORM_SPECIFIC_LIBS})
+#  SET(SCANNER_PATH "~/m/scanner/")
+#  include(${SCANNER_PATH}/cmake/Util/Op.cmake)
+#  build_op(
+#    LIB_NAME elixirmain
+#    CPP_SRCS
+#    source/elixir/data.h
+#    source/elixir/graph.h
+#    source/elixir/kernel.h
+#    source/elixir/graph.cpp
+#    source/elixir/surround360_kernels.h
+#    source/elixir/kernel_c.cpp
+#    source/elixir/kernel_f.cpp
+#    source/elixir/kernel_i.cpp
+#    source/elixir/kernel_p.cpp
+#    source/elixir/kernel_r.cpp
+#    source/elixir/scheduler.h
+#    source/elixir/scheduler.cpp
+#    source/elixir/worker.h
+#    source/elixir/worker.cpp
+#    source/elixir/nullbuf.h
+#    source/elixir/nullbuf.cpp
+#    source/elixir/main.cpp)
+#  target_link_libraries(elixirmain PRIVATE
+#    LibVrCamera
+#    LibJSON
+#    gflags
+#    glog
+#    boost_filesystem
+#    boost_system
+#    double-conversion
+#    folly
+#    ${OpenCV_LIBS}
+#    ${PLATFORM_SPECIFIC_LIBS})
   ADD_EXECUTABLE(
     ElixirMain
     source/elixir/data.h
@@ -601,7 +601,7 @@ IF (USE_ELIXIR)
   TARGET_COMPILE_FEATURES(ElixirMain PRIVATE cxx_range_for)
   TARGET_LINK_LIBRARIES(
     ElixirMain
-    elixirmain
+#    elixirmain
     LibVrCamera
     LibJSON
     gflags

@@ -3,8 +3,12 @@
 #include "nullbuf.h"
 #include "worker.h"
 
+#include <sstream>
+
 typedef int i32;
 using namespace elixir;
+
+static std::atomic_int filenameCounter(0);
 
 std::unordered_map<std::string, void *> KernelI::execute (
   std::vector<elixir::Data *>& dataList) {
@@ -36,6 +40,11 @@ std::unordered_map<std::string, void *> KernelI::execute (
     cv::Mat frame_col_mat;
     cap >> frame_col_mat;
     outputMats->push_back(frame_col_mat);
+
+    std::stringstream ss;
+    ss <<  "/home/ubuntu/o/kernel-I-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), frame_col_mat);
   }
 
   std::unordered_map<std::string, void *> outputData;

@@ -3,8 +3,12 @@
 #include "nullbuf.h"
 #include "worker.h"
 
+#include <sstream>
+
 typedef int i32;
 using namespace elixir;
+
+static std::atomic_int filenameCounter(0);
 
 void KernelF::new_frame_info(int camImageWidth, int camImageHeight) {
   camImageHeight_ = camImageHeight;
@@ -92,28 +96,12 @@ std::unordered_map<std::string, void *> KernelF::execute (
     size_t output_image_width = overlap_image_width_;
     size_t output_image_height = camImageHeight_;
 
-    std::cout << "T: left_input = "
-              << left_input.cols
-              << " * "
-              << left_input.rows
-              << " * "
-              << left_input.channels()
-              << std::endl;
-
     cv::Mat left_overlap_input =
       left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
                           overlap_image_width_, left_input.rows));
     cv::Mat right_overlap_input =
       right_input(cv::Rect(0, 0,
                            overlap_image_width_, right_input.rows));
-
-    std::cout << "T: left_overlap_input = "
-              << left_overlap_input.cols
-              << " * "
-              << left_overlap_input.rows
-              << " * "
-              << left_overlap_input.channels()
-              << std::endl;
 
     novel_view_gen_->prepare(left_overlap_input,
                              right_overlap_input,
@@ -132,6 +120,45 @@ std::unordered_map<std::string, void *> KernelF::execute (
 
     left_flow = novel_view_gen_->getFlowLtoR();
     right_flow = novel_view_gen_->getFlowRtoL();
+
+    vector<cv::Mat> left_flow_channels(2);
+    cv::split(left_flow, left_flow_channels);
+
+    vector<cv::Mat> right_flow_channels(2);
+    cv::split(right_flow, right_flow_channels);
+
+    logger << "[KernelF T"
+           << elixir::Worker::getWorkerId()
+           << "]\t"
+           << "left_flow: "
+           << left_flow.cols
+           << " * "
+           << left_flow.rows
+           << " * "
+           << left_flow.channels()
+           << endl;
+
+    std::stringstream ss;
+
+    ss << "/home/ubuntu/o/kernel-F-leftflow-1-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), left_flow_channels[1]);
+
+    ss.clear();
+
+    ss << "/home/ubuntu/o/kernel-F-leftflow-0-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), left_flow_channels[0]);
+
+    ss.clear();
+    ss << "/home/ubuntu/o/kernel-F-rightflow-0-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), right_flow_channels[0]);
+
+    ss.clear();
+    ss << "/home/ubuntu/o/kernel-F-rightflow-1-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), right_flow_channels[1]);
 
     left_flows->push_back(left_flow);
     right_flows->push_back(right_flow);

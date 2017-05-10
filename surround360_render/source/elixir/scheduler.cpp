@@ -17,8 +17,8 @@
 
 #define DEBUG
 
-//#define logger cout
-#define logger null_stream
+#define logger cout
+//#define logger null_stream
 
 
 namespace elixir {
@@ -386,6 +386,10 @@ namespace elixir {
       int minBatchIdInRunnableQueue = INT_MAX;
       for (Node *node: runnableJobs) {
         minBatchIdInRunnableQueue = min(node->batchId,
+                                        minBatchIdInRunnableQueue);
+      }
+      for (auto pair: runningJobs) {
+        minBatchIdInRunnableQueue = min(pair.second->batchId,
                                         minBatchIdInRunnableQueue);
       }
       return minBatchIdInRunnableQueue + Scheduler::LAYERS_THRESHOLD < batchId;

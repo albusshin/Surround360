@@ -3,8 +3,12 @@
 #include "nullbuf.h"
 #include "worker.h"
 
+#include <sstream>
+
 typedef int i32;
 using namespace elixir;
+
+static std::atomic_int filenameCounter(0);
 
 void KernelR::new_frame_info(int camImageWidth, int camImageHeight) {
   camImageHeight_ = camImageHeight;
@@ -121,6 +125,16 @@ std::unordered_map<std::string, void *> KernelR::execute (
     cv::Mat chunkR;
     chunkL = lazyNovelChunksLR.first;
     chunkR = lazyNovelChunksLR.second;
+
+    std::stringstream ss;
+    ss <<  "/home/ubuntu/o/kernel-R-chunkL-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), chunkL);
+
+    ss.clear();
+    ss <<  "/home/ubuntu/o/kernel-R-chunkR-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), chunkR);
 
     chunkLs->push_back(chunkL);
     chunkRs->push_back(chunkR);
