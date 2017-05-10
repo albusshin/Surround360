@@ -121,6 +121,12 @@ std::unordered_map<std::string, void *> KernelF::execute (
     left_flow = novel_view_gen_->getFlowLtoR();
     right_flow = novel_view_gen_->getFlowRtoL();
 
+    vector<cv::Mat> left_flow_channels(2);
+    cv::split(left_flow, left_flow_channels);
+
+    vector<cv::Mat> right_flow_channels(2);
+    cv::split(right_flow, right_flow_channels);
+
     logger << "[KernelF T"
            << elixir::Worker::getWorkerId()
            << "]\t"
@@ -133,14 +139,24 @@ std::unordered_map<std::string, void *> KernelF::execute (
            << endl;
 
     std::stringstream ss;
-    ss <<  "/home/ubuntu/o/kernel-F-leftflow-" << (filenameCounter++) << ".jpg";
+    ss <<  "/home/ubuntu/o/kernel-F-leftflow-0-" << (filenameCounter++) << ".jpg";
 
-    cv::imwrite(ss.str(), left_flow);
+    cv::imwrite(ss.str(), left_flow_channels[0]);
 
     ss.clear();
-    ss <<  "/home/ubuntu/o/kernel-F-rightflow-" << (filenameCounter++) << ".jpg";
+    ss <<  "/home/ubuntu/o/kernel-F-leftflow-1-" << (filenameCounter++) << ".jpg";
 
-    cv::imwrite(ss.str(), right_flow);
+    cv::imwrite(ss.str(), left_flow_channels[1]);
+
+    ss.clear();
+    ss <<  "/home/ubuntu/o/kernel-F-rightflow-0-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), right_flow_channels[0]);
+
+    ss.clear();
+    ss <<  "/home/ubuntu/o/kernel-F-rightflow-1-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), right_flow_channels[1]);
 
     left_flows->push_back(left_flow);
     right_flows->push_back(right_flow);
