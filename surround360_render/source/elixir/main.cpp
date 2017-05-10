@@ -211,7 +211,7 @@ Graph *loadGraph() {
   return graph;
 }
 
-#define NUM_THREADS 1
+#define NUM_THREADS 32
 
 pthread_barrier_t barrier;
 
