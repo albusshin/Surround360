@@ -139,22 +139,24 @@ std::unordered_map<std::string, void *> KernelF::execute (
            << endl;
 
     std::stringstream ss;
-    ss <<  "/home/ubuntu/o/kernel-F-leftflow-0-" << (filenameCounter++) << ".jpg";
 
-    cv::imwrite(ss.str(), left_flow_channels[0]);
-
-    ss.clear();
-    ss <<  "/home/ubuntu/o/kernel-F-leftflow-1-" << (filenameCounter++) << ".jpg";
+    ss << "/home/ubuntu/o/kernel-F-leftflow-1-" << (filenameCounter++) << ".jpg";
 
     cv::imwrite(ss.str(), left_flow_channels[1]);
 
     ss.clear();
-    ss <<  "/home/ubuntu/o/kernel-F-rightflow-0-" << (filenameCounter++) << ".jpg";
+
+    ss << "/home/ubuntu/o/kernel-F-leftflow-0-" << (filenameCounter++) << ".jpg";
+
+    cv::imwrite(ss.str(), left_flow_channels[0]);
+
+    ss.clear();
+    ss << "/home/ubuntu/o/kernel-F-rightflow-0-" << (filenameCounter++) << ".jpg";
 
     cv::imwrite(ss.str(), right_flow_channels[0]);
 
     ss.clear();
-    ss <<  "/home/ubuntu/o/kernel-F-rightflow-1-" << (filenameCounter++) << ".jpg";
+    ss << "/home/ubuntu/o/kernel-F-rightflow-1-" << (filenameCounter++) << ".jpg";
 
     cv::imwrite(ss.str(), right_flow_channels[1]);
 
