@@ -96,28 +96,12 @@ std::unordered_map<std::string, void *> KernelF::execute (
     size_t output_image_width = overlap_image_width_;
     size_t output_image_height = camImageHeight_;
 
-    std::cout << "T: left_input = "
-              << left_input.cols
-              << " * "
-              << left_input.rows
-              << " * "
-              << left_input.channels()
-              << std::endl;
-
     cv::Mat left_overlap_input =
       left_input(cv::Rect(left_input.cols - overlap_image_width_, 0,
                           overlap_image_width_, left_input.rows));
     cv::Mat right_overlap_input =
       right_input(cv::Rect(0, 0,
                            overlap_image_width_, right_input.rows));
-
-    std::cout << "T: left_overlap_input = "
-              << left_overlap_input.cols
-              << " * "
-              << left_overlap_input.rows
-              << " * "
-              << left_overlap_input.channels()
-              << std::endl;
 
     novel_view_gen_->prepare(left_overlap_input,
                              right_overlap_input,
@@ -146,6 +130,17 @@ std::unordered_map<std::string, void *> KernelF::execute (
     ss <<  "/home/ubuntu/o/kernel-F-rightflow-" << (filenameCounter++) << ".jpg";
 
     cv::imwrite(ss.str(), right_flow);
+
+    logger << "[KernelF T"
+           << elixir::Worker::getWorkerId()
+           << "]\t"
+           << "left_flow: "
+           << left_flow.cols
+           << " * "
+           << left_flow.rows
+           << " * "
+           << left_flow.channels()
+           << endl;
 
 
     left_flows->push_back(left_flow);
