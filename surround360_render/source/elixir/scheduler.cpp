@@ -17,8 +17,8 @@
 
 #define DEBUG
 
-#define logger cout
-//#define logger null_stream
+//#define logger cout
+#define logger null_stream
 
 
 namespace elixir {

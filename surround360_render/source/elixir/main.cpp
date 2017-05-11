@@ -5,6 +5,9 @@
 
 #include <pthread.h>
 #include <string>
+#include "nullbuf.h"
+//#define logger cout
+#define logger null_stream
 
 using namespace elixir;
 using namespace std;
@@ -224,17 +227,17 @@ int ids[NUM_THREADS];
 
 void *worker_thread(void *arg) {
   int tid = *(int *) arg;
-  std::cout << "[T " << tid << "]\t"
-            << " Up and running."
-            << std::endl;
+  logger << "[T " << tid << "]\t"
+         << " Up and running."
+         << std::endl;
 
   elixir::Worker *worker = new Worker(tid);
   pthread_barrier_wait(&barrier);
   worker->workerThread();
 
-  std::cout << "[T " << tid << "]\t"
-            << "Finished. "
-            << std::endl;
+  logger << "[T " << tid << "]\t"
+         << "Finished. "
+         << std::endl;
 }
 
 int main() {
@@ -263,9 +266,9 @@ int main() {
 
   exit(0);
 
-  std::cout << "[Main]\t"
-            << "Joined all threads. Exiting."
-            << std::endl;
+  logger << "[Main]\t"
+         << "Joined all threads. Exiting."
+         << std::endl;
 
   return 0;
 }
