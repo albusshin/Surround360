@@ -162,8 +162,8 @@ Graph *loadGraph() {
     parent.push_back(i - 14);
 
     // Children sequence: left c => right c
-    children.push_back(i + end);
-    children.push_back(i + end + 1);
+    children.push_back(end);
+    children.push_back(end + 1);
 
     // Create a node
     elixir::Node *node = new elixir::Node(i, 0, depth, graph, parent, children);
