@@ -25,7 +25,7 @@ string get_video_filename(int camId) {
 
 Graph *loadGraph() {
   size_t startFrame = 0;
-  size_t endFrame = 1; // [start, end)
+  size_t endFrame = 2; // [start, end)
   size_t frameNum = endFrame - startFrame;
   size_t nodeNum = 58;
   size_t iNodeNum = 14;
