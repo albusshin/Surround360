@@ -74,6 +74,7 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
     for (i32 i = 0; i < input_count; ++i) {
       cv::Mat left_input = frame_to_mat(left_frame_col[i].as_const_frame());
 
+      /*
       std::cout << "T: left_input = "
                 << left_input.cols
                 << " * "
@@ -81,6 +82,7 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
                 << " * "
                 << left_input.channels()
                 << std::endl;
+      */
 
       cv::Mat right_input = frame_to_mat(right_frame_col[i].as_const_frame());
 
@@ -91,6 +93,7 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
           right_input(cv::Rect(0, 0,
                                overlap_image_width_, right_input.rows));
 
+      /*
       std::cout << "T: left_overlap_input = "
                 << left_overlap_input.cols
                 << " * "
@@ -98,6 +101,7 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
                 << " * "
                 << left_overlap_input.channels()
                 << std::endl;
+      */
 
       novel_view_gen_->prepare(left_overlap_input, right_overlap_input,
                                prev_frame_flow_l_to_r_, prev_frame_flow_r_to_l_,
@@ -113,6 +117,7 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
       const auto& left_flow = novel_view_gen_->getFlowLtoR();
       const auto& right_flow = novel_view_gen_->getFlowRtoL();
 
+      /*
       cv::Mat towrite_left;
       cv::cvtColor(left_flow, towrite_left, CV_BGRA2BGR);
 
@@ -127,6 +132,7 @@ class TemporalOpticalFlowKernelCPU : public VideoKernel {
       ss << "/home/ubuntu/o/right_flow_" << imwrite_count << ".jpg";
       imwrite_count += 1;
       cv::imwrite(ss.str(), towrite_right);
+      */
 
 
       for (i32 r = 0; r < left_flow.rows; ++r) {

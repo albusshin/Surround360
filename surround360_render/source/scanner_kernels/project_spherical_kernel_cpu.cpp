@@ -68,6 +68,7 @@ class ProjectSphericalKernelCPU : public VideoKernel {
     for (i32 i = 0; i < input_count; ++i) {
       cv::Mat input = frame_to_mat(frame_col[i].as_const_frame());
 
+      /*
       std::cout << "P: input = "
                 << input.cols
                 << " * "
@@ -75,6 +76,7 @@ class ProjectSphericalKernelCPU : public VideoKernel {
                 << " * "
                 << input.channels()
                 << std::endl;
+      */
 
       cv::Mat tmp;
       cv::cvtColor(input, tmp, CV_BGR2BGRA);
@@ -85,12 +87,14 @@ class ProjectSphericalKernelCPU : public VideoKernel {
           projection_image, tmp, rig_->rigSideOnly[camIdx_], leftAngle_,
           rightAngle_, topAngle_, bottomAngle_);
 
+      /*
       cv::Mat towrite;
       cv::cvtColor(projection_image, towrite, CV_BGRA2BGR);
 
       std::stringstream ss;
       ss << "/home/ubuntu/o/projects_" << camIdx_ << ".jpg";
       cv::imwrite(ss.str(), towrite);
+      */
 
       insert_frame(output_columns[0], output_frames[i]);
     }

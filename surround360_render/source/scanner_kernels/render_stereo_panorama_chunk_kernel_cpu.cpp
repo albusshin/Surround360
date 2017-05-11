@@ -119,6 +119,7 @@ class RenderStereoPanoramaChunkKernelCPU : public VideoKernel {
       const cv::Mat& chunkL = lazyNovelChunksLR.first;
       const cv::Mat& chunkR = lazyNovelChunksLR.second;
 
+      /*
       cv::Mat towrite_left;
       cv::cvtColor(chunkL, towrite_left, CV_BGRA2BGR);
 
@@ -133,6 +134,7 @@ class RenderStereoPanoramaChunkKernelCPU : public VideoKernel {
       ss << "/home/ubuntu/o/chunkR_" << imwrite_count << ".jpg";
       imwrite_count += 1;
       cv::imwrite(ss.str(), towrite_right);
+      /*
 
 
       u8* left_output = frames[2 * i]->data;
